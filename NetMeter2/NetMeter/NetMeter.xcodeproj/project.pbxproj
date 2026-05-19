@@ -1,0 +1,414 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		63D18C462FBCE6E700908D99 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6343F1992FBCE5C200B27930 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6343F1AE2FBCE61E00B27930;
+			remoteInfo = NetBarHelper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		6343F1A12FBCE5C200B27930 /* NetBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6343F1AF2FBCE61E00B27930 /* NetBarHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetBarHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6343F1A32FBCE5C200B27930 /* NetBar */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = NetBar; sourceTree = "<group>"; };
+		6343F1B02FBCE61E00B27930 /* NetBarHelper */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = NetBarHelper; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6343F19E2FBCE5C200B27930 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6343F1B12FBCE61E00B27930 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6343F1982FBCE5C200B27930 = {
+			isa = PBXGroup;
+			children = (
+				6343F1A32FBCE5C200B27930 /* NetBar */,
+				6343F1B02FBCE61E00B27930 /* NetBarHelper */,
+				6343F1A22FBCE5C200B27930 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6343F1A22FBCE5C200B27930 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6343F1A12FBCE5C200B27930 /* NetBar.app */,
+				6343F1AF2FBCE61E00B27930 /* NetBarHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6343F1A02FBCE5C200B27930 /* NetBar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6343F1AC2FBCE5C400B27930 /* Build configuration list for PBXNativeTarget "NetBar" */;
+			buildPhases = (
+				6343F19D2FBCE5C200B27930 /* Sources */,
+				6343F19E2FBCE5C200B27930 /* Frameworks */,
+				6343F19F2FBCE5C200B27930 /* Resources */,
+				6343F1B22FBCE61E00B27930 /* Copy Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6343F1B32FBCE61E00B27930 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				6343F1A32FBCE5C200B27930 /* NetBar */,
+			);
+			name = NetBar;
+			packageProductDependencies = (
+			);
+			productName = NetBar;
+			productReference = 6343F1A12FBCE5C200B27930 /* NetBar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		6343F1AE2FBCE61E00B27930 /* NetBarHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6343F1B42FBCE61E00B27930 /* Build configuration list for PBXNativeTarget "NetBarHelper" */;
+			buildPhases = (
+				6343F1B52FBCE61E00B27930 /* Sources */,
+				6343F1B12FBCE61E00B27930 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6343F1B02FBCE61E00B27930 /* NetBarHelper */,
+			);
+			name = NetBarHelper;
+			packageProductDependencies = (
+			);
+			productName = NetBarHelper;
+			productReference = 6343F1AF2FBCE61E00B27930 /* NetBarHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6343F1992FBCE5C200B27930 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					6343F1A02FBCE5C200B27930 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+					6343F1AE2FBCE61E00B27930 = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = 6343F19C2FBCE5C200B27930 /* Build configuration list for PBXProject "NetMeter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6343F1982FBCE5C200B27930;
+			minimizedProjectReferenceProxies = 1;
+			productRefGroup = 6343F1A22FBCE5C200B27930 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6343F1A02FBCE5C200B27930 /* NetBar */,
+				6343F1AE2FBCE61E00B27930 /* NetBarHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		6343F19F2FBCE5C200B27930 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6343F1B22FBCE61E00B27930 /* Copy Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/NetBarHelper",
+			);
+			name = "Copy Helper";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/Library/LaunchServices/com.yuhui.netbar.helper",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices\"\ncp -f \"${BUILT_PRODUCTS_DIR}/NetBarHelper\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices/com.yuhui.netbar.helper\"\ncp -f \"${SRCROOT}/NetBar/Resources/com.yuhui.netbar.helper.plist\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices/com.yuhui.netbar.helper.plist\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6343F19D2FBCE5C200B27930 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6343F1B52FBCE61E00B27930 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6343F1B32FBCE61E00B27930 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6343F1AE2FBCE61E00B27930 /* NetBarHelper */;
+			targetProxy = 63D18C462FBCE6E700908D99 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		6343F1AA2FBCE5C400B27930 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6343F1AB2FBCE5C400B27930 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6343F1AD2FBCE5C400B27930 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NetBar/NetBar.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NetBar;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2025. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yuhui.NetBar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6343F1AE2FBCE5C400B27930 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = NetBar/NetBar.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEPLOYMENT_LOCATION = NO;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = NetBar;
+				INFOPLIST_KEY_CFBundlePackageType = APPL;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2025. All rights reserved.";
+				INSTALL_PATH = /Applications;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yuhui.NetBar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6343F1B62FBCE61E00B27930 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetBarHelper/NetBarHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleIdentifier = com.yuhui.netbar.helper;
+				INFOPLIST_KEY_CFBundleName = NetBarHelper;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yuhui.netbar.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		6343F1B72FBCE61E00B27930 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = NetBarHelper/NetBarHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleIdentifier = com.yuhui.netbar.helper;
+				INFOPLIST_KEY_CFBundleName = NetBarHelper;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yuhui.netbar.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6343F19C2FBCE5C200B27930 /* Build configuration list for PBXProject "NetMeter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6343F1AA2FBCE5C400B27930 /* Debug */,
+				6343F1AB2FBCE5C400B27930 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6343F1AC2FBCE5C400B27930 /* Build configuration list for PBXNativeTarget "NetBar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6343F1AD2FBCE5C400B27930 /* Debug */,
+				6343F1AE2FBCE5C400B27930 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6343F1B42FBCE61E00B27930 /* Build configuration list for PBXNativeTarget "NetBarHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6343F1B62FBCE61E00B27930 /* Debug */,
+				6343F1B72FBCE61E00B27930 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6343F1992FBCE5C200B27930 /* Project object */;
+}
