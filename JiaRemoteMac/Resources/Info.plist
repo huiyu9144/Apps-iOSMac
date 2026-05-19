@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh_CN</string>
+    <key>CFBundleDisplayName</key>
+    <string>JiaRemote</string>
+    <key>CFBundleExecutable</key>
+    <string>JiaRemoteMac</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.jia.jiaremote.mac</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>JiaRemoteMac</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.3</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSMainNibFile</key>
+    <string></string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSSupportsAutomaticGraphicsSwitching</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>局域网无损原生远程控制系统 · 仅内网使用</string>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>JiaRemote 需要使用屏幕录制权限，通过 ScreenCaptureKit 原生捕获屏幕画面，以在局域网内实现无损远程桌面画面传输。捕获内容仅在内网传输，不上传任何数据到外网。</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>JiaRemote 需要使用辅助功能权限，通过 CGEvent 原生键鼠事件注入和 AX Accessibility API 实现远程操控。所有操控指令仅来自局域网内已连接的 Windows 主控端。</string>
+</dict>
+</plist>

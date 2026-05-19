@@ -1,5 +1,4 @@
 import Foundation
-import Darwin
 
 struct ProcessTrafficInfo: Identifiable {
     let id: String
@@ -33,26 +32,41 @@ class ProcessTrafficService {
 
     private func update() async {
         isRefreshing = true
-        let snapshot = await Self.scanAllProcesses()
-        guard !snapshot.isEmpty else { isRefreshing = false; return }
+
+        var rawEntries: [(pid_t, String, UInt64, UInt64)]?
+
+        let helperResult = await HelperManager.shared.requestRefresh()
+        if let entries = helperResult, !entries.isEmpty {
+            rawEntries = entries.map { ($0.pid, $0.name, $0.bytesIn, $0.bytesOut) }
+        } else {
+            rawEntries = await Task.detached(priority: .utility) {
+                runNettopSnapshot()
+            }.value
+        }
+
+        guard let snapshot = rawEntries, !snapshot.isEmpty else {
+            isRefreshing = false
+            return
+        }
+
         let now = Date()
 
         var result: [ProcessTrafficInfo] = []
 
         for entry in snapshot {
-            let prev = previousBytes[entry.pid]
+            let prev = previousBytes[entry.0]
 
             let deltaIn: UInt64
             let deltaOut: UInt64
             if let prev = prev {
-                deltaIn = entry.bytesIn >= prev.inBytes ? entry.bytesIn - prev.inBytes : 0
-                deltaOut = entry.bytesOut >= prev.outBytes ? entry.bytesOut - prev.outBytes : 0
+                deltaIn = entry.2 >= prev.inBytes ? entry.2 - prev.inBytes : 0
+                deltaOut = entry.3 >= prev.outBytes ? entry.3 - prev.outBytes : 0
             } else {
                 deltaIn = 0
                 deltaOut = 0
             }
 
-            previousBytes[entry.pid] = (entry.bytesIn, entry.bytesOut)
+            previousBytes[entry.0] = (entry.2, entry.3)
 
             let elapsed = lastUpdateTime.map { now.timeIntervalSince($0) } ?? 3.0
             let dSpeed = elapsed > 0 ? Double(deltaIn) / elapsed : 0
@@ -60,13 +74,13 @@ class ProcessTrafficService {
 
             if dSpeed > 0 || uSpeed > 0 {
                 result.append(ProcessTrafficInfo(
-                    id: "\(entry.pid)_\(entry.name)",
-                    name: entry.name,
-                    pid: Int(entry.pid),
+                    id: "\(entry.0)_\(entry.1)",
+                    name: entry.1,
+                    pid: Int(entry.0),
                     downloadSpeed: dSpeed,
                     uploadSpeed: uSpeed,
-                    totalBytesIn: entry.bytesIn,
-                    totalBytesOut: entry.bytesOut
+                    totalBytesIn: entry.2,
+                    totalBytesOut: entry.3
                 ))
             }
         }
@@ -76,15 +90,9 @@ class ProcessTrafficService {
         processes = result
         isRefreshing = false
     }
-
-    private static func scanAllProcesses() async -> [(pid: pid_t, name: String, bytesIn: UInt64, bytesOut: UInt64)] {
-        await Task.detached(priority: .utility) {
-            runNettopSnapshot()
-        }.value
-    }
 }
 
-private func runNettopSnapshot() -> [(pid: pid_t, name: String, bytesIn: UInt64, bytesOut: UInt64)] {
+private func runNettopSnapshot() -> [(pid_t, String, UInt64, UInt64)] {
     let task = Process()
     task.executableURL = URL(fileURLWithPath: "/usr/bin/script")
     task.arguments = ["-q", "/dev/null", "/usr/bin/nettop", "-P", "-x", "-n", "-s", "1", "-l", "1", "-L", "1"]

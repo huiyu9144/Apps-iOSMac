@@ -11,7 +11,6 @@
 		PS000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000021 /* AppDelegate.swift */; };
 		PS000003 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000022 /* MenuBarPopoverView.swift */; };
 		PS000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000023 /* SettingsView.swift */; };
-		PS000005 /* FileSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000024 /* FileSelectorView.swift */; };
 		PS000006 /* CompressionResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000025 /* CompressionResultView.swift */; };
 		PS000007 /* CompressionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000026 /* CompressionViewModel.swift */; };
 		PS000008 /* ImageCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS000027 /* ImageCompressor.swift */; };
@@ -24,13 +23,14 @@
 		PS000021 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		PS000022 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
 		PS000023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		PS000024 /* FileSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSelectorView.swift; sourceTree = "<group>"; };
 		PS000025 /* CompressionResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionResultView.swift; sourceTree = "<group>"; };
 		PS000026 /* CompressionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompressionViewModel.swift; sourceTree = "<group>"; };
 		PS000027 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
 		PS000028 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
 		PS000029 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		PS000030 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		PS000031 /* PicShrink.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PicShrink.entitlements; sourceTree = "<group>"; };
+		PS000032 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		PS000035 /* PicShrink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicShrink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -46,6 +46,8 @@
 				PS000046 /* Utils */,
 				PS000029 /* Assets.xcassets */,
 				PS000030 /* Info.plist */,
+				PS000031 /* PicShrink.entitlements */,
+				PS000032 /* PrivacyInfo.xcprivacy */,
 			);
 			path = PicShrink;
 			sourceTree = "<group>";
@@ -71,7 +73,6 @@
 			isa = PBXGroup;
 			children = (
 				PS000023 /* SettingsView.swift */,
-				PS000024 /* FileSelectorView.swift */,
 				PS000025 /* CompressionResultView.swift */,
 			);
 			path = Views;
@@ -154,7 +155,7 @@
 				"en-US",
 				Base,
 				"zh-Hans",
-				ja,
+				"ja",
 			);
 			mainGroup = PS000049;
 			productRefGroup = PS000048 /* Products */;
@@ -186,7 +187,6 @@
 				PS000002 /* AppDelegate.swift in Sources */,
 				PS000003 /* MenuBarPopoverView.swift in Sources */,
 				PS000004 /* SettingsView.swift in Sources */,
-				PS000005 /* FileSelectorView.swift in Sources */,
 				PS000006 /* CompressionResultView.swift in Sources */,
 				PS000007 /* CompressionViewModel.swift in Sources */,
 				PS000008 /* ImageCompressor.swift in Sources */,
@@ -201,9 +201,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PicShrink/PicShrink.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PicShrink/Info.plist;
@@ -228,9 +230,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PicShrink/PicShrink.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PicShrink/Info.plist;

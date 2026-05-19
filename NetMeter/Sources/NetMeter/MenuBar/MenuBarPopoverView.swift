@@ -178,6 +178,7 @@ struct MenuBarPopoverView: View {
                     } else {
                         Image(systemName: "arrow.clockwise")
                             .font(.system(size: 9, weight: .medium))
+                            .foregroundColor(.secondary)
                     }
                 }
                 .buttonStyle(.plain)

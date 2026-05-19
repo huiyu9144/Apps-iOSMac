@@ -15,7 +15,6 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    outputDirectoryPicker
                     openFolderToggle
                 } header: {
                     Text(locStr("输出"))
@@ -46,7 +45,7 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
         }
-        .frame(width: 400, height: 480)
+        .frame(width: 400, height: 400)
         .background(.ultraThinMaterial)
     }
 
@@ -70,29 +69,6 @@ struct SettingsView: View {
                         delegate.rebuildPopoverContent()
                     }
                 }
-            }
-        }
-    }
-
-    private var outputDirectoryPicker: some View {
-        HStack {
-            Text(locStr("输出目录"))
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-
-            Spacer()
-
-            Picker("", selection: $viewModel.outputDirectory) {
-                ForEach(OutputDirectory.allCases) { dir in
-                    Text(locStr(dir.displayKey)).tag(dir)
-                }
-            }
-            .pickerStyle(.menu)
-            .frame(width: 130)
-            .onChange(of: viewModel.outputDirectory) { _, newValue in
-                if newValue == .custom {
-                    selectCustomFolder()
-                }
-                viewModel.saveSettings()
             }
         }
     }
@@ -145,18 +121,5 @@ struct SettingsView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
-    }
-
-    private func selectCustomFolder() {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        panel.canCreateDirectories = true
-        panel.prompt = locStr("选择")
-
-        if panel.runModal() == .OK, let url = panel.url {
-            UserDefaults.standard.set(url.path, forKey: "customOutputPath")
-            viewModel.saveSettings()
-        }
     }
 }

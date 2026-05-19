@@ -31,7 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupStatusItem() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.image = NSImage(systemSymbolName: "eyedropper", accessibilityDescription: "HueSnap")
+        statusItem.button?.image = NSImage(systemSymbolName: "eyedropper", accessibilityDescription: "HueCatch")
         statusItem.button?.action = #selector(handleStatusItemClick)
         statusItem.button?.target = self
         statusItem.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])

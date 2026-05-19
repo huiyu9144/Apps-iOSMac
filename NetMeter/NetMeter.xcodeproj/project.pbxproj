@@ -1,0 +1,502 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1B1C1D1E1F1A1B1C1D1E1F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F1 /* AppDelegate.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F2 /* NetMeterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F2 /* NetMeterApp.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F3 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F3 /* MenuBarPopoverView.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F4 /* SettingsView.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F5 /* TrafficChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F5 /* TrafficChartView.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F6 /* WeeklyReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F6 /* WeeklyReportView.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F7 /* NetMeterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F7 /* NetMeterViewModel.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F8 /* NetworkMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F8 /* NetworkMonitorService.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E1F9 /* TrafficService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E1F9 /* TrafficService.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E2F0 /* ProcessTrafficService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F0 /* ProcessTrafficService.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E2F1 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F1 /* Localized.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E2F2 /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F2 /* KeyboardShortcutManager.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E2F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F3 /* Assets.xcassets */; };
+		A1B1C1D1E1F1A1B1C1D1E2F4 /* HelperManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F4 /* HelperManager.swift */; };
+		A1B1C1D1E1F1A1B1C1D1E2F5 /* com.netmeter.helper.plist in Resources */ = {isa = PBXBuildFile; fileRef = A2B1C1D1E1F1A2B1C1D1E2F5 /* com.netmeter.helper.plist */; };
+		B1B1C1D1E1F1B1B1C1D1E1F1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2B1C1D1E1F1B2B1C1D1E1F1 /* main.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A6B1C1D1E1F1A6B1C1D1E1F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A6B1C1D1E1F1A6B1C1D1E1F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5B1C1D1E1F1B5B1C1D1E1F1;
+			remoteInfo = NetMeterHelper;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A2B1C1D1E1F1A2B1C1D1E1F1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F2 /* NetMeterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetMeterApp.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F3 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F5 /* TrafficChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrafficChartView.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F6 /* WeeklyReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReportView.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F7 /* NetMeterViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetMeterViewModel.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F8 /* NetworkMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitorService.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E1F9 /* TrafficService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrafficService.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F0 /* ProcessTrafficService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessTrafficService.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F1 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F2 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F4 /* HelperManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperManager.swift; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F5 /* com.netmeter.helper.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = com.netmeter.helper.plist; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F7 /* NetMeter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetMeter.entitlements; sourceTree = "<group>"; };
+		A2B1C1D1E1F1A2B1C1D1E2F8 /* NetMeter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetMeter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B2B1C1D1E1F1B2B1C1D1E1F1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		B2B1C1D1E1F1B2B1C1D1E1F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B2B1C1D1E1F1B2B1C1D1E1F3 /* NetMeterHelper */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = NetMeterHelper; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A3B1C1D1E1F1A3B1C1D1E1F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3B1C1D1E1F1B3B1C1D1E1F1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A4B1C1D1E1F1A4B1C1D1E1F1 = {
+			isa = PBXGroup;
+			children = (
+				A4B1C1D1E1F1A4B1C1D1E1F2 /* Sources */,
+				A4B1C1D1E1F1A4B1C1D1E1F3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F2 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				A4B1C1D1E1F1A4B1C1D1E1F4 /* NetMeter */,
+				A4B1C1D1E1F1A4B1C1D1E2F1 /* NetMeterHelper */,
+			);
+			path = Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E2F8 /* NetMeter.app */,
+				B2B1C1D1E1F1B2B1C1D1E1F3 /* NetMeterHelper */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F4 /* NetMeter */ = {
+			isa = PBXGroup;
+			children = (
+				A4B1C1D1E1F1A4B1C1D1E1F5 /* App */,
+				A4B1C1D1E1F1A4B1C1D1E1F6 /* MenuBar */,
+				A4B1C1D1E1F1A4B1C1D1E1F7 /* Views */,
+				A4B1C1D1E1F1A4B1C1D1E1F8 /* ViewModels */,
+				A4B1C1D1E1F1A4B1C1D1E1F9 /* Services */,
+				A4B1C1D1E1F1A4B1C1D1E2F0 /* Utils */,
+				A4B1C1D1E1F1A4B1C1D1E2F2 /* Resources */,
+				A2B1C1D1E1F1A2B1C1D1E2F3 /* Assets.xcassets */,
+				A2B1C1D1E1F1A2B1C1D1E2F6 /* Info.plist */,
+				A2B1C1D1E1F1A2B1C1D1E2F7 /* NetMeter.entitlements */,
+			);
+			path = NetMeter;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F5 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E1F2 /* NetMeterApp.swift */,
+				A2B1C1D1E1F1A2B1C1D1E1F1 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F6 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E1F3 /* MenuBarPopoverView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E1F4 /* SettingsView.swift */,
+				A2B1C1D1E1F1A2B1C1D1E1F5 /* TrafficChartView.swift */,
+				A2B1C1D1E1F1A2B1C1D1E1F6 /* WeeklyReportView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F8 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E1F7 /* NetMeterViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E1F9 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E1F8 /* NetworkMonitorService.swift */,
+				A2B1C1D1E1F1A2B1C1D1E1F9 /* TrafficService.swift */,
+				A2B1C1D1E1F1A2B1C1D1E2F0 /* ProcessTrafficService.swift */,
+				A2B1C1D1E1F1A2B1C1D1E2F4 /* HelperManager.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E2F0 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E2F1 /* Localized.swift */,
+				A2B1C1D1E1F1A2B1C1D1E2F2 /* KeyboardShortcutManager.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E2F1 /* NetMeterHelper */ = {
+			isa = PBXGroup;
+			children = (
+				B2B1C1D1E1F1B2B1C1D1E1F1 /* main.swift */,
+				B2B1C1D1E1F1B2B1C1D1E1F2 /* Info.plist */,
+			);
+			path = NetMeterHelper;
+			sourceTree = "<group>";
+		};
+		A4B1C1D1E1F1A4B1C1D1E2F2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A2B1C1D1E1F1A2B1C1D1E2F5 /* com.netmeter.helper.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A5B1C1D1E1F1A5B1C1D1E1F1 /* NetMeter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A7B1C1D1E1F1A7B1C1D1E1F2 /* Build configuration list for PBXNativeTarget "NetMeter" */;
+			buildPhases = (
+				A8B1C1D1E1F1A8B1C1D1E1F1 /* Sources */,
+				A3B1C1D1E1F1A3B1C1D1E1F1 /* Frameworks */,
+				A8B1C1D1E1F1A8B1C1D1E1F2 /* Resources */,
+				C1B1C1D1E1F1C1B1C1D1E1F1 /* Copy Helper */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A6B1C1D1E1F1A6B1C1D1E1F2 /* PBXTargetDependency */,
+			);
+			name = NetMeter;
+			productName = NetMeter;
+			productReference = A2B1C1D1E1F1A2B1C1D1E2F8 /* NetMeter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B5B1C1D1E1F1B5B1C1D1E1F1 /* NetMeterHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7B1C1D1E1F1B7B1C1D1E1F1 /* Build configuration list for PBXNativeTarget "NetMeterHelper" */;
+			buildPhases = (
+				B8B1C1D1E1F1B8B1C1D1E1F1 /* Sources */,
+				B3B1C1D1E1F1B3B1C1D1E1F1 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NetMeterHelper;
+			productName = NetMeterHelper;
+			productReference = B2B1C1D1E1F1B2B1C1D1E1F3 /* NetMeterHelper */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A6B1C1D1E1F1A6B1C1D1E1F1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					A5B1C1D1E1F1A5B1C1D1E1F1 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					B5B1C1D1E1F1B5B1C1D1E1F1 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = A7B1C1D1E1F1A7B1C1D1E1F1 /* Build configuration list for PBXProject "NetMeter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+				ja,
+			);
+			mainGroup = A4B1C1D1E1F1A4B1C1D1E1F1;
+			productRefGroup = A4B1C1D1E1F1A4B1C1D1E1F3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A5B1C1D1E1F1A5B1C1D1E1F1 /* NetMeter */,
+				B5B1C1D1E1F1B5B1C1D1E1F1 /* NetMeterHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A8B1C1D1E1F1A8B1C1D1E1F2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B1C1D1E1F1A1B1C1D1E2F3 /* Assets.xcassets in Resources */,
+				A1B1C1D1E1F1A1B1C1D1E2F5 /* com.netmeter.helper.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C1B1C1D1E1F1C1B1C1D1E1F1 /* Copy Helper */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/NetMeterHelper",
+			);
+			name = "Copy Helper";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/Contents/Library/LaunchServices/com.netmeter.helper",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices\"\ncp -f \"${BUILT_PRODUCTS_DIR}/NetMeterHelper\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices/com.netmeter.helper\"\ncp -f \"${SRCROOT}/Sources/NetMeter/Resources/com.netmeter.helper.plist\" \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Library/LaunchServices/com.netmeter.helper.plist\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A8B1C1D1E1F1A8B1C1D1E1F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B1C1D1E1F1A1B1C1D1E1F1 /* AppDelegate.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F2 /* NetMeterApp.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F3 /* MenuBarPopoverView.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F4 /* SettingsView.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F5 /* TrafficChartView.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F6 /* WeeklyReportView.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F7 /* NetMeterViewModel.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F8 /* NetworkMonitorService.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E1F9 /* TrafficService.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E2F0 /* ProcessTrafficService.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E2F1 /* Localized.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E2F2 /* KeyboardShortcutManager.swift in Sources */,
+				A1B1C1D1E1F1A1B1C1D1E2F4 /* HelperManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8B1C1D1E1F1B8B1C1D1E1F1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1B1C1D1E1F1B1B1C1D1E1F1 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A6B1C1D1E1F1A6B1C1D1E1F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5B1C1D1E1F1B5B1C1D1E1F1 /* NetMeterHelper */;
+			targetProxy = A6B1C1D1E1F1A6B1C1D1E1F3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A9B1C1D1E1F1A9B1C1D1E1F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A9B1C1D1E1F1A9B1C1D1E1F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A9B1C1D1E1F1A9B1C1D1E1F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/NetMeter/NetMeter.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/NetMeter/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetMeter;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netmeter.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A9B1C1D1E1F1A9B1C1D1E1F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/NetMeter/NetMeter.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/NetMeter/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = NetMeter;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netmeter.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B9B1C1D1E1F1B9B1C1D1E1F1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				INFOPLIST_FILE = Sources/NetMeterHelper/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netmeter.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B9B1C1D1E1F1B9B1C1D1E1F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Sources/NetMeterHelper/Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.netmeter.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A7B1C1D1E1F1A7B1C1D1E1F1 /* Build configuration list for PBXProject "NetMeter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B1C1D1E1F1A9B1C1D1E1F1 /* Debug */,
+				A9B1C1D1E1F1A9B1C1D1E1F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A7B1C1D1E1F1A7B1C1D1E1F2 /* Build configuration list for PBXNativeTarget "NetMeter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9B1C1D1E1F1A9B1C1D1E1F3 /* Debug */,
+				A9B1C1D1E1F1A9B1C1D1E1F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B7B1C1D1E1F1B7B1C1D1E1F1 /* Build configuration list for PBXNativeTarget "NetMeterHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9B1C1D1E1F1B9B1C1D1E1F1 /* Debug */,
+				B9B1C1D1E1F1B9B1C1D1E1F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A6B1C1D1E1F1A6B1C1D1E1F1 /* Project object */;
+}

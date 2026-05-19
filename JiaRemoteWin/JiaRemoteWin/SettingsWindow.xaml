@@ -1,0 +1,163 @@
+<Window x:Class="JiaRemoteWin.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Width="420" Height="560"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Border Background="#E51C1C1E" CornerRadius="16"
+            BorderBrush="#25FFFFFF" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ══ 标题栏 ══ -->
+            <Grid Grid.Row="0" Height="52" MouseLeftButtonDown="TitleBar_MouseDown">
+                <Rectangle Width="32" Height="4" Fill="#2FFFFFFF" RadiusX="2" RadiusY="2"
+                           HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,10,0,0"/>
+                <TextBlock Text="设置" FontSize="18" FontWeight="SemiBold"
+                           Foreground="#E8E8E8" VerticalAlignment="Center" Margin="22,0,0,0"/>
+                <Button Width="30" Height="30" HorizontalAlignment="Right" Margin="0,0,14,0"
+                        VerticalAlignment="Center" Click="CloseBtn_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="#0FFFFFFF" CornerRadius="15"
+                                    x:Name="bg">
+                                <TextBlock Text="✕" FontSize="13" Foreground="#888"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="bg" Property="Background" Value="#1EFFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <!-- ══ 内容 ══ -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden"
+                          Padding="0,0,0,24">
+                <StackPanel Margin="22,4,22,0">
+
+                    <!-- ═══ 🖱 操控 ═══ -->
+                    <TextBlock Text="🖱 操控模式" Style="{StaticResource SectionHdr}"/>
+                    <Border Style="{StaticResource Card2}" MouseLeftButtonDown="LockRow_Click" Cursor="Hand">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="锁定键鼠到远程窗口" FontSize="14" Foreground="#EEE"/>
+                                <TextBlock Text="Ctrl+Alt 组合键释放" FontSize="11" Foreground="#555" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <Border x:Name="ToggleBg_Lock" Width="44" Height="26" CornerRadius="13"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Background="#33FFFFFF"/>
+                            <Border x:Name="ToggleKnob_Lock" Width="22" Height="22" CornerRadius="11"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Margin="0,0,21,0" Background="White">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="0" BlurRadius="4" Opacity="0.25" Color="Black"/>
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ═══ 👁 显示 ═══ -->
+                    <TextBlock Text="👁 显示" Style="{StaticResource SectionHdr}" Margin="0,28,0,10"/>
+                    <Border Style="{StaticResource Card2}" MouseLeftButtonDown="OverlayRow_Click" Cursor="Hand">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="画面上显示参数" FontSize="14" Foreground="#EEE"/>
+                                <TextBlock Text="FPS / 延迟 / 无损画质" FontSize="11" Foreground="#555" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <Border x:Name="ToggleBg_Overlay" Width="44" Height="26" CornerRadius="13"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Background="#33FFFFFF"/>
+                            <Border x:Name="ToggleKnob_Overlay" Width="22" Height="22" CornerRadius="11"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Margin="0,0,21,0" Background="White">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="0" BlurRadius="4" Opacity="0.25" Color="Black"/>
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource Card2}" MouseLeftButtonDown="FullscreenRow_Click" Cursor="Hand"
+                            Margin="0,4,0,0">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="全屏模式" FontSize="14" Foreground="#EEE"/>
+                            </StackPanel>
+                            <Border x:Name="ToggleBg_Fullscreen" Width="44" Height="26" CornerRadius="13"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Background="#33FFFFFF"/>
+                            <Border x:Name="ToggleKnob_Fullscreen" Width="22" Height="22" CornerRadius="11"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Margin="0,0,21,0" Background="White">
+                                <Border.Effect>
+                                    <DropShadowEffect ShadowDepth="0" BlurRadius="4" Opacity="0.25" Color="Black"/>
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- ═══ 📋 剪贴板 ═══ -->
+                    <TextBlock Text="📋 剪贴板同步" Style="{StaticResource SectionHdr}" Margin="0,28,0,10"/>
+                    <Border Style="{StaticResource Card2}" Padding="12,10,12,12">
+                        <StackPanel>
+                            <TextBox x:Name="ClipText" Text=""
+                                     Foreground="#AAA" CaretBrush="#0A84FF"
+                                     Background="#08FFFFFF" BorderThickness="0"
+                                     FontSize="12" FontFamily="Consolas"
+                                     MinHeight="48" TextWrapping="Wrap" AcceptsReturn="True"
+                                     VerticalScrollBarVisibility="Auto" Padding="8"/>
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Content="▶ 推送到 Mac"
+                                        Style="{StaticResource PillBtn2}" Click="ClipPush_Click"/>
+                                <Button Grid.Column="2" Content="◀ 从 Mac 拉取"
+                                        Style="{StaticResource PillBtn2}" Click="ClipPull_Click"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- ═══ ⚡ 系统快捷控制 ═══ -->
+                    <TextBlock Text="⚡ Mac 系统控制" Style="{StaticResource SectionHdr}" Margin="0,28,0,10"/>
+                    <UniformGrid Rows="2" Columns="4">
+                        <Button Style="{StaticResource QuickChip2}" Content="😴" Tag="sleep" Click="QuickBtn_Click"
+                                ToolTip="休眠"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="🔄" Tag="restart" Click="QuickBtn_Click"
+                                ToolTip="重启"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="⏻" Tag="shutdown" Click="QuickBtn_Click"
+                                ToolTip="关机"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="🔒" Tag="lockScreen" Click="QuickBtn_Click"
+                                ToolTip="锁屏"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="🔊" Tag="volumeUp" Click="QuickBtn_Click"
+                                ToolTip="音量"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="☀️" Tag="brightnessUp" Click="QuickBtn_Click"
+                                ToolTip="亮度"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="🚀" Tag="launchpad" Click="QuickBtn_Click"
+                                ToolTip="Launchpad"/>
+                        <Button Style="{StaticResource QuickChip2}" Content="⚡" Tag="wake" Click="QuickBtn_Click"
+                                ToolTip="唤醒"/>
+                    </UniformGrid>
+
+                    <TextBlock Text="ScreenCaptureKit · IOSurface · CGEvent · D3D11"
+                               FontSize="10" Foreground="#2A2A2A" HorizontalAlignment="Center"
+                               Margin="0,28,0,8"/>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

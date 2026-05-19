@@ -422,7 +422,7 @@ struct MenuBarPopoverView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("HueSnap")
+                Text("HueCatch")
                     .font(.system(size: 14, weight: .semibold, design: .default))
                     .foregroundColor(.primary)
                 Text(locStr("版本") + " 1.0")

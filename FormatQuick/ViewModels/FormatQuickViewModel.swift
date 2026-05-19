@@ -34,19 +34,9 @@ enum ImageFormat: String, CaseIterable, Identifiable {
 }
 
 enum OutputDirectory: String, CaseIterable, Identifiable {
-    case sameAsSource = "same"
-    case desktop = "desktop"
-    case custom = "custom"
+    case temporary = "temporary"
 
     var id: String { rawValue }
-
-    var displayKey: String {
-        switch self {
-        case .sameAsSource: return "与源文件相同"
-        case .desktop: return "桌面"
-        case .custom: return "自定义"
-        }
-    }
 }
 
 enum ResizeMode: String, CaseIterable {
@@ -73,13 +63,12 @@ class FormatQuickViewModel {
     var currentFileName: String = ""
     var totalFileCount: Int = 0
     var totalFileSize: UInt64 = 0
-    var outputDirectory: OutputDirectory = .sameAsSource
+    var outputDirectory: OutputDirectory = .temporary
     var openFolderAfterConvert = true
     var showAlert = false
     var alertMessage = ""
 
     private let converter = FormatConverterService()
-    private let shortcutManager = KeyboardShortcutManager()
 
     var estimatedTime: String {
         guard !imageFiles.isEmpty else { return "0" + locStr("秒") }
@@ -203,19 +192,10 @@ class FormatQuickViewModel {
     }
 
     private func resolveOutputDirectory() -> URL {
-        switch outputDirectory {
-        case .desktop:
-            let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
-            return desktop.appendingPathComponent("FormatQuick")
-        case .custom:
-            if let customPath = UserDefaults.standard.string(forKey: "customOutputPath"),
-               !customPath.isEmpty {
-                return URL(fileURLWithPath: customPath)
-            }
-            fallthrough
-        case .sameAsSource:
-            return FileManager.default.temporaryDirectory.appendingPathComponent("FormatQuick")
-        }
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("com.formatquick.app")
+            .appendingPathComponent(UUID().uuidString)
+        return dir
     }
 
     private func calculateTotalSize() {
@@ -235,14 +215,10 @@ class FormatQuickViewModel {
     }
 
     private func loadSettings() {
-        outputDirectory = OutputDirectory(
-            rawValue: UserDefaults.standard.string(forKey: "outputDirectory") ?? "same"
-        ) ?? .sameAsSource
         openFolderAfterConvert = UserDefaults.standard.object(forKey: "openFolderAfterConvert") as? Bool ?? true
     }
 
     func saveSettings() {
-        UserDefaults.standard.set(outputDirectory.rawValue, forKey: "outputDirectory")
         UserDefaults.standard.set(openFolderAfterConvert, forKey: "openFolderAfterConvert")
     }
 }

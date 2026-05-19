@@ -1,0 +1,358 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* ── PBXBuildFile ── */
+		100001A000000001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000001 /* main.swift */; };
+		100001A000000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000002 /* AppDelegate.swift */; };
+		100001A000000003 /* JiaProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000003 /* JiaProtocol.swift */; };
+		100001A000000004 /* CaptureEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000004 /* CaptureEngine.swift */; };
+		100001A000000005 /* InputController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000005 /* InputController.swift */; };
+		100001A000000006 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000006 /* ConfigManager.swift */; };
+		100001A000000007 /* BonjourService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000007 /* BonjourService.swift */; };
+		100001A000000008 /* TCPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F000000008 /* TCPServer.swift */; };
+		100001A000000009 /* UDPScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F00000000B /* UDPScanner.swift */; };
+		100001A00000000C /* DebugLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100001F00000000C /* DebugLogger.swift */; };
+/* ── PBXFileReference ── */
+		100001F000000001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		100001F000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		100001F000000003 /* JiaProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaProtocol.swift; sourceTree = "<group>"; };
+		100001F000000004 /* CaptureEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureEngine.swift; sourceTree = "<group>"; };
+		100001F000000005 /* InputController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputController.swift; sourceTree = "<group>"; };
+		100001F000000006 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
+		100001F000000007 /* BonjourService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BonjourService.swift; sourceTree = "<group>"; };
+		100001F000000008 /* TCPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCPServer.swift; sourceTree = "<group>"; };
+		100001F000000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100001F00000000A /* JiaRemoteMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JiaRemoteMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		100001F00000000B /* UDPScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UDPScanner.swift; sourceTree = "<group>"; };
+		100001F00000000C /* DebugLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugLogger.swift; sourceTree = "<group>"; };
+
+/* ── PBXFrameworksBuildPhase ── */
+		100001B000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+/* ── PBXGroup ── */
+		100001G000000001 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				100001G000000002 /* Sources */,
+				100001G000000007 /* Resources */,
+				100001G000000008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+
+		100001G000000002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000001 /* main.swift */,
+				100001F000000002 /* AppDelegate.swift */,
+				100001G000000003 /* Protocol */,
+				100001G000000004 /* Capture */,
+				100001G000000005 /* Input */,
+				100001G000000006 /* Config */,
+				100001G000000009 /* Network */,
+				100001G00000000A /* Utils */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+
+		100001G000000003 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000003 /* JiaProtocol.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+
+		100001G000000004 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000004 /* CaptureEngine.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+
+		100001G000000005 /* Input */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000005 /* InputController.swift */,
+			);
+			path = Input;
+			sourceTree = "<group>";
+		};
+
+		100001G000000006 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000006 /* ConfigManager.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+
+		100001G00000000A /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				100001F00000000C /* DebugLogger.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+
+		100001G000000009 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000007 /* BonjourService.swift */,
+				100001F000000008 /* TCPServer.swift */,
+				100001F00000000B /* UDPScanner.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+
+		100001G000000007 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				100001F000000009 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+
+		100001G000000008 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				100001F00000000A /* JiaRemoteMac.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+
+/* ── PBXNativeTarget ── */
+		100001T000000001 /* JiaRemoteMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 100001C000000001 /* Build configs for JiaRemoteMac */;
+			buildPhases = (
+				100001S000000001 /* Sources */,
+				100001B000000001 /* Frameworks */,
+				100001R000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JiaRemoteMac;
+			productName = JiaRemoteMac;
+			productReference = 100001F00000000A /* JiaRemoteMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+
+/* ── PBXProject ── */
+		100001P000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					100001T000000001 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+				};
+			};
+			buildConfigurationList = 100001C000000002 /* Build configs for project */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+			);
+			mainGroup = 100001G000000001;
+			productRefGroup = 100001G000000008 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				100001T000000001 /* JiaRemoteMac */,
+			);
+		};
+
+/* ── PBXResourcesBuildPhase ── */
+		100001R000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+/* ── PBXSourcesBuildPhase ── */
+		100001S000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100001A000000001 /* main.swift in Sources */,
+				100001A000000002 /* AppDelegate.swift in Sources */,
+				100001A000000003 /* JiaProtocol.swift in Sources */,
+				100001A000000004 /* CaptureEngine.swift in Sources */,
+				100001A000000005 /* InputController.swift in Sources */,
+				100001A000000006 /* ConfigManager.swift in Sources */,
+				100001A000000007 /* BonjourService.swift in Sources */,
+				100001A000000008 /* TCPServer.swift in Sources */,
+				100001A000000009 /* UDPScanner.swift in Sources */,
+				100001A00000000C /* DebugLogger.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+
+/* ── XCBuildConfiguration ── */
+		100001D000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		100001D000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		100001D000000003 /* Target Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "局域网无损原生远程控制系统 · 仅内网使用";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jia.jiaremote.mac;
+				PRODUCT_NAME = JiaRemoteMac;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		100001D000000004 /* Target Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "局域网无损原生远程控制系统 · 仅内网使用";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jia.jiaremote.mac;
+				PRODUCT_NAME = JiaRemoteMac;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+
+/* ── XCConfigurationList ── */
+		100001C000000001 /* Build configs for JiaRemoteMac */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100001D000000003 /* Target Debug */,
+				100001D000000004 /* Target Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		100001C000000002 /* Build configs for project */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				100001D000000001 /* Debug */,
+				100001D000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+
+	}; /* end objects */
+
+	rootObject = 100001P000000001 /* Project object */;
+}

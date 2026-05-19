@@ -74,13 +74,14 @@ class ColorPickerService {
 
     func startPicking() {
         let sampler = NSColorSampler()
-        sampler.show { [weak self] nsColor in
-            guard let self = self else { return }
+        let pickedHandler = onColorPicked
+        let cancelHandler = onCancel
+        sampler.show { nsColor in
             if let nsColor = nsColor {
                 let picked = PickedColor(nsColor: nsColor)
-                self.onColorPicked?(picked)
+                pickedHandler?(picked)
             } else {
-                self.onCancel?()
+                cancelHandler?()
             }
         }
     }

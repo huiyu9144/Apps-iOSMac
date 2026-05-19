@@ -14,7 +14,6 @@
 		77000005 /* FormatQuickViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000034 /* FormatQuickViewModel.swift */; };
 		77000006 /* FormatConverterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000035 /* FormatConverterService.swift */; };
 		77000007 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000036 /* Localized.swift */; };
-		77000008 /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000037 /* KeyboardShortcutManager.swift */; };
 		77000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77000040 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -27,7 +26,6 @@
 		77000034 /* FormatQuickViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatQuickViewModel.swift; sourceTree = "<group>"; };
 		77000035 /* FormatConverterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatConverterService.swift; sourceTree = "<group>"; };
 		77000036 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
-		77000037 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
 		77000040 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		77000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		77000042 /* FormatQuick.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FormatQuick.entitlements; sourceTree = "<group>"; };
@@ -113,7 +111,6 @@
 			isa = PBXGroup;
 			children = (
 				77000036 /* Localized.swift */,
-				77000037 /* KeyboardShortcutManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -196,7 +193,6 @@
 				77000005 /* FormatQuickViewModel.swift in Sources */,
 				77000006 /* FormatConverterService.swift in Sources */,
 				77000007 /* Localized.swift in Sources */,
-				77000008 /* KeyboardShortcutManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,14 +256,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FormatQuick.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FormatQuick;
 				INFOPLIST_KEY_CFBundleName = FormatQuick;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
@@ -284,14 +284,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FormatQuick.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_HARDENED_RUNTIME = YES;
-				GENERATE_INFOPLIST_FILE = NO;
+				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FormatQuick;
 				INFOPLIST_KEY_CFBundleName = FormatQuick;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;

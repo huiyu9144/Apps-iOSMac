@@ -7,12 +7,20 @@ let package = Package(
     platforms: [
         .macOS(.v14)
     ],
+    products: [
+        .executable(name: "NetMeter", targets: ["NetMeter"]),
+        .executable(name: "NetMeterHelper", targets: ["NetMeterHelper"]),
+    ],
     targets: [
         .executableTarget(
             name: "NetMeter",
             resources: [
                 .process("Assets.xcassets"),
+                .process("Resources"),
             ]
-        )
+        ),
+        .executableTarget(
+            name: "NetMeterHelper"
+        ),
     ]
 )

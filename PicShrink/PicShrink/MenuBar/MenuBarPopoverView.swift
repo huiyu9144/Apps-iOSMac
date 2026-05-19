@@ -4,6 +4,7 @@ struct MenuBarPopoverView: View {
     @Bindable var viewModel: CompressionViewModel
     @AppStorage("preserveEXIF") private var preserveEXIF: Bool = true
     @AppStorage("autoOpenFolder") private var autoOpenFolder: Bool = true
+    @AppStorage("outputFormat") private var outputFormatSetting: String = "jpeg"
     @State private var showSettings = false
     @State private var isHoveringSettings = false
 
@@ -14,7 +15,7 @@ struct MenuBarPopoverView: View {
             bottomBar
         }
         .frame(width: 360)
-        .background(Color.white)
+        .background(Color(nsColor: .windowBackgroundColor))
         .clipShape(.rect(cornerRadius: 14))
         .sheet(isPresented: $showSettings) {
             SettingsView()
@@ -58,6 +59,7 @@ struct MenuBarPopoverView: View {
         VStack(spacing: 12) {
             fileSelectorSection
             qualitySection
+            formatSection
             compressButton
             if viewModel.isCompressing { progressSection }
             CompressionResultView(viewModel: viewModel)
@@ -143,34 +145,67 @@ struct MenuBarPopoverView: View {
     }
 
     private func qualityButton(for q: CompressionQuality) -> some View {
-        Button(action: {
+        let isSelected = viewModel.quality == q
+        return Button(action: {
             withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.8)) {
                 viewModel.quality = q
             }
         }) {
             Text(q.displayName)
                 .font(.system(size: 11.5,
-                              weight: viewModel.quality == q ? .semibold : .regular,
+                              weight: isSelected ? .semibold : .regular,
                               design: .rounded))
                 .lineLimit(1)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
-                .foregroundStyle(viewModel.quality == q ? .white : .secondary)
-                .background(qualityBackground(for: q))
+                .foregroundStyle(isSelected ? .white : .secondary)
+                .background(qualityBackground(isSelected: isSelected))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
     @ViewBuilder
-    private func qualityBackground(for q: CompressionQuality) -> some View {
-        if viewModel.quality == q {
+    private func qualityBackground(isSelected: Bool) -> some View {
+        if isSelected {
             Capsule()
                 .fill(.tint)
                 .shadow(color: Color(.controlAccentColor).opacity(0.25), radius: 4, y: 1)
-        } else {
-            EmptyView()
         }
+    }
+
+    private var formatSection: some View {
+        HStack(spacing: 0) {
+            ForEach(OutputFormat.allCases, id: \.rawValue) { fmt in
+                let isSelected = viewModel.outputFormat == fmt
+                Button(action: {
+                    withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.8)) {
+                        outputFormatSetting = fmt.rawValue
+                        viewModel.outputFormat = fmt
+                    }
+                }) {
+                    Text(fmt.fileExtension.uppercased())
+                        .font(.system(size: 11, weight: isSelected ? .semibold : .regular, design: .monospaced))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .foregroundStyle(isSelected ? .white : .secondary)
+                        .background(
+                            Group {
+                                if isSelected {
+                                    Capsule().fill(.tint)
+                                }
+                            }
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(
+            Capsule()
+                .fill(.fill.quaternary.opacity(0.35))
+        )
     }
 
     private var compressButton: some View {
@@ -268,6 +303,7 @@ struct MenuBarPopoverView: View {
     private func syncSettingsToViewModel() {
         viewModel.preserveEXIF = preserveEXIF
         viewModel.autoOpenFolder = autoOpenFolder
+        viewModel.outputFormat = OutputFormat(rawValue: outputFormatSetting) ?? .jpeg
     }
 }
 
