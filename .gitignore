@@ -118,3 +118,9 @@ Temporary Items
 
 # Xcode 13+ / Xcode Cloud
 .xcodecloud/
+
+# Menu Meter build directory
+menu meter/MenuMeter/.build/
+
+# Menu Meter build directory
+menu meter/MenuMeter/.build/
