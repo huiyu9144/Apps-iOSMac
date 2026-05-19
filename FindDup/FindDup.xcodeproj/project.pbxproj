@@ -1,0 +1,338 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F0000001 /* FindDupApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000020 /* FindDupApp.swift */; };
+		F0000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000021 /* ContentView.swift */; };
+		F0000003 /* FileInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000022 /* FileInfo.swift */; };
+		F0000004 /* FileScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000023 /* FileScanner.swift */; };
+		F0000005 /* HashCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000024 /* HashCalculator.swift */; };
+		F0000006 /* DuplicateFinder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000025 /* DuplicateFinder.swift */; };
+		F0000007 /* DuplicateGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000026 /* DuplicateGroup.swift */; };
+		F0000008 /* FileDeleter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000027 /* FileDeleter.swift */; };
+		F0000009 /* ScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000028 /* ScanViewModel.swift */; };
+		F000000A /* ResultViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000029 /* ResultViewModel.swift */; };
+		F000000B /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002A /* SettingsViewModel.swift */; };
+		F000000C /* ScanPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002B /* ScanPanelView.swift */; };
+		F000000D /* ResultPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002C /* ResultPanelView.swift */; };
+		F000000E /* DuplicateGroupRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002D /* DuplicateGroupRow.swift */; };
+		F000000F /* FileRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002E /* FileRowView.swift */; };
+		F0000010 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F000002F /* SettingsView.swift */; };
+		F0000011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F0000030 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F0000020 /* FindDupApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindDupApp.swift; sourceTree = "<group>"; };
+		F0000021 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F0000022 /* FileInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInfo.swift; sourceTree = "<group>"; };
+		F0000023 /* FileScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileScanner.swift; sourceTree = "<group>"; };
+		F0000024 /* HashCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashCalculator.swift; sourceTree = "<group>"; };
+		F0000025 /* DuplicateFinder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateFinder.swift; sourceTree = "<group>"; };
+		F0000026 /* DuplicateGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateGroup.swift; sourceTree = "<group>"; };
+		F0000027 /* FileDeleter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileDeleter.swift; sourceTree = "<group>"; };
+		F0000028 /* ScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewModel.swift; sourceTree = "<group>"; };
+		F0000029 /* ResultViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultViewModel.swift; sourceTree = "<group>"; };
+		F000002A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		F000002B /* ScanPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanPanelView.swift; sourceTree = "<group>"; };
+		F000002C /* ResultPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultPanelView.swift; sourceTree = "<group>"; };
+		F000002D /* DuplicateGroupRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuplicateGroupRow.swift; sourceTree = "<group>"; };
+		F000002E /* FileRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileRowView.swift; sourceTree = "<group>"; };
+		F000002F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F0000030 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F0000031 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F0000032 /* FindDup.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = FindDup.entitlements; sourceTree = "<group>"; };
+		F0000033 /* FindDup.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FindDup.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		F0000040 /* FindDup */ = {
+			isa = PBXGroup;
+			children = (
+				F0000041 /* App */,
+				F0000042 /* Core */,
+				F0000043 /* ViewModel */,
+				F0000044 /* View */,
+				F0000030 /* Assets.xcassets */,
+				F0000031 /* Info.plist */,
+				F0000032 /* FindDup.entitlements */,
+			);
+			path = FindDup;
+			sourceTree = "<group>";
+		};
+		F0000041 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F0000020 /* FindDupApp.swift */,
+				F0000021 /* ContentView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		F0000042 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				F0000022 /* FileInfo.swift */,
+				F0000023 /* FileScanner.swift */,
+				F0000024 /* HashCalculator.swift */,
+				F0000025 /* DuplicateFinder.swift */,
+				F0000026 /* DuplicateGroup.swift */,
+				F0000027 /* FileDeleter.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		F0000043 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F0000028 /* ScanViewModel.swift */,
+				F0000029 /* ResultViewModel.swift */,
+				F000002A /* SettingsViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F0000044 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				F000002B /* ScanPanelView.swift */,
+				F000002C /* ResultPanelView.swift */,
+				F000002D /* DuplicateGroupRow.swift */,
+				F000002E /* FileRowView.swift */,
+				F000002F /* SettingsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F0000050 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F0000033 /* FindDup.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F0000051 = {
+			isa = PBXGroup;
+			children = (
+				F0000040 /* FindDup */,
+				F0000050 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F0000060 /* FindDup */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F0000090 /* Build configuration list for PBXNativeTarget "FindDup" */;
+			buildPhases = (
+				F0000071 /* Sources */,
+				F0000070 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FindDup;
+			productName = FindDup;
+			productReference = F0000033 /* FindDup.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F0000072 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = F0000091 /* Build configuration list for PBXProject "FindDup" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "en-US";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en-US,
+				Base,
+			);
+			mainGroup = F0000051;
+			productRefGroup = F0000050 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F0000060 /* FindDup */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F0000070 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0000011 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F0000071 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F0000001 /* FindDupApp.swift in Sources */,
+				F0000002 /* ContentView.swift in Sources */,
+				F0000003 /* FileInfo.swift in Sources */,
+				F0000004 /* FileScanner.swift in Sources */,
+				F0000005 /* HashCalculator.swift in Sources */,
+				F0000006 /* DuplicateFinder.swift in Sources */,
+				F0000007 /* DuplicateGroup.swift in Sources */,
+				F0000008 /* FileDeleter.swift in Sources */,
+				F0000009 /* ScanViewModel.swift in Sources */,
+				F000000A /* ResultViewModel.swift in Sources */,
+				F000000B /* SettingsViewModel.swift in Sources */,
+				F000000C /* ScanPanelView.swift in Sources */,
+				F000000D /* ResultPanelView.swift in Sources */,
+				F000000E /* DuplicateGroupRow.swift in Sources */,
+				F000000F /* FileRowView.swift in Sources */,
+				F0000010 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F0000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "FindDup/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "FindDup";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 FindDup. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finddup.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F0000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "FindDup/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "FindDup";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 FindDup. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finddup.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		F0000082 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F0000083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F0000090 /* Build configuration list for PBXNativeTarget "FindDup" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0000080 /* Debug */,
+				F0000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F0000091 /* Build configuration list for PBXProject "FindDup" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0000082 /* Debug */,
+				F0000083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F0000072 /* Project object */;
+}

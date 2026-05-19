@@ -1,0 +1,352 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CF000001 /* ClipFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000020 /* ClipFlowApp.swift */; };
+		CF000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000021 /* AppDelegate.swift */; };
+		CF000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000022 /* MenuBarController.swift */; };
+		CF000004 /* ClipboardMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000023 /* ClipboardMonitor.swift */; };
+		CF000005 /* ClipboardItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000024 /* ClipboardItem.swift */; };
+		CF000006 /* PasteboardTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000025 /* PasteboardTypes.swift */; };
+		CF000007 /* HistoryPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000026 /* HistoryPanelController.swift */; };
+		CF000008 /* HistoryPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000027 /* HistoryPanelView.swift */; };
+		CF000009 /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000028 /* SearchBarView.swift */; };
+		CF00000A /* HistoryItemRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000029 /* HistoryItemRow.swift */; };
+		CF00000B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF00002C /* SettingsView.swift */; };
+		CF00000C /* HistoryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF00002D /* HistoryService.swift */; };
+		CF00000D /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF00002E /* SearchService.swift */; };
+		CF00000E /* LoginItemsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000030 /* LoginItemsService.swift */; };
+		CF00000F /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000031 /* KeyboardShortcutManager.swift */; };
+		CF000010 /* Formatters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000032 /* Formatters.swift */; };
+		CF000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF000033 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		CF000020 /* ClipFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipFlowApp.swift; sourceTree = "<group>"; };
+		CF000021 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CF000022 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
+		CF000023 /* ClipboardMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardMonitor.swift; sourceTree = "<group>"; };
+		CF000024 /* ClipboardItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardItem.swift; sourceTree = "<group>"; };
+		CF000025 /* PasteboardTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteboardTypes.swift; sourceTree = "<group>"; };
+		CF000026 /* HistoryPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPanelController.swift; sourceTree = "<group>"; };
+		CF000027 /* HistoryPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPanelView.swift; sourceTree = "<group>"; };
+		CF000028 /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
+		CF000029 /* HistoryItemRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemRow.swift; sourceTree = "<group>"; };
+		CF00002C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CF00002D /* HistoryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryService.swift; sourceTree = "<group>"; };
+		CF00002E /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
+		CF000030 /* LoginItemsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginItemsService.swift; sourceTree = "<group>"; };
+		CF000031 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
+		CF000032 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
+		CF000033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CF000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CF000035 /* ClipFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		CF000040 /* ClipFlow */ = {
+			isa = PBXGroup;
+			children = (
+				CF000041 /* App */,
+				CF000042 /* MenuBar */,
+				CF000043 /* Clipboard */,
+				CF000044 /* Views */,
+				CF000045 /* Services */,
+				CF000046 /* Utils */,
+				CF000033 /* Assets.xcassets */,
+				CF000034 /* Info.plist */,
+			);
+			path = ClipFlow;
+			sourceTree = "<group>";
+		};
+		CF000041 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				CF000020 /* ClipFlowApp.swift */,
+				CF000021 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		CF000042 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				CF000022 /* MenuBarController.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		CF000043 /* Clipboard */ = {
+			isa = PBXGroup;
+			children = (
+				CF000023 /* ClipboardMonitor.swift */,
+				CF000024 /* ClipboardItem.swift */,
+				CF000025 /* PasteboardTypes.swift */,
+			);
+			path = Clipboard;
+			sourceTree = "<group>";
+		};
+		CF000044 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CF000026 /* HistoryPanelController.swift */,
+				CF000027 /* HistoryPanelView.swift */,
+				CF000028 /* SearchBarView.swift */,
+				CF000029 /* HistoryItemRow.swift */,
+				CF00002C /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		CF000045 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CF00002D /* HistoryService.swift */,
+				CF00002E /* SearchService.swift */,
+				CF000030 /* LoginItemsService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		CF000046 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				CF000031 /* KeyboardShortcutManager.swift */,
+				CF000032 /* Formatters.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		CF000048 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CF000035 /* ClipFlow.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CF000049 = {
+			isa = PBXGroup;
+			children = (
+				CF000040 /* ClipFlow */,
+				CF000048 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CF000050 /* ClipFlow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CF000090 /* Build configuration list for PBXNativeTarget "ClipFlow" */;
+			buildPhases = (
+				CF000071 /* Sources */,
+				CF000070 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ClipFlow;
+			productName = ClipFlow;
+			productReference = CF000035 /* ClipFlow.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CF000060 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = CF000091 /* Build configuration list for PBXProject "ClipFlow" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "en-US";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en-US,
+				Base,
+			);
+			mainGroup = CF000049;
+			productRefGroup = CF000048 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CF000050 /* ClipFlow */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CF000070 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF000012 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CF000071 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CF000001 /* ClipFlowApp.swift in Sources */,
+				CF000002 /* AppDelegate.swift in Sources */,
+				CF000003 /* MenuBarController.swift in Sources */,
+				CF000004 /* ClipboardMonitor.swift in Sources */,
+				CF000005 /* ClipboardItem.swift in Sources */,
+				CF000006 /* PasteboardTypes.swift in Sources */,
+				CF000007 /* HistoryPanelController.swift in Sources */,
+				CF000008 /* HistoryPanelView.swift in Sources */,
+				CF000009 /* SearchBarView.swift in Sources */,
+				CF00000A /* HistoryItemRow.swift in Sources */,
+				CF00000B /* SettingsView.swift in Sources */,
+				CF00000C /* HistoryService.swift in Sources */,
+				CF00000D /* SearchService.swift in Sources */,
+				CF00000E /* LoginItemsService.swift in Sources */,
+				CF00000F /* KeyboardShortcutManager.swift in Sources */,
+				CF000010 /* Formatters.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CF000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "ClipFlow/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "ClipFlow";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.clipflow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		CF000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "ClipFlow/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "ClipFlow";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.clipflow.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		CF000082 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CF000083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CF000090 /* Build configuration list for PBXNativeTarget "ClipFlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF000080 /* Debug */,
+				CF000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CF000091 /* Build configuration list for PBXProject "ClipFlow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CF000082 /* Debug */,
+				CF000083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CF000060 /* Project object */;
+}

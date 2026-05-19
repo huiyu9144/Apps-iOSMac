@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MenuMeter</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:-apple-system,"SF Pro","Helvetica Neue",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    padding:32px 20px;
+    background:#f5f5f7;color:#1d1d1f;
+    transition:background .3s,color .3s;
+  }
+  body.dark{background:#1c1c1e;color:#f5f5f7}
+
+  .mode{position:fixed;top:14px;right:20px;display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;z-index:100;user-select:none}
+  body.light .mode{color:#86868b}
+  body.dark .mode{color:#98989d}
+  .mode .tr{width:34px;height:18px;border-radius:9px;background:#c7c7cc;position:relative;transition:background .3s}
+  body.dark .mode .tr{background:#3a3a3c}
+  .mode .kn{width:14px;height:14px;border-radius:7px;background:#fff;position:absolute;top:2px;left:2px;transition:transform .3s;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+  body.dark .mode .kn{transform:translateX(16px)}
+
+  .hdr{text-align:center;margin-bottom:24px}
+  .hdr h1{font-size:22px;font-weight:700;letter-spacing:-.3px}
+  .hdr p{font-size:12px;margin-top:2px;opacity:.4}
+
+  .frame{width:640px;border-radius:10px;overflow:hidden;transition:background .3s,border .3s,box-shadow .3s}
+  body.light .frame{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+  body.dark .frame{background:#2c2c2e;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+
+  .bar{height:24px;display:flex;align-items:center;padding:0 14px;gap:12px;font-size:12px;transition:background .3s,border-color .3s}
+  body.light .bar{background:rgba(255,255,255,.85);border-bottom:1px solid rgba(0,0,0,.04)}
+  body.dark .bar{background:rgba(44,44,46,.85);border-bottom:1px solid rgba(255,255,255,.04)}
+  .bar .al{font-size:13px;transition:color .3s}
+  body.light .bar .al{color:#1d1d1f}
+  body.dark .bar .al{color:#f5f5f7}
+  .bar .sp{flex:1}
+  .bar .trg{display:flex;align-items:center;gap:4px;padding:1px 6px;border-radius:4px;cursor:pointer;transition:background .15s}
+  body.light .bar .trg{background:rgba(0,0,0,.04)}
+  body.dark .bar .trg{background:rgba(255,255,255,.07)}
+  .bar .trg .dt{width:5px;height:5px;border-radius:50%;background:#007aff}
+  .bar .trg .pv{font-size:11px;font-weight:600;font-family:"SF Mono",monospace;color:#34c759}
+  .bar .cl{font-size:11px;opacity:.45}
+
+  .pop{margin:4px 14px 0 auto;width:290px;border-radius:10px;overflow:hidden;animation:in .2s cubic-bezier(.22,1,.36,1)}
+  @keyframes in{from{opacity:0;transform:scale(.92) translateY(-6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+  body.light .pop{background:rgba(255,255,255,.92);backdrop-filter:blur(30px);border:1px solid rgba(0,0,0,.06);box-shadow:0 8px 30px rgba(0,0,0,.06)}
+  body.dark .pop{background:rgba(44,44,46,.92);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 30px rgba(0,0,0,.35)}
+
+  .sec{padding:10px 14px;border-bottom:1px solid}
+  .sec:last-of-type{border-bottom:none}
+  body.light .sec{border-color:rgba(0,0,0,.04)}
+  body.dark .sec{border-color:rgba(255,255,255,.04)}
+
+  .sl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  body.light .sl{color:rgba(0,0,0,.55)}
+  body.dark .sl{color:rgba(255,255,255,.55)}
+
+  .rw{display:flex;align-items:center;gap:8px}
+  .tr{flex:1;height:4px;border-radius:2px;overflow:hidden}
+  body.light .tr{background:rgba(0,0,0,.06)}
+  body.dark .tr{background:rgba(255,255,255,.06)}
+  .tr .fl{height:100%;border-radius:2px;transition:width .3s}
+  .fl.b{background:#007aff}
+  .fl.g{background:#34c759}
+  .fl.o{background:#ff9500}
+
+  .vl{font-size:12px;font-weight:600;font-family:"SF Mono",monospace;min-width:38px;text-align:right}
+  .sb{font-size:10px;font-family:"SF Mono",monospace;padding:1px 5px;border-radius:3px;min-width:auto}
+  body.light .sb{color:rgba(0,0,0,.5);background:rgba(0,0,0,.04)}
+  body.dark .sb{color:rgba(255,255,255,.5);background:rgba(255,255,255,.06)}
+
+  .pr{margin-top:4px}
+  .pr .p{display:flex;padding:2px 0;font-size:11px}
+  .pr .p .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body.light .pr .p .n{color:rgba(0,0,0,.8)}
+  body.dark .pr .p .n{color:rgba(255,255,255,.8)}
+  .pr .p .m{font-family:"SF Mono",monospace}
+  body.light .pr .p .m{color:rgba(0,0,0,.35)}
+  body.dark .pr .p .m{color:rgba(255,255,255,.35)}
+
+  .ch.hide{display:none}
+  .ch{height:32px;display:flex;align-items:flex-end;gap:1px;margin-top:6px;animation:fadeIn .2s}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .ch .ba{flex:1;border-radius:1px 1px 0 0;min-height:1px}
+  .ch .ba.b{background:#007aff}
+  .ch .ba.g{background:#34c759}
+
+  .tg{display:flex;align-items:center;gap:4px;cursor:pointer;padding:2px 0;user-select:none}
+  .tg .ar{font-size:8px}
+  body.light .tg .ar{color:rgba(0,0,0,.3)}
+  body.dark .tg .ar{color:rgba(255,255,255,.3)}
+  .tg .tl{font-size:9px}
+  body.light .tg .tl{color:rgba(0,0,0,.3)}
+  body.dark .tg .tl{color:rgba(255,255,255,.3)}
+
+  .ntw{display:flex;justify-content:space-between}
+  .ntw .g{display:flex;flex-direction:column;gap:1px}
+  .ntw .g .lb{display:flex;align-items:center;gap:3px;font-size:9px}
+  body.light .ntw .g .lb{color:rgba(0,0,0,.55)}
+  body.dark .ntw .g .lb{color:rgba(255,255,255,.55)}
+  .ntw .g .v{font-size:13px;font-weight:600;font-family:"SF Mono",monospace}
+  .ntw .g .v.d{color:#007aff}
+  .ntw .g .v.u{color:#ff9500}
+  .ntw .g.r{text-align:right}
+  .tdy{font-size:9px;margin-top:3px}
+  body.light .tdy{color:rgba(0,0,0,.3)}
+  body.dark .tdy{color:rgba(255,255,255,.3)}
+
+  .ft{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;border-top:1px solid}
+  body.light .ft{border-color:rgba(0,0,0,.04)}
+  body.dark .ft{border-color:rgba(255,255,255,.04)}
+  .ft .btn{background:none;border:none;font-size:11px;cursor:pointer;padding:3px;border-radius:4px;font-family:inherit;transition:all .12s;width:26px;height:20px;display:flex;align-items:center;justify-content:center}
+  body.light .ft .btn{color:rgba(0,0,0,.5)}
+  body.dark .ft .btn{color:rgba(255,255,255,.5)}
+  .ft .btn:hover{background:rgba(0,0,0,.04)}
+  body.dark .ft .btn:hover{background:rgba(255,255,255,.06)}
+
+  .bth{display:flex;gap:12px;margin-top:2px;font-size:10px}
+  body.light .bth{color:rgba(0,0,0,.35)}
+  body.dark .bth{color:rgba(255,255,255,.35)}
+  .bth .bv{font-family:"SF Mono",monospace}
+  body.light .bth .bv{color:rgba(0,0,0,.7)}
+  body.dark .bth .bv{color:rgba(255,255,255,.7)}
+</style>
+</head>
+<body class="light">
+
+<div class="mode" onclick="document.body.classList.toggle('dark');document.body.classList.toggle('light')">
+  <span>☀️</span><div class="tr"><div class="kn"></div></div><span>🌙</span>
+</div>
+
+<div class="hdr"><h1>MenuMeter</h1><p>macOS Menu Bar System Monitor</p></div>
+
+<div class="frame">
+  <div class="bar">
+    <span class="al"></span><span style="font-weight:600">MenuMeter</span>
+    <div class="sp"></div>
+    <div class="trg" onclick="togglePop()"><div class="dt"></div><span class="pv" id="cpuVal">32%</span></div>
+    <span class="cl" id="clock">10:42 AM</span>
+  </div>
+
+  <div class="pop" id="pop">
+    <!-- CPU -->
+    <div class="sec">
+      <div class="sl">CPU</div>
+      <div class="rw">
+        <div class="tr"><div class="fl b" id="cpuFl" style="width:32%"></div></div>
+        <span class="vl" id="cpuPc" style="color:#007aff">32%</span>
+        <span class="sb" id="cpuTmp">72°</span>
+      </div>
+      <div class="tg" onclick="toggleChart('cpuCh',this)"><span class="ar" id="cpuAr">▸</span><span class="tl">Trend</span></div>
+      <div class="ch hide" id="cpuCh"></div>
+    </div>
+    <!-- Memory -->
+    <div class="sec">
+      <div class="sl">Memory</div>
+      <div class="rw">
+        <div class="tr"><div class="fl g" id="memFl" style="width:45%"></div></div>
+        <span class="vl" style="color:#34c759">7.2 GB</span>
+        <span style="font-size:10px;font-family:'SF Mono',monospace;transition:color .3s;color:rgba(128,128,132,.7)">16 GB</span>
+      </div>
+      <div class="pr">
+        <div class="p"><span class="n">Google Chrome</span><span class="m">2.8 GB</span></div>
+        <div class="p"><span class="n">Code</span><span class="m">1.6 GB</span></div>
+        <div class="p"><span class="n">Xcode</span><span class="m">1.4 GB</span></div>
+        <div class="p"><span class="n">Safari</span><span class="m">0.9 GB</span></div>
+        <div class="p"><span class="n">Spotify</span><span class="m">0.4 GB</span></div>
+      </div>
+      <div class="tg" onclick="toggleChart('memCh',this)"><span class="ar" id="memAr">▸</span><span class="tl">Trend</span></div>
+      <div class="ch hide" id="memCh"></div>
+    </div>
+    <!-- Network -->
+    <div class="sec">
+      <div class="sl">Network</div>
+      <div class="ntw">
+        <div class="g"><div class="lb">↓ Download</div><span class="v d" id="dn">2.3 MB/s</span></div>
+        <div class="g r"><div class="lb">↑ Upload</div><span class="v u" id="up">0.4 MB/s</span></div>
+      </div>
+      <div class="tdy">Today: ↓ 1.2 GB · ↑ 0.3 GB</div>
+    </div>
+    <!-- Disk -->
+    <div class="sec">
+      <div class="sl">Disk</div>
+      <div class="rw">
+        <div class="tr"><div class="fl o" style="width:62%"></div></div>
+        <span class="vl" style="color:#ff9500">308 GB</span>
+        <span style="font-size:10px;font-family:'SF Mono',monospace;transition:color .3s;color:rgba(128,128,132,.7)">500 GB</span>
+      </div>
+      <span style="font-size:10px;transition:color .3s;color:rgba(128,128,132,.55)">192 GB available</span>
+    </div>
+    <!-- Battery -->
+    <div class="sec">
+      <div class="sl">Battery</div>
+      <div style="display:flex;gap:12px;margin-bottom:8px;font-size:10px">
+        <span style="transition:color .3s">168 cycles</span>
+        <span style="transition:color .3s">Health 92%</span>
+      </div>
+      <div class="rw">
+        <div class="tr"><div class="fl g" style="width:78%"></div></div>
+        <span class="vl" style="color:#34c759">78%</span>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="ft">
+      <button class="btn" onclick="oS()">⚙</button>
+      <button class="btn" onclick="rf()">↻</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let vis=!0;
+  function togglePop(){vis=!vis;document.getElementById('pop').style.display=vis?'block':'none'}
+  function oS(){}
+  function rf(){
+    const c=Math.floor(Math.random()*40+15),m=Math.floor(Math.random()*15+40),d=(Math.random()*4+.5).toFixed(1),u=(Math.random()*1.5+.1).toFixed(1),t=Math.floor(Math.random()*15+65);
+    document.getElementById('cpuVal').textContent=c+'%';document.getElementById('cpuFl').style.width=c+'%';document.getElementById('cpuPc').textContent=c+'%';
+    document.getElementById('cpuTmp').textContent=t+'°';document.getElementById('memFl').style.width=m+'%';
+    document.getElementById('dn').textContent=d+' MB/s';document.getElementById('up').textContent=u+' MB/s';
+    ge()
+  }
+  function toggleChart(id,el){
+    const ch=document.getElementById(id);const ar=el.querySelector('.ar');
+    ch.classList.toggle('hide');ar.textContent=ch.classList.contains('hide')?'▸':'▾'
+  }
+  function ge(){
+    ['cpuCh','memCh'].forEach(id=>{
+      const e=document.getElementById(id);e.innerHTML='';
+      if(!e.classList.contains('hide')) for(let i=0;i<60;i++){const b=document.createElement('div');b.className='ba '+(id==='cpuCh'?'b':'g');b.style.height=(id==='cpuCh'?Math.random()*60+10:Math.random()*30+35)+'%';e.appendChild(b)}
+    })
+  }
+  function uc(){const n=new Date();let h=n.getHours(),m=String(n.getMinutes()).padStart(2,'0');const a=h>=12?'PM':'AM';h=h%12||12;document.getElementById('clock').textContent=h+':'+m+' '+a}
+  setInterval(uc,1000);uc();ge();
+  let c=0;
+  setInterval(()=>{
+    const vs=[32,28,35,42,38,45,48,42,36,30,26,22,28,34,40,46,52,48,44,38,32];
+    const cv=vs[c%vs.length],mv=Math.floor(40+Math.sin(c*.3)*6),dv=(1.6+Math.sin(c*.5)*.6+Math.random()*.3).toFixed(1);
+    document.getElementById('cpuVal').textContent=cv+'%';document.getElementById('cpuFl').style.width=cv+'%';document.getElementById('cpuPc').textContent=cv+'%';
+    document.getElementById('memFl').style.width=mv+'%';document.getElementById('dn').textContent=dv+' MB/s';
+    c++
+  },2000)
+</script>
+</body>
+</html>

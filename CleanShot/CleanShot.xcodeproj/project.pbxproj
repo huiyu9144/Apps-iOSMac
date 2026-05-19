@@ -1,0 +1,349 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		77000001 /* CleanShotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000020 /* CleanShotApp.swift */; };
+		77000002 /* CaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000021 /* CaptureManager.swift */; };
+		77000003 /* RegionCapturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000022 /* RegionCapturer.swift */; };
+		77000004 /* WindowCapturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000023 /* WindowCapturer.swift */; };
+		77000005 /* FullscreenCapturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000024 /* FullscreenCapturer.swift */; };
+		77000006 /* ScrollingCapturer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000025 /* ScrollingCapturer.swift */; };
+		77000007 /* MenuBarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000026 /* MenuBarManager.swift */; };
+		77000008 /* AnnotationEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000027 /* AnnotationEditorView.swift */; };
+		77000009 /* AnnotationEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000028 /* AnnotationEngine.swift */; };
+		77000010 /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7700002F /* HistoryManager.swift */; };
+		77000011 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000030 /* SettingsView.swift */; };
+		77000012 /* NSImage+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000031 /* NSImage+Extensions.swift */; };
+		77000013 /* KeyboardShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000032 /* KeyboardShortcuts.swift */; };
+		77000014 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77000033 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		77000020 /* CleanShotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanShotApp.swift; sourceTree = "<group>"; };
+		77000021 /* CaptureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptureManager.swift; sourceTree = "<group>"; };
+		77000022 /* RegionCapturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionCapturer.swift; sourceTree = "<group>"; };
+		77000023 /* WindowCapturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowCapturer.swift; sourceTree = "<group>"; };
+		77000024 /* FullscreenCapturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenCapturer.swift; sourceTree = "<group>"; };
+		77000025 /* ScrollingCapturer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollingCapturer.swift; sourceTree = "<group>"; };
+		77000026 /* MenuBarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarManager.swift; sourceTree = "<group>"; };
+		77000027 /* AnnotationEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationEditorView.swift; sourceTree = "<group>"; };
+		77000028 /* AnnotationEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationEngine.swift; sourceTree = "<group>"; };
+		7700002F /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
+		77000030 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		77000031 /* NSImage+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSImage+Extensions.swift"; sourceTree = "<group>"; };
+		77000032 /* KeyboardShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcuts.swift; sourceTree = "<group>"; };
+		77000033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		77000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		77000035 /* CleanShot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CleanShot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		77000040 /* CleanShot */ = {
+			isa = PBXGroup;
+			children = (
+				77000020 /* CleanShotApp.swift */,
+				77000041 /* Capture */,
+				77000042 /* Editor */,
+				77000044 /* MenuBar */,
+				77000045 /* History */,
+				77000046 /* Settings */,
+				77000047 /* Extensions */,
+				77000033 /* Assets.xcassets */,
+				77000034 /* Info.plist */,
+			);
+			path = CleanShot;
+			sourceTree = "<group>";
+		};
+		77000041 /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				77000021 /* CaptureManager.swift */,
+				77000022 /* RegionCapturer.swift */,
+				77000023 /* WindowCapturer.swift */,
+				77000024 /* FullscreenCapturer.swift */,
+				77000025 /* ScrollingCapturer.swift */,
+			);
+			path = Capture;
+			sourceTree = "<group>";
+		};
+		77000042 /* Editor */ = {
+			isa = PBXGroup;
+			children = (
+				77000027 /* AnnotationEditorView.swift */,
+				77000028 /* AnnotationEngine.swift */,
+			);
+			path = Editor;
+			sourceTree = "<group>";
+		};
+		77000044 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				77000026 /* MenuBarManager.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		77000045 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				7700002F /* HistoryManager.swift */,
+			);
+			path = History;
+			sourceTree = "<group>";
+		};
+		77000046 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				77000030 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		77000047 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				77000031 /* NSImage+Extensions.swift */,
+				77000032 /* KeyboardShortcuts.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		77000048 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				77000035 /* CleanShot.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		77000049 = {
+			isa = PBXGroup;
+			children = (
+				77000040 /* CleanShot */,
+				77000048 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		77000050 /* CleanShot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 77000090 /* Build configuration list for PBXNativeTarget "CleanShot" */;
+			buildPhases = (
+				77000071 /* Sources */,
+				77000070 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CleanShot;
+			productName = CleanShot;
+			productReference = 77000035 /* CleanShot.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		77000060 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 77000091 /* Build configuration list for PBXProject "CleanShot" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "en-US";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en-US,
+				Base,
+				"zh-Hans",
+				"zh-Hant",
+				ja,
+				ko,
+				de,
+				fr,
+				es,
+			);
+			mainGroup = 77000049;
+			productRefGroup = 77000048 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				77000050 /* CleanShot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		77000070 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77000014 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		77000071 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77000001 /* CleanShotApp.swift in Sources */,
+				77000002 /* CaptureManager.swift in Sources */,
+				77000003 /* RegionCapturer.swift in Sources */,
+				77000004 /* WindowCapturer.swift in Sources */,
+				77000005 /* FullscreenCapturer.swift in Sources */,
+				77000006 /* ScrollingCapturer.swift in Sources */,
+				77000007 /* MenuBarManager.swift in Sources */,
+				77000008 /* AnnotationEditorView.swift in Sources */,
+				77000009 /* AnnotationEngine.swift in Sources */,
+				77000010 /* HistoryManager.swift in Sources */,
+				77000011 /* SettingsView.swift in Sources */,
+				77000012 /* NSImage+Extensions.swift in Sources */,
+				77000013 /* KeyboardShortcuts.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		77000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "CleanShot/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "CleanShot";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 CleanShot. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cleanshot.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		77000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "CleanShot/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "CleanShot";
+				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 CleanShot. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cleanshot.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		77000082 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				WARNING_CFLAGS = "-Wno-deprecated-declarations";
+			};
+			name = Debug;
+		};
+		77000083 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				WARNING_CFLAGS = "-Wno-deprecated-declarations";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		77000090 /* Build configuration list for PBXNativeTarget "CleanShot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77000080 /* Debug */,
+				77000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		77000091 /* Build configuration list for PBXProject "CleanShot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				77000082 /* Debug */,
+				77000083 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 77000060 /* Project object */;
+}
