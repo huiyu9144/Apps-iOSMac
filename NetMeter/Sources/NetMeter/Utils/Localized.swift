@@ -86,6 +86,18 @@ private let translations: [String: [String: String]] = [
     "今日流量": ["en": "Today's Traffic", "zh-Hans": "今日流量", "ja": "今日のトラフィック"],
     "本月已用": ["en": "This Month", "zh-Hans": "本月已用", "ja": "今月の使用量"],
     "无流量数据": ["en": "No Traffic Data", "zh-Hans": "无流量数据", "ja": "トラフィックデータなし"],
+    "总速度": ["en": "Total Speed", "zh-Hans": "总速度", "ja": "合計速度"],
+    "名称": ["en": "Name", "zh-Hans": "名称", "ja": "名前"],
+    "关闭应用": ["en": "Quit App", "zh-Hans": "关闭应用", "ja": "アプリを終了"],
+    "刷新进程": ["en": "Refresh", "zh-Hans": "刷新进程", "ja": "プロセスを更新"],
+    "进程详情": ["en": "Process Details", "zh-Hans": "进程详情", "ja": "プロセス詳細"],
+    "总流量": ["en": "Total Traffic", "zh-Hans": "总流量", "ja": "合計トラフィック"],
+    "日": ["en": "Day", "zh-Hans": "日", "ja": "日"],
+    "周": ["en": "Week", "zh-Hans": "周", "ja": "週"],
+    "月": ["en": "Month", "zh-Hans": "月", "ja": "月"],
+    "流量报告": ["en": "Traffic Report", "zh-Hans": "流量报告", "ja": "トラフィックレポート"],
+    "应用占比": ["en": "App Usage", "zh-Hans": "应用占比", "ja": "アプリ使用率"],
+    "更多": ["en": "More", "zh-Hans": "更多", "ja": "もっと見る"],
 ]
 
 private var currentLanguage: String {

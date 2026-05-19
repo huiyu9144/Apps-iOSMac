@@ -2,44 +2,32 @@ import Foundation
 import SwiftUI
 
 enum ImageFormat: String, CaseIterable, Identifiable {
-    case png = "PNG"
     case jpg = "JPG"
-    case webp = "WebP"
     case heic = "HEIC"
-    case avif = "AVIF"
     case gif = "GIF"
 
     var id: String { rawValue }
 
     var utType: String {
         switch self {
-        case .png: return "public.png"
         case .jpg: return "public.jpeg"
-        case .webp: return "org.webmproject.webp"
         case .heic: return "public.heic"
-        case .avif: return "public.avif"
         case .gif: return "com.compuserve.gif"
         }
     }
 
     var fileExtension: String {
         switch self {
-        case .png: return "png"
         case .jpg: return "jpg"
-        case .webp: return "webp"
         case .heic: return "heic"
-        case .avif: return "avif"
         case .gif: return "gif"
         }
     }
 
     var defaultQuality: Double {
         switch self {
-        case .png: return 1.0
-        case .jpg: return 0.9
-        case .webp: return 0.9
-        case .heic: return 0.8
-        case .avif: return 0.8
+        case .jpg: return 0.3
+        case .heic: return 0.3
         case .gif: return 1.0
         }
     }
@@ -61,20 +49,30 @@ enum OutputDirectory: String, CaseIterable, Identifiable {
     }
 }
 
+enum ResizeMode: String, CaseIterable {
+    case fit = "适应"
+    case fill = "填充"
+    case stretch = "拉伸"
+
+    var id: String { rawValue }
+}
+
 @MainActor
 @Observable
 class FormatQuickViewModel {
     var imageFiles: [URL] = []
-    var selectedFormat: ImageFormat = .webp
-    var quality: Double = 0.9
+    var selectedFormat: ImageFormat = .jpg
+    var quality: Double = 0.3
     var resizeEnabled = false
     var resizeWidth: Int = 1920
     var resizeHeight: Int = 1080
+    var resizeMode: ResizeMode = .fit
     var keepExif = true
     var isConverting = false
     var progress: Double = 0
     var currentFileName: String = ""
     var totalFileCount: Int = 0
+    var totalFileSize: UInt64 = 0
     var outputDirectory: OutputDirectory = .sameAsSource
     var openFolderAfterConvert = true
     var showAlert = false
@@ -95,47 +93,60 @@ class FormatQuickViewModel {
         return countStr + locStr("张 → 约") + " " + estimatedTime
     }
 
+    var totalSizeLabel: String {
+        if totalFileSize == 0 { return "" }
+        let size = Double(totalFileSize)
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: Int64(size))
+    }
+
     init() {
         loadSettings()
     }
 
     func addImages(_ urls: [URL]) {
+        let existingSet = Set(imageFiles)
         let newUrls = urls.filter { url in
-            guard let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier,
-                  NSImage.imageTypes.contains(typeIdentifier) else {
-                return false
-            }
-            return !imageFiles.contains(url)
+            guard !existingSet.contains(url) else { return false }
+            guard let typeIdentifier = try? url.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier else { return false }
+            return NSImage.imageTypes.contains(typeIdentifier)
         }
+        guard !newUrls.isEmpty else { return }
+
         imageFiles.append(contentsOf: newUrls)
-        if !newUrls.isEmpty {
-            updateFormatForInput()
-        }
+        calculateTotalSize()
     }
 
     func addFolder(_ url: URL) {
-        let fileManager = FileManager.default
-        guard let enumerator = fileManager.enumerator(
-            at: url,
-            includingPropertiesForKeys: [.typeIdentifierKey],
-            options: [.skipsHiddenFiles]
-        ) else { return }
+        DispatchQueue.global(qos: .userInitiated).async {
+            let fileManager = FileManager.default
+            guard let enumerator = fileManager.enumerator(
+                at: url,
+                includingPropertiesForKeys: [.typeIdentifierKey],
+                options: [.skipsHiddenFiles]
+            ) else { return }
 
-        var imageUrls: [URL] = []
-        for case let fileURL as URL in enumerator {
-            guard let typeIdentifier = try? fileURL.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier,
-                  NSImage.imageTypes.contains(typeIdentifier) else {
-                continue
+            var imageUrls: [URL] = []
+            for case let fileURL as URL in enumerator {
+                guard let typeIdentifier = try? fileURL.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier,
+                      NSImage.imageTypes.contains(typeIdentifier) else {
+                    continue
+                }
+                imageUrls.append(fileURL)
             }
-            imageUrls.append(fileURL)
+
+            DispatchQueue.main.async { [weak self] in
+                self?.addImages(imageUrls)
+            }
         }
-        addImages(imageUrls)
     }
 
     func clearImages() {
         imageFiles.removeAll()
         progress = 0
         currentFileName = ""
+        totalFileSize = 0
     }
 
     func selectFormat(_ format: ImageFormat) {
@@ -160,6 +171,7 @@ class FormatQuickViewModel {
         let shouldResize = resizeEnabled
         let targetWidth = resizeWidth
         let targetHeight = resizeHeight
+        let targetResizeMode = resizeMode
         let shouldKeepExif = keepExif
 
         let files = imageFiles
@@ -171,6 +183,7 @@ class FormatQuickViewModel {
             resize: shouldResize,
             targetWidth: targetWidth,
             targetHeight: targetHeight,
+            resizeMode: targetResizeMode,
             keepExif: shouldKeepExif,
             outputDirectory: destinationDir,
             onProgress: { [weak self] completed, fileName in
@@ -205,14 +218,19 @@ class FormatQuickViewModel {
         }
     }
 
-    private func updateFormatForInput() {
-        guard let firstFile = imageFiles.first,
-              let typeIdentifier = try? firstFile.resourceValues(forKeys: [.typeIdentifierKey]).typeIdentifier else {
-            return
-        }
-        if typeIdentifier == "public.png" {
-            selectedFormat = .webp
-            quality = ImageFormat.webp.defaultQuality
+    private func calculateTotalSize() {
+        let files = imageFiles
+        DispatchQueue.global(qos: .utility).async {
+            var total: UInt64 = 0
+            for url in files {
+                if let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
+                   let size = attrs[.size] as? UInt64 {
+                    total += size
+                }
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.totalFileSize = total
+            }
         }
     }
 

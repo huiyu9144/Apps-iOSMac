@@ -7,37 +7,34 @@ struct ProcessTrafficInfo: Identifiable {
     let pid: Int
     let downloadSpeed: Double
     let uploadSpeed: Double
+    let totalBytesIn: UInt64
+    let totalBytesOut: UInt64
 
     var hasTraffic: Bool { uploadSpeed > 0 || downloadSpeed > 0 }
 }
 
 @MainActor
 class ProcessTrafficService {
-    private var timer: Timer?
     @Published var processes: [ProcessTrafficInfo] = []
+    @Published var isRefreshing = false
 
     private var previousBytes: [pid_t: (inBytes: UInt64, outBytes: UInt64)] = [:]
     private var lastUpdateTime: Date?
 
-    func startMonitoring(interval: TimeInterval = 3.0) {
+    func refresh() {
+        guard !isRefreshing else { return }
         Task { await update() }
-        timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
-            Task { [weak self] in
-                await self?.update()
-            }
-        }
     }
 
     func stopMonitoring() {
-        timer?.invalidate()
-        timer = nil
         previousBytes = [:]
         lastUpdateTime = nil
     }
 
     private func update() async {
+        isRefreshing = true
         let snapshot = await Self.scanAllProcesses()
-        guard !snapshot.isEmpty else { return }
+        guard !snapshot.isEmpty else { isRefreshing = false; return }
         let now = Date()
 
         var result: [ProcessTrafficInfo] = []
@@ -67,7 +64,9 @@ class ProcessTrafficService {
                     name: entry.name,
                     pid: Int(entry.pid),
                     downloadSpeed: dSpeed,
-                    uploadSpeed: uSpeed
+                    uploadSpeed: uSpeed,
+                    totalBytesIn: entry.bytesIn,
+                    totalBytesOut: entry.bytesOut
                 ))
             }
         }
@@ -75,55 +74,63 @@ class ProcessTrafficService {
         lastUpdateTime = now
         result.sort { ($0.downloadSpeed + $0.uploadSpeed) > ($1.downloadSpeed + $1.uploadSpeed) }
         processes = result
+        isRefreshing = false
     }
 
     private static func scanAllProcesses() async -> [(pid: pid_t, name: String, bytesIn: UInt64, bytesOut: UInt64)] {
         await Task.detached(priority: .utility) {
-            let capacity = 4096
-            let pidList = UnsafeMutablePointer<pid_t>.allocate(capacity: capacity)
-            defer { pidList.deallocate() }
-
-            let count = proc_listallpids(pidList, Int32(MemoryLayout<pid_t>.stride * capacity))
-            guard count > 0 else { return [] }
-
-            let pidBuf = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(PROC_PIDPATHINFO_MAXSIZE))
-            defer { pidBuf.deallocate() }
-
-            var nameCache: [pid_t: String] = [:]
-            var result: [(pid_t, String, UInt64, UInt64)] = []
-
-            for i in 0..<Int(count) {
-                let pid = pidList[i]
-                guard pid > 0 else { continue }
-
-                let traffic = readProcNetworkBytes(pid)
-                guard traffic.0 > 0 || traffic.1 > 0 else { continue }
-
-                let name: String
-                if let cached = nameCache[pid] {
-                    name = cached
-                } else {
-                    let pathSize = proc_pidpath(pid, pidBuf, UInt32(PROC_PIDPATHINFO_MAXSIZE))
-                    if pathSize > 0 {
-                        let path = String(cString: pidBuf)
-                        name = URL(fileURLWithPath: path).lastPathComponent
-                        nameCache[pid] = name
-                    } else {
-                        continue
-                    }
-                }
-
-                result.append((pid, name, traffic.0, traffic.1))
-            }
-
-            return result
+            runNettopSnapshot()
         }.value
     }
 }
 
-private func readProcNetworkBytes(_ pid: pid_t) -> (UInt64, UInt64) {
-    var info = proc_taskinfo()
-    let size = proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &info, Int32(MemoryLayout<proc_taskinfo>.stride))
-    guard size == MemoryLayout<proc_taskinfo>.stride else { return (0, 0) }
-    return (info.pti_total_bytes_in, info.pti_total_bytes_out)
+private func runNettopSnapshot() -> [(pid: pid_t, name: String, bytesIn: UInt64, bytesOut: UInt64)] {
+    let task = Process()
+    task.executableURL = URL(fileURLWithPath: "/usr/bin/script")
+    task.arguments = ["-q", "/dev/null", "/usr/bin/nettop", "-P", "-x", "-n", "-s", "1", "-l", "1", "-L", "1"]
+
+    let outPipe = Pipe()
+    task.standardOutput = outPipe
+    task.standardError = Pipe()
+    task.standardInput = FileHandle.nullDevice
+
+    do {
+        try task.run()
+        task.waitUntilExit()
+    } catch {
+        return []
+    }
+
+    let data = outPipe.fileHandleForReading.readDataToEndOfFile()
+    guard let text = String(data: data, encoding: .utf8) else { return [] }
+
+    var result: [pid_t: (String, UInt64, UInt64)] = [:]
+    let lines = text.components(separatedBy: .newlines)
+
+    for line in lines {
+        let cleaned = line.replacingOccurrences(of: "\u{0004}", with: "")
+                             .replacingOccurrences(of: "\u{0008}", with: "")
+        guard cleaned.contains(",") else { continue }
+
+        let cols = cleaned.components(separatedBy: ",")
+        guard cols.count >= 6 else { continue }
+        if cols[1].hasPrefix("time") || cols[1] == "interface" { continue }
+
+        let namePid = cols[1].trimmingCharacters(in: .whitespaces)
+        guard !namePid.isEmpty, namePid.contains(".") else { continue }
+
+        let bytesInStr = cols[4].trimmingCharacters(in: .whitespaces)
+        let bytesOutStr = cols[5].trimmingCharacters(in: .whitespaces)
+        guard let bytesIn = UInt64(bytesInStr), let bytesOut = UInt64(bytesOutStr) else { continue }
+
+        guard let dotIndex = namePid.lastIndex(of: ".") else { continue }
+        let pidStr = namePid[namePid.index(after: dotIndex)...]
+        let procName = String(namePid[..<dotIndex]).trimmingCharacters(in: .whitespaces)
+        guard let pid = pid_t(pidStr), pid > 0 else { continue }
+        guard result[pid] == nil else { continue }
+
+        result[pid] = (procName, bytesIn, bytesOut)
+    }
+
+    return result.map { ($0.key, $0.value.0, $0.value.1, $0.value.2) }
 }

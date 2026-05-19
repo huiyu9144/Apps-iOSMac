@@ -21,10 +21,6 @@ private let translations: [String: [String: String]] = [
     "设置…": ["en": "Settings…", "zh-Hans": "设置…", "ja": "設定…"],
     "退出": ["en": "Quit", "zh-Hans": "退出", "ja": "終了"],
     "退出应用": ["en": "Quit", "zh-Hans": "退出应用", "ja": "アプリを終了"],
-    "外观": ["en": "Appearance", "zh-Hans": "外观", "ja": "外観"],
-    "跟随系统": ["en": "Follow System", "zh-Hans": "跟随系统", "ja": "システムに従う"],
-    "浅色": ["en": "Light", "zh-Hans": "浅色", "ja": "ライト"],
-    "深色": ["en": "Dark", "zh-Hans": "深色", "ja": "ダーク"],
     "语言": ["en": "Language", "zh-Hans": "语言", "ja": "言語"],
     "语言 Language 言語": ["en": "Language", "zh-Hans": "语言", "ja": "言語"],
     "开机自启": ["en": "Launch at Login", "zh-Hans": "开机自启", "ja": "ログイン時に起動"],
@@ -40,7 +36,6 @@ private let translations: [String: [String: String]] = [
     "无结果": ["en": "No Results", "zh-Hans": "无结果", "ja": "結果なし"],
 
     "拖拽图片或文件夹到此处": ["en": "Drop images or folders here", "zh-Hans": "拖拽图片或文件夹到此处", "ja": "画像またはフォルダをここにドロップ"],
-    "PNG, JPG, HEIC, WebP, AVIF, GIF": ["en": "PNG, JPG, HEIC, WebP, AVIF, GIF", "zh-Hans": "PNG, JPG, HEIC, WebP, AVIF, GIF", "ja": "PNG, JPG, HEIC, WebP, AVIF, GIF"],
     "选择图片": ["en": "Select Images", "zh-Hans": "选择图片", "ja": "画像を選択"],
     "或拖拽到此处": ["en": "or drag & drop here", "zh-Hans": "或拖拽到此处", "ja": "またはここにドロップ"],
     "支持多选": ["en": "Multi-select supported", "zh-Hans": "支持多选", "ja": "複数選択可"],
@@ -77,6 +72,9 @@ private let translations: [String: [String: String]] = [
     "没有选择图片": ["en": "No images selected", "zh-Hans": "没有选择图片", "ja": "画像が選択されていません"],
     "张 → 约": ["en": " files → ~", "zh-Hans": "张 → 约", "ja": "枚 → 約"],
     "秒": ["en": "s", "zh-Hans": "秒", "ja": "秒"],
+    "适应": ["en": "Fit", "zh-Hans": "适应", "ja": "フィット"],
+    "填充": ["en": "Fill", "zh-Hans": "填充", "ja": "塗りつぶし"],
+    "拉伸": ["en": "Stretch", "zh-Hans": "拉伸", "ja": "伸縮"],
 ]
 
 private var currentLanguage: String {

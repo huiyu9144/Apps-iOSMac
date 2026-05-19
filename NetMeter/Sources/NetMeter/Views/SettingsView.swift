@@ -145,23 +145,6 @@ struct SettingsView: View {
             }
 
             HStack {
-                Text(locStr("外观"))
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                Spacer()
-                Picker("", selection: Binding(
-                    get: { viewModel.appearance },
-                    set: { viewModel.setAppearance($0) }
-                )) {
-                    ForEach(AppearanceMode.allCases, id: \.rawValue) { mode in
-                        Text(mode.displayName).tag(mode)
-                    }
-                }
-                .pickerStyle(.menu)
-                .labelsHidden()
-                .frame(width: 120)
-            }
-
-            HStack {
                 Text(locStr("语言 Language 言語"))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                 Spacer()

@@ -7,7 +7,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var popover: NSPopover!
     private var viewModel: NetMeterViewModel!
     private var eventMonitor: Any?
-    private var menuBarTimer: Timer?
     private let iconImage: NSImage = {
         NSImage(systemSymbolName: "antenna.radiowaves.left.and.right", accessibilityDescription: "NetMeter")!
     }()
@@ -44,7 +43,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         viewModel?.stopMonitoring()
-        menuBarTimer?.invalidate()
         if let monitor = eventMonitor {
             NSEvent.removeMonitor(monitor)
         }
@@ -72,6 +70,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func openPopover() {
         rebuildPopoverContent()
         viewModel.startMonitoring()
+        viewModel.refreshProcesses()
         guard let button = statusItem.button else { return }
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         popover.contentViewController?.view.window?.makeKey()
@@ -114,19 +113,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func startMenuBarTimer() {
-        menuBarTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor [weak self] in
-                guard let self = self, let viewModel = self.viewModel else { return }
-                let title = viewModel.menuBarTitle
-                if title.isEmpty {
-                    self.statusItem.button?.title = ""
-                    self.statusItem.button?.image = self.iconImage
-                } else {
-                    self.statusItem.button?.image = nil
-                    self.statusItem.button?.title = title
-                    self.statusItem.button?.font = NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
-                }
-            }
-        }
+        statusItem.button?.title = ""
+        statusItem.button?.image = iconImage
     }
 }

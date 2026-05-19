@@ -104,7 +104,6 @@ enum ImageCompressor {
         }
 
         let baseName = url.deletingPathExtension().lastPathComponent
-        let outFile = uniqueOutputURL(baseName: baseName, ext: outputFormat.fileExtension, in: outputDirectory)
 
         let sourceProperties = preserveEXIF
             ? CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any]
@@ -118,6 +117,8 @@ enum ImageCompressor {
         } else {
             imageToWrite = originalCGImage
         }
+
+        let outFile = uniqueOutputURL(baseName: baseName, ext: outputFormat.fileExtension, in: outputDirectory)
 
         switch outputFormat {
         case .png:
@@ -191,20 +192,17 @@ enum ImageCompressor {
         rep.size = NSSize(width: image.width, height: image.height)
 
         var props: [NSBitmapImageRep.PropertyKey: Any] = [:]
+        props[.interlaced] = false
 
         switch quality {
         case .lossless:
             props[.compressionFactor] = 1.0
-            props[.interlaced] = false
         case .high:
             props[.compressionFactor] = 0.65
-            props[.interlaced] = false
         case .medium:
             props[.compressionFactor] = 0.4
-            props[.interlaced] = false
         case .low:
             props[.compressionFactor] = 0.2
-            props[.interlaced] = false
         }
 
         guard let data = rep.representation(using: .png, properties: props) else {
@@ -268,9 +266,18 @@ enum ImageCompressor {
             throw CompressionError.webpNotSupported
         }
 
-        var properties: [CFString: Any] = [
-            kCGImageDestinationLossyCompressionQuality: quality.webpValue / 100.0,
-        ]
+        var properties: [CFString: Any] = [:]
+
+        switch quality {
+        case .lossless:
+            properties[kCGImageDestinationLossyCompressionQuality] = 1.0
+        case .high, .medium, .low:
+            properties[kCGImageDestinationLossyCompressionQuality] = quality.webpValue / 100.0
+        }
+
+        if let exif = sourceProperties?[kCGImagePropertyExifDictionary] {
+            properties[kCGImagePropertyExifDictionary] = exif
+        }
 
         CGImageDestinationAddImage(destination, image, properties as CFDictionary)
 

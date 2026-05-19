@@ -28,6 +28,22 @@ enum AppearanceMode: String, CaseIterable {
     }
 }
 
+enum ProcessSortMode: String, CaseIterable {
+    case totalSpeed = "total"
+    case uploadSpeed = "upload"
+    case downloadSpeed = "download"
+    case name = "name"
+
+    var displayName: String {
+        switch self {
+        case .totalSpeed: return locStr("总速度")
+        case .uploadSpeed: return locStr("上传速度")
+        case .downloadSpeed: return locStr("下载速度")
+        case .name: return locStr("名称")
+        }
+    }
+}
+
 @MainActor
 class NetMeterViewModel: ObservableObject {
     private let networkMonitor = NetworkMonitorService()
@@ -43,6 +59,7 @@ class NetMeterViewModel: ObservableObject {
     @Published var sessionDownload: UInt64 = 0
     @Published var speedHistory: [TrafficSnapshot] = []
     @Published var processes: [ProcessTrafficInfo] = []
+    @Published var processIsRefreshing = false
     @Published var dailyTotals: [(date: Date, upload: UInt64, download: UInt64)] = []
 
     @Published var showLiveChart = false
@@ -57,6 +74,7 @@ class NetMeterViewModel: ObservableObject {
     @Published var monthlyLimitGB: Double = 100
     @Published var notifyAt80 = true
     @Published var appLanguage: Language = .system
+    @Published var processSortMode: ProcessSortMode = .totalSpeed
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -78,6 +96,23 @@ class NetMeterViewModel: ObservableObject {
             return "\(interfaceType) (\(ipAddress))"
         }
         return locStr("未连接")
+    }
+
+    var sortedProcesses: [ProcessTrafficInfo] {
+        switch processSortMode {
+        case .totalSpeed:
+            return processes.sorted { $0.downloadSpeed + $0.uploadSpeed > $1.downloadSpeed + $1.uploadSpeed }
+        case .uploadSpeed:
+            return processes.sorted { $0.uploadSpeed > $1.uploadSpeed }
+        case .downloadSpeed:
+            return processes.sorted { $0.downloadSpeed > $1.downloadSpeed }
+        case .name:
+            return processes.sorted { $0.name.localizedCompare($1.name) == .orderedAscending }
+        }
+    }
+
+    var maxProcessSpeed: Double {
+        sortedProcesses.first.map { $0.downloadSpeed + $0.uploadSpeed } ?? 1
     }
 
     init() {
@@ -102,6 +137,10 @@ class NetMeterViewModel: ObservableObject {
         if let raw = defaults.string(forKey: "appLanguage"),
            let lang = Language(rawValue: raw) {
             appLanguage = lang
+        }
+        if let raw = defaults.string(forKey: "processSortMode"),
+           let mode = ProcessSortMode(rawValue: raw) {
+            processSortMode = mode
         }
     }
 
@@ -160,13 +199,17 @@ class NetMeterViewModel: ObservableObject {
         saveSetting("appLanguage", value: lang.rawValue)
     }
 
+    func setProcessSortMode(_ mode: ProcessSortMode) {
+        processSortMode = mode
+        saveSetting("processSortMode", value: mode.rawValue)
+    }
+
     func startMonitoring() {
         guard !isMonitoring else { return }
         isMonitoring = true
 
         networkMonitor.startMonitoring()
         trafficService.startMonitoring(interval: refreshInterval)
-        processTrafficService.startMonitoring(interval: 3.0)
 
         networkMonitor.$isConnected
             .receive(on: RunLoop.main)
@@ -217,6 +260,15 @@ class NetMeterViewModel: ObservableObject {
             .receive(on: RunLoop.main)
             .assign(to: \.processes, on: self)
             .store(in: &cancellables)
+
+        processTrafficService.$isRefreshing
+            .receive(on: RunLoop.main)
+            .assign(to: \.processIsRefreshing, on: self)
+            .store(in: &cancellables)
+    }
+
+    func refreshProcesses() {
+        processTrafficService.refresh()
     }
 
     func stopMonitoring() {
@@ -235,9 +287,9 @@ class NetMeterViewModel: ObservableObject {
 
     func formatSpeed(_ bytesPerSecond: Double) -> String {
         if bytesPerSecond >= 1024 * 1024 {
-            return String(format: "%.1f \(locStr("MB/s"))", bytesPerSecond / (1024 * 1024))
+            return String(format: "%.0f \(locStr("MB/s"))", bytesPerSecond / (1024 * 1024))
         } else if bytesPerSecond >= 1024 {
-            return String(format: "%.1f \(locStr("KB/s"))", bytesPerSecond / 1024)
+            return String(format: "%.0f \(locStr("KB/s"))", bytesPerSecond / 1024)
         } else {
             return String(format: "%.0f \(locStr("B/s"))", bytesPerSecond)
         }
@@ -246,11 +298,11 @@ class NetMeterViewModel: ObservableObject {
     func formatBytes(_ bytes: UInt64) -> String {
         let b = Double(bytes)
         if b >= 1024 * 1024 * 1024 {
-            return String(format: "%.1f \(locStr("GB"))", b / (1024 * 1024 * 1024))
+            return String(format: "%.0f \(locStr("GB"))", b / (1024 * 1024 * 1024))
         } else if b >= 1024 * 1024 {
-            return String(format: "%.1f \(locStr("MB"))", b / (1024 * 1024))
+            return String(format: "%.0f \(locStr("MB"))", b / (1024 * 1024))
         } else if b >= 1024 {
-            return String(format: "%.1f \(locStr("KB"))", b / 1024)
+            return String(format: "%.0f \(locStr("KB"))", b / 1024)
         } else {
             return String(format: "%.0f \(locStr("B"))", b)
         }

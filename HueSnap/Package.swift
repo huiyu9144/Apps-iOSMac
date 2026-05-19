@@ -20,19 +20,14 @@ let package = Package(
                 "App/HueSnapApp.swift",
                 "App/AppDelegate.swift",
                 "MenuBar/MenuBarPopoverView.swift",
-                "Views/SettingsView.swift",
                 "ViewModels/HueSnapViewModel.swift",
                 "Services/ColorPickerService.swift",
                 "Services/TailwindService.swift",
-                "Utils/Localized.swift",
-                "Utils/KeyboardShortcutManager.swift"
+                "Utils/Localized.swift"
             ],
             swiftSettings: [
                 .define("APP_STORE"),
                 .unsafeFlags(["-Xfrontend", "-enable-actor-data-race-checks"])
-            ],
-            linkerSettings: [
-                .unsafeFlags(["-Xlinker", "-sdk_version", "-Xlinker", "14.0"])
             ]
         )
     ]

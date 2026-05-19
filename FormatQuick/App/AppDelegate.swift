@@ -25,7 +25,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         setupStatusItem()
         setupPopover()
-        setupAppearance()
     }
 
     private func setupStatusItem() {
@@ -54,7 +53,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupPopover() {
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 380, height: 500)
+        popover.contentSize = NSSize(width: 380, height: 420)
         popover.behavior = .transient
         popover.contentViewController = NSViewController()
         rebuildPopoverContent()
@@ -107,10 +106,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if settingsWindow == nil {
             let settingsView = SettingsView(viewModel: viewModel)
             let hostingView = NSHostingView(rootView: settingsView)
-            hostingView.frame.size = NSSize(width: 400, height: 380)
+            hostingView.frame.size = NSSize(width: 400, height: 480)
 
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 380),
+                contentRect: NSRect(x: 0, y: 0, width: 400, height: 480),
                 styleMask: [.titled, .closable, .miniaturizable],
                 backing: .buffered,
                 defer: false
@@ -128,22 +127,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func terminateApp() {
         NSApplication.shared.terminate(nil)
-    }
-
-    private func setupAppearance() {
-        let appearanceRaw = UserDefaults.standard.string(forKey: "appearance") ?? "system"
-        applyAppearance(appearanceRaw)
-    }
-
-    func applyAppearance(_ rawValue: String) {
-        switch rawValue {
-        case "light":
-            NSApp.appearance = NSAppearance(named: .aqua)
-        case "dark":
-            NSApp.appearance = NSAppearance(named: .darkAqua)
-        default:
-            NSApp.appearance = nil
-        }
     }
 }
 

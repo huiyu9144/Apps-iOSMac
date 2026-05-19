@@ -15,8 +15,8 @@ class HueSnapViewModel {
     var palette: [PickedColor] = []
     var currentColor: PickedColor?
     var selectedFormat: ColorFormat = .hex
-    var isPicking = false
     var copiedToast: String?
+    var onContentChanged: (() -> Void)?
 
     private let colorPickerService = ColorPickerService()
     private let tailwindService = TailwindService()
@@ -30,31 +30,13 @@ class HueSnapViewModel {
     }
 
     func startPicking() {
-        guard !isPicking else { return }
-        isPicking = true
         colorPickerService.startPicking()
     }
 
     func copyCurrentColor(format: ColorFormat) {
         guard let color = currentColor else { return }
-
-        let string: String
-        switch format {
-        case .hex:
-            string = color.hex
-        case .rgb:
-            string = color.rgbString()
-        case .hsl:
-            string = color.hslString()
-        case .tailwind:
-            let match = tailwindService.closestMatch(red: color.red, green: color.green, blue: color.blue)
-            string = match.name
-        }
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(string, forType: .string)
-
+        let string = formatColor(color: color, format: format)
+        copyToPasteboard(string)
         showToast(locStr("已复制") + " · \(color.hex)")
     }
 
@@ -65,29 +47,23 @@ class HueSnapViewModel {
             savePalette()
             showToast(color.hex + " · " + locStr("保存到色板"))
         }
-    }
-
-    func removeFromPalette(at indexSet: IndexSet) {
-        palette.remove(atOffsets: indexSet)
-        savePalette()
+        onContentChanged?()
     }
 
     func removeFromPalette(_ color: PickedColor) {
         palette.removeAll { $0.id == color.id }
         savePalette()
-    }
-
-    func movePaletteItem(from source: IndexSet, to destination: Int) {
-        palette.move(fromOffsets: source, toOffset: destination)
-        savePalette()
+        onContentChanged?()
     }
 
     func selectFromHistory(_ color: PickedColor) {
         currentColor = color
+        onContentChanged?()
     }
 
     func selectPaletteColor(_ color: PickedColor) {
         currentColor = color
+        onContentChanged?()
     }
 
     func closestTailwindName(red: Double, green: Double, blue: Double) -> String {
@@ -131,9 +107,29 @@ class HueSnapViewModel {
             }
             savePalette()
             showToast(locStr("完成"))
+            onContentChanged?()
         } catch {
             print("Import error: \(error)")
         }
+    }
+
+    private func formatColor(color: PickedColor, format: ColorFormat) -> String {
+        switch format {
+        case .hex:
+            return color.hex
+        case .rgb:
+            return color.rgbString()
+        case .hsl:
+            return color.hslString()
+        case .tailwind:
+            return tailwindService.closestMatch(red: color.red, green: color.green, blue: color.blue).name
+        }
+    }
+
+    private func copyToPasteboard(_ string: String) {
+        let pasteboard = NSPasteboard.general
+        pasteboard.clearContents()
+        pasteboard.setString(string, forType: .string)
     }
 
     private func showToast(_ message: String) {
@@ -157,37 +153,14 @@ class HueSnapViewModel {
             if self.history.count > self.maxHistoryCount {
                 self.history = Array(self.history.prefix(self.maxHistoryCount))
             }
-            self.isPicking = false
-            let string = self.copyColorAndToast(color: color, format: self.selectedFormat)
+            let string = self.formatColor(color: color, format: self.selectedFormat)
+            self.copyToPasteboard(string)
             ColorPickerService.showFloatingToast(message: locStr("已复制") + " · \(string)")
+            self.onContentChanged?()
         }
 
-        colorPickerService.onCancel = { [weak self] in
-            self?.isPicking = false
+        colorPickerService.onCancel = {
         }
-    }
-
-    @discardableResult
-    private func copyColorAndToast(color: PickedColor, format: ColorFormat) -> String {
-        let string: String
-        switch format {
-        case .hex:
-            string = color.hex
-        case .rgb:
-            string = color.rgbString()
-        case .hsl:
-            string = color.hslString()
-        case .tailwind:
-            let match = tailwindService.closestMatch(red: color.red, green: color.green, blue: color.blue)
-            string = match.name
-        }
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(string, forType: .string)
-
-        showToast(locStr("已复制") + " · \(string)")
-        return string
     }
 
     private func loadPalette() {

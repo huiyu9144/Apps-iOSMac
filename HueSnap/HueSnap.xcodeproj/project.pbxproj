@@ -10,12 +10,10 @@
 		66000001 /* HueSnapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000030 /* HueSnapApp.swift */; };
 		66000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000031 /* AppDelegate.swift */; };
 		66000003 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000032 /* MenuBarPopoverView.swift */; };
-		66000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000033 /* SettingsView.swift */; };
 		66000005 /* HueSnapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000034 /* HueSnapViewModel.swift */; };
 		66000006 /* ColorPickerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000035 /* ColorPickerService.swift */; };
 		66000007 /* TailwindService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000036 /* TailwindService.swift */; };
 		66000008 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000037 /* Localized.swift */; };
-		66000009 /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000038 /* KeyboardShortcutManager.swift */; };
 		66000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66000040 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -24,12 +22,10 @@
 		66000030 /* HueSnapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HueSnapApp.swift; sourceTree = "<group>"; };
 		66000031 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66000032 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
-		66000033 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		66000034 /* HueSnapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HueSnapViewModel.swift; sourceTree = "<group>"; };
 		66000035 /* ColorPickerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerService.swift; sourceTree = "<group>"; };
 		66000036 /* TailwindService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TailwindService.swift; sourceTree = "<group>"; };
 		66000037 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
-		66000038 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
 		66000040 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		66000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		66000042 /* HueSnap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HueSnap.entitlements; sourceTree = "<group>"; };
@@ -90,7 +86,6 @@
 		66000072 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				66000033 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -116,7 +111,6 @@
 			isa = PBXGroup;
 			children = (
 				66000037 /* Localized.swift */,
-				66000038 /* KeyboardShortcutManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -195,12 +189,10 @@
 				66000001 /* HueSnapApp.swift in Sources */,
 				66000002 /* AppDelegate.swift in Sources */,
 				66000003 /* MenuBarPopoverView.swift in Sources */,
-				66000004 /* SettingsView.swift in Sources */,
 				66000005 /* HueSnapViewModel.swift in Sources */,
 				66000006 /* ColorPickerService.swift in Sources */,
 				66000007 /* TailwindService.swift in Sources */,
 				66000008 /* Localized.swift in Sources */,
-				66000009 /* KeyboardShortcutManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

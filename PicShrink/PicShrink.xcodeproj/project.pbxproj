@@ -154,7 +154,7 @@
 				"en-US",
 				Base,
 				"zh-Hans",
-				"ja",
+				ja,
 			);
 			mainGroup = PS000049;
 			productRefGroup = PS000048 /* Products */;
@@ -203,6 +203,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PicShrink/Info.plist;
@@ -229,6 +230,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PicShrink/Info.plist;

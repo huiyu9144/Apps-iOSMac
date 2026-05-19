@@ -3,14 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @State var viewModel: FormatQuickViewModel
     @AppStorage("appLanguage") private var appLanguage: String = "system"
-    @AppStorage("appearance") private var appearance: String = "system"
 
     var body: some View {
         VStack(spacing: 0) {
             Form {
                 Section {
                     languagePicker
-                    appearancePicker
                 } header: {
                     Text(locStr("通用"))
                         .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -32,7 +30,6 @@ struct SettingsView: View {
                 }
             }
             .formStyle(.grouped)
-            .padding(.top, 8)
 
             Spacer()
 
@@ -41,15 +38,16 @@ struct SettingsView: View {
             HStack {
                 Text("FormatQuick")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
                 Text(locStr("版本") + " 1.0.0")
                     .font(.system(size: 11, weight: .regular, design: .rounded))
-                    .foregroundColor(.secondary.opacity(0.6))
+                    .foregroundStyle(.tertiary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
         }
-        .frame(width: 400, height: 380)
+        .frame(width: 400, height: 480)
+        .background(.ultraThinMaterial)
     }
 
     private var languagePicker: some View {
@@ -71,28 +69,6 @@ struct SettingsView: View {
                     DispatchQueue.main.async {
                         delegate.rebuildPopoverContent()
                     }
-                }
-            }
-        }
-    }
-
-    private var appearancePicker: some View {
-        HStack {
-            Text(locStr("外观"))
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-
-            Spacer()
-
-            Picker("", selection: $appearance) {
-                Text(locStr("跟随系统")).tag("system")
-                Text(locStr("浅色")).tag("light")
-                Text(locStr("深色")).tag("dark")
-            }
-            .pickerStyle(.segmented)
-            .frame(width: 200)
-            .onChange(of: appearance) { _, newValue in
-                if let delegate = NSApp.delegate as? AppDelegate {
-                    delegate.applyAppearance(newValue)
                 }
             }
         }
@@ -139,29 +115,32 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(spacing: 8) {
-            Image(systemName: "arrow.triangle.swap")
-                .font(.system(size: 22))
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-                .background(
-                    LinearGradient(
-                        colors: [Color.blue, Color.purple.opacity(0.8)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
+            ZStack {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.blue, Color.purple.opacity(0.8)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .frame(width: 44, height: 44)
+
+                Image(systemName: "arrow.triangle.swap")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(.white)
+            }
 
             Text("FormatQuick")
                 .font(.system(size: 16, weight: .bold, design: .rounded))
 
             Text(locStr("版本") + " 1.0.0" + " (1)")
                 .font(.system(size: 12, weight: .regular, design: .monospaced))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             Text("macOS 菜单栏批量图片格式转换工具")
                 .font(.system(size: 12, weight: .regular, design: .rounded))
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)

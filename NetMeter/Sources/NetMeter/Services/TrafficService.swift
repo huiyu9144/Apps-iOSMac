@@ -132,11 +132,12 @@ private func getInterfaceTraffic() -> [(String, UInt64, UInt64)] {
 
         if name.hasPrefix("lo") {
             // skip loopback
-        } else if interface.ifa_addr?.pointee.sa_family == AF_LINK,
+        } else if let addr = interface.ifa_addr,
+                  addr.pointee.sa_family == AF_LINK,
                   let data = interface.ifa_data {
             let dataPtr = data.assumingMemoryBound(to: if_data.self)
-            let bytesIn = dataPtr.pointee.ifi_ibytes
-            let bytesOut = dataPtr.pointee.ifi_obytes
+            let bytesIn = UInt64(dataPtr.pointee.ifi_ibytes)
+            let bytesOut = UInt64(dataPtr.pointee.ifi_obytes)
 
             if !seen.contains(name) {
                 seen.insert(name)

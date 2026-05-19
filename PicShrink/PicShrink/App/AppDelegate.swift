@@ -12,7 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.button?.image = NSImage(
-            systemSymbolName: "arrow.down.to.line.compact",
+            systemSymbolName: "photo.badge.arrow.down",
             accessibilityDescription: "PicShrink"
         )
         statusItem.button?.target = self
@@ -21,7 +21,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let hostingView = NSHostingView(rootView: MenuBarPopoverView(viewModel: viewModel))
         popover = NSPopover()
-        popover.contentSize = NSSize(width: 390, height: 530)
+        popover.contentSize = NSSize(width: 390, height: 320)
         popover.behavior = .transient
         popover.contentViewController = NSViewController()
         popover.contentViewController?.view = hostingView
@@ -78,7 +78,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let window = NSWindow(contentViewController: hostingController)
         window.title = locStr("设置")
         window.styleMask = [.titled, .closable, .miniaturizable]
-        window.setContentSize(NSSize(width: 380, height: 480))
+        window.setContentSize(NSSize(width: 380, height: 350))
         window.center()
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true

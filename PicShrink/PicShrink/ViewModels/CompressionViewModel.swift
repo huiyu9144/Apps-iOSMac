@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 final class CompressionViewModel {
     var selectedURLs: [URL] = []
     var totalOriginalSize: Int64 = 0
-    var quality: CompressionQuality = .high
+    var quality: CompressionQuality = .low
     var outputFormat: OutputFormat = .jpeg
     var preserveEXIF: Bool = true
     var autoOpenFolder: Bool = true
@@ -16,6 +16,7 @@ final class CompressionViewModel {
     var progress: Double = 0
     var currentFileIndex: Int = 0
     var totalFiles: Int = 0
+    var currentFileName: String = ""
     var results: [CompressionResult] = []
     var compressionComplete: Bool = false
     var totalCompressedSize: Int64 = 0
@@ -100,6 +101,9 @@ final class CompressionViewModel {
                     group.addTask {
                         await semaphore.wait()
                         defer { Task { await semaphore.signal() } }
+                        await MainActor.run {
+                            self.currentFileName = url.lastPathComponent
+                        }
                         do {
                             let result = try await ImageCompressor.compress(
                                 imageAt: url,

@@ -2,21 +2,20 @@ import SwiftUI
 
 struct MenuBarPopoverView: View {
     @Bindable var viewModel: CompressionViewModel
-    @AppStorage("outputFormat") private var outputFormatSetting: String = "jpeg"
     @AppStorage("preserveEXIF") private var preserveEXIF: Bool = true
     @AppStorage("autoOpenFolder") private var autoOpenFolder: Bool = true
     @State private var showSettings = false
+    @State private var isHoveringSettings = false
 
     var body: some View {
         VStack(spacing: 0) {
             headerRow
-
             contentArea
-
-            quitButton
+            bottomBar
         }
         .frame(width: 360)
-        .background(Color(.controlBackgroundColor))
+        .background(Color.white)
+        .clipShape(.rect(cornerRadius: 14))
         .sheet(isPresented: $showSettings) {
             SettingsView()
         }
@@ -25,186 +24,152 @@ struct MenuBarPopoverView: View {
 
     private var headerRow: some View {
         HStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .fill(.blue.opacity(0.12))
-                    .frame(width: 30, height: 30)
-                Image(systemName: "arrow.down.to.line.compact")
-                    .font(.system(size: 14, weight: .semibold))
+            HStack(spacing: 8) {
+                Image(systemName: "photo.badge.arrow.down")
+                    .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.blue)
-            }
 
-            Text("PicShrink")
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                Text("PicShrink")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+            }
 
             Spacer()
 
             Button(action: { showSettings = true }) {
                 Image(systemName: "gearshape")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(isHoveringSettings ? .primary : .secondary)
                     .frame(width: 28, height: 28)
-                    .background(Circle().fill(.clear))
+                    .background(
+                        Circle()
+                            .fill(isHoveringSettings ? Color(.separatorColor).opacity(0.12) : .clear)
+                    )
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .onHover { isHoveringSettings = $0 }
         }
         .padding(.horizontal, 18)
-        .padding(.top, 16)
-        .padding(.bottom, 12)
+        .padding(.top, 14)
+        .padding(.bottom, 10)
     }
 
     private var contentArea: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                fileSelectorSection
-                qualitySection
-                compressButton
-                if viewModel.isCompressing { progressSection }
-                CompressionResultView(viewModel: viewModel)
-                formatSection
-            }
-            .padding(.horizontal, 18)
-            .padding(.top, 4)
-            .padding(.bottom, 12)
+        VStack(spacing: 12) {
+            fileSelectorSection
+            qualitySection
+            compressButton
+            if viewModel.isCompressing { progressSection }
+            CompressionResultView(viewModel: viewModel)
         }
+        .padding(.horizontal, 16)
+        .padding(.top, 2)
+        .padding(.bottom, 10)
     }
 
     private var fileSelectorSection: some View {
-        Group {
-            if viewModel.selectedURLs.isEmpty {
-                emptyFileSelector
-            } else {
-                activeFileSelector
-            }
-        }
-    }
-
-    private var emptyFileSelector: some View {
         Button(action: { viewModel.selectFilesFromPanel() }) {
-            VStack(spacing: 10) {
-                Image(systemName: "square.and.arrow.down.on.square")
-                    .font(.system(size: 26, weight: .light))
-                    .foregroundStyle(.secondary)
+            Group {
+                if viewModel.selectedURLs.isEmpty {
+                    VStack(spacing: 10) {
+                        Image(systemName: "plus.viewfinder")
+                            .font(.system(size: 22, weight: .light))
+                            .foregroundStyle(.tertiary)
+                        Text(locStr("选择文件/文件夹"))
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 26)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .strokeBorder(
+                                style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])
+                            )
+                            .foregroundStyle(.quaternary)
+                    )
+                } else {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(.tint.opacity(0.1))
+                                .frame(width: 32, height: 32)
+                            Image(systemName: "photo.on.rectangle.angled")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(.tint)
+                        }
 
-                Text(locStr("选择文件/文件夹"))
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(viewModel.selectedFileCount)\(locStr("张图片"))")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                            Text(viewModel.formattedOriginalSize)
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                        }
 
-                Text("PNG · JPG · WebP · HEIC")
-                    .font(.system(size: 11, design: .rounded))
-                    .foregroundStyle(.tertiary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 4]))
-                    .foregroundStyle(.secondary.opacity(0.2))
-            )
-        }
-        .buttonStyle(.plain)
-    }
+                        Spacer()
 
-    private var activeFileSelector: some View {
-        Button(action: { viewModel.selectFilesFromPanel() }) {
-            HStack(spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .fill(.blue.opacity(0.12))
-                        .frame(width: 40, height: 40)
-                    Image(systemName: "photo.stack.fill")
-                        .font(.system(size: 17, weight: .medium))
-                        .foregroundStyle(.blue)
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(.tint.opacity(0.05))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(.tint.opacity(0.1), lineWidth: 1)
+                    )
                 }
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("\(viewModel.selectedFileCount)\(locStr("张图片"))")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-
-                    Text(viewModel.formattedOriginalSize)
-                        .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        .foregroundStyle(.blue.opacity(0.75))
-                }
-
-                Spacer()
-
-                Image(systemName: "pencil.circle")
-                    .font(.system(size: 16))
-                    .foregroundStyle(.secondary)
             }
-            .padding(12)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(.blue.opacity(0.04))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(.blue.opacity(0.15), lineWidth: 1)
-            )
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
     private var qualitySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionHeader(locStr("压缩后质量"))
-
-            HStack(spacing: 0) {
-                ForEach(CompressionQuality.allCases, id: \.rawValue) { q in
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.2)) { viewModel.quality = q }
-                    }) {
-                        Text(q.displayName)
-                            .font(.system(size: 12, weight: viewModel.quality == q ? .semibold : .medium, design: .rounded))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 9)
-                            .foregroundStyle(viewModel.quality == q ? .white : .secondary)
-                            .background(
-                                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                    .fill(viewModel.quality == q ? .blue : .clear)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
+        HStack(spacing: 0) {
+            ForEach(CompressionQuality.allCases, id: \.rawValue) { q in
+                qualityButton(for: q)
             }
-            .padding(3)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.black.opacity(0.04))
-            )
         }
+        .padding(4)
+        .background(
+            Capsule()
+                .fill(.fill.quaternary.opacity(0.35))
+        )
     }
 
-    private var formatSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionHeader(locStr("输出格式"))
-
-            HStack(spacing: 0) {
-                ForEach(OutputFormat.allCases, id: \.rawValue) { fmt in
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            outputFormatSetting = fmt.rawValue
-                            viewModel.outputFormat = fmt
-                        }
-                    }) {
-                        Text(fmt.fileExtension.uppercased())
-                            .font(.system(size: 12, weight: viewModel.outputFormat == fmt ? .bold : .medium, design: .monospaced))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .foregroundStyle(viewModel.outputFormat == fmt ? .blue : .secondary)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .fill(viewModel.outputFormat == fmt ? .blue.opacity(0.08) : .clear)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
+    private func qualityButton(for q: CompressionQuality) -> some View {
+        Button(action: {
+            withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.8)) {
+                viewModel.quality = q
             }
-            .padding(3)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.black.opacity(0.04))
-            )
+        }) {
+            Text(q.displayName)
+                .font(.system(size: 11.5,
+                              weight: viewModel.quality == q ? .semibold : .regular,
+                              design: .rounded))
+                .lineLimit(1)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .foregroundStyle(viewModel.quality == q ? .white : .secondary)
+                .background(qualityBackground(for: q))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func qualityBackground(for q: CompressionQuality) -> some View {
+        if viewModel.quality == q {
+            Capsule()
+                .fill(.tint)
+                .shadow(color: Color(.controlAccentColor).opacity(0.25), radius: 4, y: 1)
+        } else {
+            EmptyView()
         }
     }
 
@@ -217,91 +182,92 @@ struct MenuBarPopoverView: View {
                 viewModel.startCompression()
             }
         }) {
-            HStack(spacing: 8) {
-                Image(systemName: viewModel.isCompressing ? "xmark" : "arrow.down.circle.fill")
-                    .font(.system(size: 15, weight: .semibold))
-
+            HStack(spacing: 6) {
+                Image(systemName: viewModel.isCompressing ? "xmark" : "arrow.down")
+                    .font(.system(size: 12, weight: .semibold))
                 Text(viewModel.isCompressing ? locStr("取消压缩") : locStr("压缩并导出"))
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .font(.system(size: 12.5, weight: .semibold, design: .rounded))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 13)
+            .padding(.vertical, 10)
             .background(
-                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
                     .fill(viewModel.isCompressing ? Color.red : Color.blue)
+                    .shadow(color: (viewModel.isCompressing ? Color.red : Color.blue).opacity(0.25),
+                            radius: 6, y: 2)
             )
             .foregroundStyle(.white)
-            .shadow(color: (viewModel.isCompressing ? Color.red : Color.blue).opacity(0.2), radius: 8, y: 4)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .scaleEffect(viewModel.isCompressing ? 0.98 : 1)
-        .animation(.easeInOut(duration: 0.15), value: viewModel.isCompressing)
+        .scaleEffect(viewModel.isCompressing ? 0.97 : 1)
+        .animation(.interactiveSpring(response: 0.2, dampingFraction: 0.8), value: viewModel.isCompressing)
     }
 
     private var progressSection: some View {
-        VStack(spacing: 10) {
-            HStack {
+        VStack(spacing: 8) {
+            HStack(spacing: 8) {
                 HStack(spacing: 6) {
-                    ProgressView()
-                        .scaleEffect(0.7)
-                        .frame(width: 16, height: 16)
+                    DotPulsingView()
                     Text(locStr("正在压缩..."))
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                 }
                 .foregroundStyle(.secondary)
 
                 Spacer()
 
                 Text("\(viewModel.currentFileIndex)/\(viewModel.totalFiles)")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.blue)
+                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.tint)
                     .contentTransition(.numericText())
             }
 
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    Capsule(style: .continuous)
-                        .fill(.secondary.opacity(0.1))
-                        .frame(height: 5)
+            ProgressView(value: viewModel.progress)
+                .tint(.blue)
 
-                    Capsule(style: .continuous)
-                        .fill(LinearGradient(colors: [.blue, .blue.opacity(0.7)], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: max(5, geo.size.width * viewModel.progress), height: 5)
-                }
+            if !viewModel.currentFileName.isEmpty {
+                Text(viewModel.currentFileName)
+                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .transition(.move(edge: .top).combined(with: .opacity))
             }
-            .frame(height: 5)
-            .animation(.easeInOut(duration: 0.3), value: viewModel.progress)
         }
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(.blue.opacity(0.04))
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(.blue.opacity(0.08), lineWidth: 1)
+        )
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
-    private var quitButton: some View {
-        Button(action: { NSApplication.shared.terminate(nil) }) {
-            Text(locStr("退出应用"))
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(.tertiary)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+    private var bottomBar: some View {
+        HStack {
+            Button(action: { NSApplication.shared.terminate(nil) }) {
+                Text(locStr("退出应用"))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .contentShape(Rectangle())
+
+            Spacer()
         }
-        .buttonStyle(.plain)
-    }
-
-    private func sectionHeader(_ text: String) -> some View {
-        Text(text)
-            .font(.system(size: 10, weight: .semibold, design: .rounded))
-            .foregroundStyle(.tertiary)
-            .textCase(.uppercase)
-            .tracking(0.5)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 8)
+        .overlay(alignment: .top) {
+            Divider()
+        }
     }
 
     private func syncSettingsToViewModel() {
         viewModel.preserveEXIF = preserveEXIF
         viewModel.autoOpenFolder = autoOpenFolder
-        viewModel.outputFormat = OutputFormat(rawValue: outputFormatSetting) ?? .jpeg
     }
 }
 
@@ -313,5 +279,26 @@ extension CompressionQuality {
         case .medium: return locStr("中等质量")
         case .low: return locStr("最小体积")
         }
+    }
+}
+
+struct DotPulsingView: View {
+    @State private var opacity: Double = 1.0
+    @State private var scale: CGFloat = 1.0
+
+    var body: some View {
+        Circle()
+            .fill(.blue)
+            .frame(width: 7, height: 7)
+            .opacity(opacity)
+            .scaleEffect(scale)
+            .onAppear {
+                withAnimation(
+                    .easeInOut(duration: 0.6).repeatForever(autoreverses: true)
+                ) {
+                    opacity = 0.4
+                    scale = 0.6
+                }
+            }
     }
 }
