@@ -5,8 +5,10 @@ struct FileRowView: View {
     let isSelected: Bool
     let isPreserved: Bool
     let onToggle: () -> Void
+    @ObservedObject private var langManager = LocalizationManager.shared
 
     var body: some View {
+        let _ = langManager
         HStack(spacing: 10) {
             if isPreserved {
                 Image(systemName: "lock.fill")

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ResultPanelView: View {
     @ObservedObject var scanVM: ScanViewModel
+    @ObservedObject private var langManager = LocalizationManager.shared
     @StateObject private var resultVM = ResultViewModel()
 
     private var totalWastedSpace: Int64 {
@@ -9,6 +10,7 @@ struct ResultPanelView: View {
     }
 
     var body: some View {
+        let _ = langManager
         VStack(spacing: 0) {
             if scanVM.duplicateGroups.isEmpty {
                 emptyView

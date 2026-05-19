@@ -1,0 +1,330 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		77000001 /* FormatQuickApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000030 /* FormatQuickApp.swift */; };
+		77000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000031 /* AppDelegate.swift */; };
+		77000003 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000032 /* MenuBarPopoverView.swift */; };
+		77000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000033 /* SettingsView.swift */; };
+		77000005 /* FormatQuickViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000034 /* FormatQuickViewModel.swift */; };
+		77000006 /* FormatConverterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000035 /* FormatConverterService.swift */; };
+		77000007 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000036 /* Localized.swift */; };
+		77000008 /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77000037 /* KeyboardShortcutManager.swift */; };
+		77000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77000040 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		77000020 /* FormatQuick.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FormatQuick.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		77000030 /* FormatQuickApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatQuickApp.swift; sourceTree = "<group>"; };
+		77000031 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		77000032 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
+		77000033 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		77000034 /* FormatQuickViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatQuickViewModel.swift; sourceTree = "<group>"; };
+		77000035 /* FormatConverterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatConverterService.swift; sourceTree = "<group>"; };
+		77000036 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
+		77000037 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
+		77000040 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		77000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		77000042 /* FormatQuick.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FormatQuick.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		77000050 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		77000060 = {
+			isa = PBXGroup;
+			children = (
+				77000070 /* App */,
+				77000071 /* MenuBar */,
+				77000072 /* Views */,
+				77000073 /* ViewModels */,
+				77000074 /* Services */,
+				77000075 /* Utils */,
+				77000040 /* Assets.xcassets */,
+				77000041 /* Info.plist */,
+				77000042 /* FormatQuick.entitlements */,
+				77000062 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		77000062 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				77000020 /* FormatQuick.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		77000070 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				77000030 /* FormatQuickApp.swift */,
+				77000031 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		77000071 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				77000032 /* MenuBarPopoverView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		77000072 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				77000033 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		77000073 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				77000034 /* FormatQuickViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		77000074 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				77000035 /* FormatConverterService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		77000075 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				77000036 /* Localized.swift */,
+				77000037 /* KeyboardShortcutManager.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		77000080 /* FormatQuick */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 770000C0 /* Build configuration list for PBXNativeTarget "FormatQuick" */;
+			buildPhases = (
+				77000090 /* Sources */,
+				77000050 /* Frameworks */,
+				77000091 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FormatQuick;
+			productName = FormatQuick;
+			productReference = 77000020 /* FormatQuick.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		770000A0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					77000080 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+				};
+			};
+			buildConfigurationList = 770000C1 /* Build configuration list for PBXProject "FormatQuick" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+				ja,
+				Base,
+			);
+			mainGroup = 77000060;
+			productRefGroup = 77000062 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				77000080 /* FormatQuick */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		77000091 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77000010 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		77000090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				77000001 /* FormatQuickApp.swift in Sources */,
+				77000002 /* AppDelegate.swift in Sources */,
+				77000003 /* MenuBarPopoverView.swift in Sources */,
+				77000004 /* SettingsView.swift in Sources */,
+				77000005 /* FormatQuickViewModel.swift in Sources */,
+				77000006 /* FormatConverterService.swift in Sources */,
+				77000007 /* Localized.swift in Sources */,
+				77000008 /* KeyboardShortcutManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		770000B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		770000B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		770000B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FormatQuick.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleName = FormatQuick;
+				INFOPLIST_KEY_LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.formatquick.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		770000B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FormatQuick.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleName = FormatQuick;
+				INFOPLIST_KEY_LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.formatquick.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		770000C0 /* Build configuration list for PBXNativeTarget "FormatQuick" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				770000B2 /* Debug */,
+				770000B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		770000C1 /* Build configuration list for PBXProject "FormatQuick" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				770000B0 /* Debug */,
+				770000B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 770000A0 /* Project object */;
+}

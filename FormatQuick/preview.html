@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FormatQuick — UI Design Preview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+  :root {
+    --bg-page: #0e0e10;
+    --bg-panel: rgba(30, 30, 32, 0.92);
+    --bg-panel-solid: #1e1e20;
+    --bg-card: rgba(44, 44, 48, 0.6);
+    --bg-card-hover: rgba(58, 58, 64, 0.7);
+    --bg-input: rgba(38, 38, 42, 0.9);
+    --bg-button: rgba(255, 255, 255, 0.08);
+    --bg-button-hover: rgba(255, 255, 255, 0.14);
+    --bg-button-active: rgba(0, 122, 255, 0.2);
+    --bg-button-active-border: rgba(0, 122, 255, 0.6);
+    --bg-accent: #007AFF;
+    --bg-accent-hover: #0066d6;
+    --bg-danger: rgba(255, 59, 48, 0.12);
+    --bg-danger-hover: rgba(255, 59, 48, 0.2);
+    --bg-progress: rgba(0, 122, 255, 0.15);
+    --bg-progress-fill: #007AFF;
+    --bg-toggle-on: #007AFF;
+    --bg-toggle-off: rgba(120, 120, 128, 0.32);
+    --bg-dropzone: rgba(255, 255, 255, 0.03);
+    --bg-dropzone-border: rgba(255, 255, 255, 0.08);
+    --bg-dropzone-hover: rgba(0, 122, 255, 0.06);
+    --bg-dropzone-hover-border: rgba(0, 122, 255, 0.3);
+    --bg-thumbnail: rgba(255, 255, 255, 0.04);
+    --text-primary: rgba(255, 255, 255, 0.92);
+    --text-secondary: rgba(255, 255, 255, 0.55);
+    --text-tertiary: rgba(255, 255, 255, 0.35);
+    --text-accent: #4DA3FF;
+    --text-danger: #FF6B6B;
+    --border-primary: rgba(255, 255, 255, 0.08);
+    --border-secondary: rgba(255, 255, 255, 0.05);
+    --border-focus: rgba(0, 122, 255, 0.5);
+    --shadow-panel: 0 24px 80px rgba(0,0,0,0.55), 0 8px 24px rgba(0,0,0,0.3);
+    --shadow-card: 0 2px 8px rgba(0,0,0,0.2);
+    --shadow-button: 0 1px 3px rgba(0,0,0,0.15);
+    --radius-panel: 14px;
+    --radius-card: 10px;
+    --radius-button: 8px;
+    --radius-toggle: 10px;
+    --font-main: 'DM Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    --font-mono: 'SF Mono', 'Menlo', 'Monaco', monospace;
+  }
+
+  [data-theme="light"] {
+    --bg-page: #f0f0f2;
+    --bg-panel: rgba(255, 255, 255, 0.95);
+    --bg-panel-solid: #ffffff;
+    --bg-card: rgba(0, 0, 0, 0.03);
+    --bg-card-hover: rgba(0, 0, 0, 0.06);
+    --bg-input: rgba(0, 0, 0, 0.04);
+    --bg-button: rgba(0, 0, 0, 0.05);
+    --bg-button-hover: rgba(0, 0, 0, 0.09);
+    --bg-button-active: rgba(0, 122, 255, 0.1);
+    --bg-button-active-border: rgba(0, 122, 255, 0.5);
+    --bg-accent: #007AFF;
+    --bg-accent-hover: #0066d6;
+    --bg-danger: rgba(255, 59, 48, 0.08);
+    --bg-danger-hover: rgba(255, 59, 48, 0.14);
+    --bg-progress: rgba(0, 122, 255, 0.1);
+    --bg-progress-fill: #007AFF;
+    --bg-toggle-on: #007AFF;
+    --bg-toggle-off: rgba(120, 120, 128, 0.24);
+    --bg-dropzone: rgba(0, 0, 0, 0.02);
+    --bg-dropzone-border: rgba(0, 0, 0, 0.08);
+    --bg-dropzone-hover: rgba(0, 122, 255, 0.04);
+    --bg-dropzone-hover-border: rgba(0, 122, 255, 0.25);
+    --bg-thumbnail: rgba(0, 0, 0, 0.03);
+    --text-primary: rgba(0, 0, 0, 0.88);
+    --text-secondary: rgba(0, 0, 0, 0.5);
+    --text-tertiary: rgba(0, 0, 0, 0.3);
+    --text-accent: #0066d6;
+    --text-danger: #FF3B30;
+    --border-primary: rgba(0, 0, 0, 0.1);
+    --border-secondary: rgba(0, 0, 0, 0.06);
+    --border-focus: rgba(0, 122, 255, 0.5);
+    --shadow-panel: 0 24px 80px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
+    --shadow-card: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-button: 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-main);
+    background: var(--bg-page);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    transition: background 0.4s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-title {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0.5;
+  }
+
+  .controls-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ctrl-btn {
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-button);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .ctrl-btn:hover { background: var(--bg-button-hover); color: var(--text-primary); }
+  .ctrl-btn.active {
+    background: var(--bg-button-active);
+    border-color: var(--bg-button-active-border);
+    color: var(--text-accent);
+  }
+
+  .panels-wrapper {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .panel-label {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .mac-panel {
+    background: var(--bg-panel);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-panel);
+    box-shadow: var(--shadow-panel);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    position: relative;
+  }
+
+  .mac-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    pointer-events: none;
+  }
+
+  /* ===== MAIN POPOVER ===== */
+  .main-popover {
+    width: 380px;
+    padding: 0;
+  }
+
+  .popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 10px;
+  }
+
+  .popover-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .popover-title-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #007AFF, #5856D6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  }
+
+  .popover-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .settings-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: var(--bg-button);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+  }
+  .settings-btn:hover { background: var(--bg-button-hover); color: var(--text-primary); }
+
+  .popover-divider {
+    height: 1px;
+    background: var(--border-primary);
+    margin: 0 18px;
+  }
+
+  .popover-body {
+    padding: 14px 18px;
+  }
+
+  /* Drop Zone */
+  .dropzone {
+    border: 2px dashed var(--bg-dropzone-border);
+    border-radius: var(--radius-card);
+    background: var(--bg-dropzone);
+    padding: 20px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .dropzone:hover {
+    border-color: var(--bg-dropzone-hover-border);
+    background: var(--bg-dropzone-hover);
+  }
+  .dropzone.drag-over {
+    border-color: var(--bg-accent);
+    background: rgba(0, 122, 255, 0.08);
+    transform: scale(1.01);
+  }
+  .dropzone-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+    opacity: 0.35;
+    display: block;
+  }
+  .dropzone-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .dropzone-hint {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-bottom: 14px;
+  }
+  .dropzone-pick-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-button);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .dropzone-pick-btn:hover {
+    background: var(--bg-accent);
+    color: white;
+    border-color: var(--bg-accent);
+    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.3);
+  }
+  .dropzone-pick-btn:active {
+    transform: scale(0.96);
+  }
+  .dropzone-pick-btn .pick-icon {
+    font-size: 15px;
+  }
+  .dropzone-pick-multi {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+  }
+
+  /* File Count */
+  .file-count {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0 6px;
+  }
+  .file-count-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .file-count-value {
+    font-size: 12px;
+    color: var(--text-accent);
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+  .file-count-clear {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--font-main);
+    transition: color 0.2s;
+  }
+  .file-count-clear:hover { color: var(--text-danger); }
+
+  /* Format Selector */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    margin-top: 4px;
+  }
+
+  .format-grid {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .format-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: 1.5px solid var(--border-primary);
+    background: var(--bg-button);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    letter-spacing: 0.02em;
+  }
+  .format-btn:hover {
+    background: var(--bg-button-hover);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.15);
+  }
+  .format-btn.active {
+    background: var(--bg-button-active);
+    border-color: var(--bg-button-active-border);
+    color: var(--text-accent);
+    box-shadow: 0 0 12px rgba(0, 122, 255, 0.15);
+  }
+
+  /* Options */
+  .options-section {
+    margin-top: 14px;
+  }
+
+  .option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+  }
+
+  .option-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    min-width: 70px;
+  }
+
+  .option-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    justify-content: flex-end;
+  }
+
+  /* Slider */
+  .slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    max-width: 200px;
+  }
+
+  .quality-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--bg-toggle-off);
+    outline: none;
+    cursor: pointer;
+  }
+  .quality-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg-accent);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .quality-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+
+  .quality-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-accent);
+    font-family: var(--font-mono);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* Toggle */
+  .toggle {
+    width: 38px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--bg-toggle-off);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--bg-toggle-on); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.25s ease;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* Size Inputs */
+  .size-inputs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .size-input {
+    width: 64px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .size-input:focus { border-color: var(--border-focus); }
+  .size-x {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-weight: 500;
+  }
+
+  /* Convert Button */
+  .convert-section {
+    margin-top: 16px;
+  }
+
+  .convert-btn {
+    width: 100%;
+    height: 40px;
+    border-radius: var(--radius-button);
+    border: none;
+    background: var(--bg-accent);
+    color: white;
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 12px rgba(0, 122, 255, 0.3);
+    letter-spacing: -0.01em;
+  }
+  .convert-btn:hover {
+    background: var(--bg-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.4);
+  }
+  .convert-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .convert-btn.converting {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--text-accent);
+    box-shadow: none;
+    cursor: default;
+  }
+  .convert-btn .btn-icon { font-size: 16px; }
+  .convert-btn .btn-sub {
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-left: 4px;
+  }
+
+  /* Progress */
+  .progress-section {
+    margin-top: 12px;
+    display: none;
+  }
+  .progress-section.visible { display: block; }
+
+  .progress-bar-wrapper {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--bg-progress);
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #007AFF, #5856D6);
+    transition: width 0.4s ease;
+    position: relative;
+  }
+  .progress-bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+  .progress-text {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .progress-percent {
+    font-size: 11px;
+    color: var(--text-accent);
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+
+  /* Current File Preview */
+  .current-file {
+    margin-top: 10px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--bg-thumbnail);
+  }
+  .current-file.visible { display: flex; }
+
+  .current-file-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, rgba(0,122,255,0.15), rgba(88,86,214,0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .current-file-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .current-file-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .current-file-detail {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+  }
+
+  /* Footer */
+  .popover-footer {
+    padding: 10px 18px 14px;
+  }
+
+  .quit-btn {
+    width: 100%;
+    height: 32px;
+    border-radius: 7px;
+    border: none;
+    background: var(--bg-danger);
+    color: var(--text-danger);
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .quit-btn:hover { background: var(--bg-danger-hover); }
+  .quit-btn:active { transform: scale(0.97); }
+
+  /* ===== SETTINGS PANEL ===== */
+  .settings-panel {
+    width: 340px;
+  }
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+  }
+
+  .settings-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .settings-close {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-button);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+  }
+  .settings-close:hover { background: var(--bg-button-hover); color: var(--text-primary); }
+
+  .settings-body {
+    padding: 4px 18px 18px;
+  }
+
+  .settings-group {
+    margin-bottom: 18px;
+  }
+  .settings-group:last-child { margin-bottom: 0; }
+
+  .settings-group-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+  }
+
+  .settings-row-label {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Select */
+  .settings-select {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-primary);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 12px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+    min-width: 120px;
+  }
+  .settings-select:focus { border-color: var(--border-focus); }
+
+  /* About Section */
+  .about-section {
+    text-align: center;
+    padding: 12px 0 4px;
+  }
+  .about-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #007AFF, #5856D6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+    margin: 0 auto 10px;
+    box-shadow: 0 4px 16px rgba(0, 122, 255, 0.25);
+  }
+  .about-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  .about-version {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    font-family: var(--font-mono);
+  }
+  .about-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .mac-panel { animation: fadeIn 0.5s ease; }
+  .panels-wrapper .mac-panel:nth-child(2) { animation-delay: 0.1s; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 800px) {
+    .panels-wrapper { flex-direction: column; align-items: center; }
+  }
+
+  /* ===== SVG Icons ===== */
+  .icon-svg {
+    display: inline-block;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title" data-i18n="FormatQuick UI Preview">FormatQuick UI Preview</div>
+
+<div class="controls-bar">
+  <button class="ctrl-btn active" onclick="setTheme('dark')" id="btn-dark">Dark</button>
+  <button class="ctrl-btn" onclick="setTheme('light')" id="btn-light">Light</button>
+  <span style="width:1px;height:20px;background:var(--border-primary);margin:0 4px"></span>
+  <button class="ctrl-btn active" onclick="setLang('zh')" id="btn-zh">中文</button>
+  <button class="ctrl-btn" onclick="setLang('en')" id="btn-en">English</button>
+  <button class="ctrl-btn" onclick="setLang('ja')" id="btn-ja">日本語</button>
+  <span style="width:1px;height:20px;background:var(--border-primary);margin:0 4px"></span>
+  <button class="ctrl-btn" onclick="toggleProgress()" id="btn-progress">Show Progress</button>
+</div>
+
+<div class="panels-wrapper">
+
+  <!-- ===== MAIN POPOVER ===== -->
+  <div>
+    <div class="panel-label" data-i18n="Main Panel">Main Panel</div>
+    <div class="mac-panel main-popover">
+      <div class="popover-header">
+        <div class="popover-title">
+          <div class="popover-title-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 5L8 11L13 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M5 5L8 2L11 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="popover-title-text">FormatQuick</span>
+        </div>
+        <button class="settings-btn" title="Settings">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M6.5 1.5L7.2 3.5C7.6 3.6 8 3.8 8.3 4L10.2 3.1L11.8 5.7L10.2 7.1C10.2 7.4 10.3 7.7 10.3 8C10.3 8.3 10.2 8.6 10.2 8.9L11.8 10.3L10.2 12.9L8.3 12C8 12.2 7.6 12.4 7.2 12.5L6.5 14.5H3.5L2.8 12.5C2.4 12.4 2 12.2 1.7 12L-0.2 12.9L-1.8 10.3L-0.2 8.9C-0.2 8.6-0.3 8.3-0.3 8C-0.3 7.7-0.2 7.4-0.2 7.1L-1.8 5.7L-0.2 3.1L1.7 4C2 3.8 2.4 3.6 2.8 3.5L3.5 1.5H6.5Z" transform="translate(3,0)" stroke="currentColor" stroke-width="1.2" fill="none"/>
+            <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="popover-divider"></div>
+
+      <div class="popover-body">
+        <!-- Drop Zone -->
+        <div class="dropzone" id="dropzone">
+          <span class="dropzone-icon">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+              <rect x="4" y="6" width="24" height="20" rx="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+              <circle cx="12" cy="14" r="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+              <path d="M4 22L10 17L14 20L20 14L28 22" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+              <path d="M16 4V18M16 18L11 13M16 18L21 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="dropzone-text" data-i18n="dropzone-text">拖拽图片或文件夹到此处</div>
+          <div class="dropzone-hint" data-i18n="dropzone-hint">PNG, JPG, HEIC, WebP, AVIF, GIF</div>
+          <button class="dropzone-pick-btn" id="pickBtn" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+            <span class="pick-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2V14M2 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </span>
+            <span data-i18n="pick-files">选择图片</span>
+          </button>
+          <div class="dropzone-pick-multi" data-i18n="pick-multi">支持多选</div>
+          <input type="file" id="fileInput" accept="image/png,image/jpeg,image/heic,image/webp,image/avif,image/gif" multiple style="display:none">
+        </div>
+
+        <!-- File Count -->
+        <div class="file-count">
+          <span class="file-count-label" data-i18n="added-count">已添加: 24 张图片</span>
+          <button class="file-count-clear" data-i18n="clear">清除</button>
+        </div>
+
+        <!-- Format Selector -->
+        <div class="section-label" data-i18n="target-format">目标格式</div>
+        <div class="format-grid">
+          <button class="format-btn" data-format="png">PNG</button>
+          <button class="format-btn active" data-format="webp">WebP</button>
+          <button class="format-btn" data-format="jpg">JPG</button>
+          <button class="format-btn" data-format="heic">HEIC</button>
+          <button class="format-btn" data-format="avif">AVIF</button>
+          <button class="format-btn" data-format="gif">GIF</button>
+        </div>
+
+        <!-- Options -->
+        <div class="options-section">
+          <div class="section-label" data-i18n="options">选项</div>
+
+          <div class="option-row">
+            <span class="option-label" data-i18n="quality">质量</span>
+            <div class="option-control">
+              <div class="slider-wrapper">
+                <input type="range" class="quality-slider" min="1" max="100" value="90" id="qualitySlider" oninput="updateQuality(this.value)">
+                <span class="quality-value" id="qualityValue">90%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="option-row">
+            <span class="option-label" data-i18n="resize">调整尺寸</span>
+            <div class="option-control">
+              <div class="toggle" id="resizeToggle" onclick="toggleSwitch(this)"></div>
+              <div class="size-inputs" id="sizeInputs" style="opacity:0.35;pointer-events:none">
+                <input type="text" class="size-input" value="1920" placeholder="W">
+                <span class="size-x">×</span>
+                <input type="text" class="size-input" value="1080" placeholder="H">
+              </div>
+            </div>
+          </div>
+
+          <div class="option-row">
+            <span class="option-label" data-i18n="keep-exif">保持 EXIF</span>
+            <div class="option-control">
+              <div class="toggle on" id="exifToggle" onclick="toggleSwitch(this)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Convert Button -->
+        <div class="convert-section">
+          <button class="convert-btn" id="convertBtn" onclick="toggleConvert()">
+            <span class="btn-icon">↻</span>
+            <span data-i18n="start-convert">开始转换</span>
+            <span class="btn-sub" data-i18n="convert-estimate">24 张 → 约 15 秒</span>
+          </button>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-section" id="progressSection">
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" id="progressFill" style="width: 68%"></div>
+          </div>
+          <div class="progress-info">
+            <span class="progress-text" data-i18n="converting">正在转换...</span>
+            <span class="progress-percent" id="progressPercent">68%</span>
+          </div>
+          <div class="current-file visible" id="currentFile">
+            <div class="current-file-thumb">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <rect x="2" y="3" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/>
+                <circle cx="7" cy="8" r="2" stroke="currentColor" stroke-width="1" fill="none"/>
+                <path d="M2 13L6 9L9 11L13 7L16 10" stroke="currentColor" stroke-width="1" fill="none"/>
+              </svg>
+            </div>
+            <div class="current-file-info">
+              <div class="current-file-name">product-hero-shot.png</div>
+              <div class="current-file-detail" data-i18n="file-detail">2.4 MB → WebP · 68%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="popover-divider"></div>
+
+      <div class="popover-footer">
+        <button class="quit-btn" data-i18n="quit-app">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3 1L1 3L4.5 6L1 9L3 11L6 7.5L9 11L11 9L7.5 6L11 3L9 1L6 4.5L3 1Z" fill="currentColor"/>
+          </svg>
+          退出应用
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SETTINGS PANEL ===== -->
+  <div>
+    <div class="panel-label" data-i18n="Settings Window">Settings Window</div>
+    <div class="mac-panel settings-panel">
+      <div class="settings-header">
+        <span class="settings-title" data-i18n="settings-title">设置</span>
+        <button class="settings-close">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M1 1L9 9M9 1L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="popover-divider" style="margin:0 18px"></div>
+
+      <div class="settings-body">
+        <!-- General -->
+        <div class="settings-group">
+          <div class="settings-group-title" data-i18n="general">通用</div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="appearance">外观</span>
+            <select class="settings-select" id="appearanceSelect">
+              <option value="system" data-i18n-opt="follow-system">跟随系统</option>
+              <option value="light" data-i18n-opt="light">浅色</option>
+              <option value="dark" data-i18n-opt="dark">深色</option>
+            </select>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="language-label">语言 Language 言語</span>
+            <select class="settings-select" id="languageSelect">
+              <option value="system" data-i18n-opt="follow-system">跟随系统</option>
+              <option value="zh-Hans">中文</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="launch-at-login">开机自启</span>
+            <div class="toggle" onclick="toggleSwitch(this)"></div>
+          </div>
+        </div>
+
+        <!-- Output -->
+        <div class="settings-group">
+          <div class="settings-group-title" data-i18n="output-settings">输出设置</div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="output-dir">输出目录</span>
+            <select class="settings-select">
+              <option data-i18n-opt="same-dir">与源文件相同</option>
+              <option data-i18n-opt="desktop">桌面</option>
+              <option data-i18n-opt="custom">自定义...</option>
+            </select>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="overwrite">覆盖同名文件</span>
+            <div class="toggle" onclick="toggleSwitch(this)"></div>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" data-i18n="open-after">转换后打开文件夹</span>
+            <div class="toggle on" onclick="toggleSwitch(this)"></div>
+          </div>
+        </div>
+
+        <!-- About -->
+        <div class="settings-group">
+          <div class="settings-group-title" data-i18n="about">关于</div>
+          <div class="about-section">
+            <div class="about-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M5 8L12 16L19 8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 8L12 4L16 8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="about-name">FormatQuick</div>
+            <div class="about-version">v1.0.0</div>
+            <div class="about-desc" data-i18n="about-desc">macOS 菜单栏批量图片格式转换工具<br>拖入图片 → 选择格式 → 一键转换</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const i18n = {
+  zh: {
+    'FormatQuick UI Preview': 'FormatQuick UI 预览',
+    'Main Panel': '主面板',
+    'Settings Window': '设置窗口',
+    'dropzone-text': '拖拽图片或文件夹到此处',
+    'dropzone-hint': 'PNG, JPG, HEIC, WebP, AVIF, GIF',
+    'pick-files': '选择图片',
+    'pick-multi': '支持多选',
+    'added-count': '已添加: 24 张图片',
+    'clear': '清除',
+    'target-format': '目标格式',
+    'options': '选项',
+    'quality': '质量',
+    'resize': '调整尺寸',
+    'keep-exif': '保持 EXIF',
+    'start-convert': '开始转换',
+    'convert-estimate': '24 张 → 约 15 秒',
+    'converting': '正在转换...',
+    'file-detail': '2.4 MB → WebP · 68%',
+    'quit-app': '退出应用',
+    'settings-title': '设置',
+    'general': '通用',
+    'appearance': '外观',
+    'follow-system': '跟随系统',
+    'light': '浅色',
+    'dark': '深色',
+    'language-label': '语言 Language 言語',
+    'launch-at-login': '开机自启',
+    'output-settings': '输出设置',
+    'output-dir': '输出目录',
+    'same-dir': '与源文件相同',
+    'desktop': '桌面',
+    'custom': '自定义...',
+    'overwrite': '覆盖同名文件',
+    'open-after': '转换后打开文件夹',
+    'about': '关于',
+    'about-desc': 'macOS 菜单栏批量图片格式转换工具<br>拖入图片 → 选择格式 → 一键转换',
+  },
+  en: {
+    'FormatQuick UI Preview': 'FormatQuick UI Preview',
+    'Main Panel': 'Main Panel',
+    'Settings Window': 'Settings Window',
+    'dropzone-text': 'Drop images or folders here',
+    'dropzone-hint': 'PNG, JPG, HEIC, WebP, AVIF, GIF',
+    'pick-files': 'Select Images',
+    'pick-multi': 'Multi-select supported',
+    'added-count': 'Added: 24 images',
+    'clear': 'Clear',
+    'target-format': 'Target Format',
+    'options': 'Options',
+    'quality': 'Quality',
+    'resize': 'Resize',
+    'keep-exif': 'Keep EXIF',
+    'start-convert': 'Start Convert',
+    'convert-estimate': '24 files → ~15s',
+    'converting': 'Converting...',
+    'file-detail': '2.4 MB → WebP · 68%',
+    'quit-app': 'Quit',
+    'settings-title': 'Settings',
+    'general': 'General',
+    'appearance': 'Appearance',
+    'follow-system': 'Follow System',
+    'light': 'Light',
+    'dark': 'Dark',
+    'language-label': 'Language',
+    'launch-at-login': 'Launch at Login',
+    'output-settings': 'Output',
+    'output-dir': 'Output Folder',
+    'same-dir': 'Same as Source',
+    'desktop': 'Desktop',
+    'custom': 'Custom...',
+    'overwrite': 'Overwrite Existing',
+    'open-after': 'Open Folder After Convert',
+    'about': 'About',
+    'about-desc': 'macOS Menu Bar Batch Image Converter<br>Drop images → Pick format → Convert',
+  },
+  ja: {
+    'FormatQuick UI Preview': 'FormatQuick UI プレビュー',
+    'Main Panel': 'メインパネル',
+    'Settings Window': '設定ウィンドウ',
+    'dropzone-text': '画像またはフォルダをここにドロップ',
+    'dropzone-hint': 'PNG, JPG, HEIC, WebP, AVIF, GIF',
+    'pick-files': '画像を選択',
+    'pick-multi': '複数選択可',
+    'added-count': '追加済み: 24枚の画像',
+    'clear': 'クリア',
+    'target-format': '出力形式',
+    'options': 'オプション',
+    'quality': '品質',
+    'resize': 'サイズ変更',
+    'keep-exif': 'EXIF保持',
+    'start-convert': '変換開始',
+    'convert-estimate': '24枚 → 約15秒',
+    'converting': '変換中...',
+    'file-detail': '2.4 MB → WebP · 68%',
+    'quit-app': 'アプリを終了',
+    'settings-title': '設定',
+    'general': '一般',
+    'appearance': '外観',
+    'follow-system': 'システムに従う',
+    'light': 'ライト',
+    'dark': 'ダーク',
+    'language-label': '言語',
+    'launch-at-login': 'ログイン時に起動',
+    'output-settings': '出力設定',
+    'output-dir': '出力フォルダ',
+    'same-dir': '元と同じ',
+    'desktop': 'デスクトップ',
+    'custom': 'カスタム...',
+    'overwrite': '同名ファイルを上書き',
+    'open-after': '変換後にフォルダを開く',
+    'about': 'について',
+    'about-desc': 'macOSメニューバーバッチ画像変換ツール<br>画像をドロップ → 形式を選択 → 変換',
+  }
+};
+
+let currentLang = 'zh';
+let currentTheme = 'dark';
+let progressVisible = false;
+let converting = false;
+
+function setTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btn-dark').classList.toggle('active', theme === 'dark');
+  document.getElementById('btn-light').classList.toggle('active', theme === 'light');
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[lang] && i18n[lang][key]) {
+      el.innerHTML = i18n[lang][key];
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+    const key = el.getAttribute('data-i18n-opt');
+    if (i18n[lang] && i18n[lang][key]) {
+      el.textContent = i18n[lang][key];
+    }
+  });
+}
+
+function toggleSwitch(el) {
+  el.classList.toggle('on');
+  if (el.id === 'resizeToggle') {
+    const inputs = document.getElementById('sizeInputs');
+    const isOn = el.classList.contains('on');
+    inputs.style.opacity = isOn ? '1' : '0.35';
+    inputs.style.pointerEvents = isOn ? 'auto' : 'none';
+  }
+}
+
+function updateQuality(val) {
+  document.getElementById('qualityValue').textContent = val + '%';
+}
+
+document.querySelectorAll('.format-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+function toggleProgress() {
+  progressVisible = !progressVisible;
+  document.getElementById('progressSection').classList.toggle('visible', progressVisible);
+  document.getElementById('btn-progress').classList.toggle('active', progressVisible);
+  if (progressVisible) {
+    animateProgress();
+  }
+}
+
+function toggleConvert() {
+  converting = !converting;
+  const btn = document.getElementById('convertBtn');
+  btn.classList.toggle('converting', converting);
+  if (converting) {
+    progressVisible = true;
+    document.getElementById('progressSection').classList.add('visible');
+    document.getElementById('btn-progress').classList.add('active');
+    animateProgress();
+  }
+}
+
+let progressAnim;
+function animateProgress() {
+  let pct = 0;
+  clearInterval(progressAnim);
+  progressAnim = setInterval(() => {
+    pct += Math.random() * 3 + 1;
+    if (pct >= 100) {
+      pct = 100;
+      clearInterval(progressAnim);
+      setTimeout(() => {
+        converting = false;
+        document.getElementById('convertBtn').classList.remove('converting');
+      }, 500);
+    }
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPercent').textContent = Math.round(pct) + '%';
+  }, 200);
+}
+
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('drag-over'); });
+dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('drag-over'); });
+</script>
+
+</body>
+</html>

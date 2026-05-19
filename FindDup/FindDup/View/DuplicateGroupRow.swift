@@ -10,8 +10,10 @@ struct DuplicateGroupRow: View {
     let onToggle: () -> Void
     let onToggleGroup: () -> Void
     let onToggleFile: (UUID) -> Void
+    @ObservedObject private var langManager = LocalizationManager.shared
 
     var body: some View {
+        let _ = langManager
         VStack(spacing: 0) {
             Button(action: onToggle) {
                 HStack(spacing: 8) {

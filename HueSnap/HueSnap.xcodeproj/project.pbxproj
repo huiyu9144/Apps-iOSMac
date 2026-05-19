@@ -1,0 +1,334 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		66000001 /* HueSnapApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000030 /* HueSnapApp.swift */; };
+		66000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000031 /* AppDelegate.swift */; };
+		66000003 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000032 /* MenuBarPopoverView.swift */; };
+		66000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000033 /* SettingsView.swift */; };
+		66000005 /* HueSnapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000034 /* HueSnapViewModel.swift */; };
+		66000006 /* ColorPickerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000035 /* ColorPickerService.swift */; };
+		66000007 /* TailwindService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000036 /* TailwindService.swift */; };
+		66000008 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000037 /* Localized.swift */; };
+		66000009 /* KeyboardShortcutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000038 /* KeyboardShortcutManager.swift */; };
+		66000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 66000040 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		66000020 /* HueSnap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HueSnap.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66000030 /* HueSnapApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HueSnapApp.swift; sourceTree = "<group>"; };
+		66000031 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		66000032 /* MenuBarPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarPopoverView.swift; sourceTree = "<group>"; };
+		66000033 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		66000034 /* HueSnapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HueSnapViewModel.swift; sourceTree = "<group>"; };
+		66000035 /* ColorPickerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPickerService.swift; sourceTree = "<group>"; };
+		66000036 /* TailwindService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TailwindService.swift; sourceTree = "<group>"; };
+		66000037 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
+		66000038 /* KeyboardShortcutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutManager.swift; sourceTree = "<group>"; };
+		66000040 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		66000041 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		66000042 /* HueSnap.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HueSnap.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		66000050 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		66000060 = {
+			isa = PBXGroup;
+			children = (
+				66000070 /* App */,
+				66000071 /* MenuBar */,
+				66000072 /* Views */,
+				66000073 /* ViewModels */,
+				66000074 /* Services */,
+				66000075 /* Utils */,
+				66000040 /* Assets.xcassets */,
+				66000041 /* Info.plist */,
+				66000042 /* HueSnap.entitlements */,
+				66000062 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		66000062 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				66000020 /* HueSnap.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		66000070 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				66000030 /* HueSnapApp.swift */,
+				66000031 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		66000071 /* MenuBar */ = {
+			isa = PBXGroup;
+			children = (
+				66000032 /* MenuBarPopoverView.swift */,
+			);
+			path = MenuBar;
+			sourceTree = "<group>";
+		};
+		66000072 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				66000033 /* SettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		66000073 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				66000034 /* HueSnapViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		66000074 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				66000035 /* ColorPickerService.swift */,
+				66000036 /* TailwindService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		66000075 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				66000037 /* Localized.swift */,
+				66000038 /* KeyboardShortcutManager.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		66000080 /* HueSnap */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 660000C0 /* Build configuration list for PBXNativeTarget "HueSnap" */;
+			buildPhases = (
+				66000090 /* Sources */,
+				66000050 /* Frameworks */,
+				66000091 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HueSnap;
+			productName = HueSnap;
+			productReference = 66000020 /* HueSnap.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		660000A0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					66000080 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+				};
+			};
+			buildConfigurationList = 660000C1 /* Build configuration list for PBXProject "HueSnap" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = "zh-Hans";
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+				ja,
+				Base,
+			);
+			mainGroup = 66000060;
+			productRefGroup = 66000062 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				66000080 /* HueSnap */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		66000091 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66000010 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		66000090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				66000001 /* HueSnapApp.swift in Sources */,
+				66000002 /* AppDelegate.swift in Sources */,
+				66000003 /* MenuBarPopoverView.swift in Sources */,
+				66000004 /* SettingsView.swift in Sources */,
+				66000005 /* HueSnapViewModel.swift in Sources */,
+				66000006 /* ColorPickerService.swift in Sources */,
+				66000007 /* TailwindService.swift in Sources */,
+				66000008 /* Localized.swift in Sources */,
+				66000009 /* KeyboardShortcutManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		660000B0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		660000B1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		660000B2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HueSnap.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleName = HueSnap;
+				INFOPLIST_KEY_LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.huesnap.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		660000B3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HueSnap.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleName = HueSnap;
+				INFOPLIST_KEY_LSUIElement = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.huesnap.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		660000C0 /* Build configuration list for PBXNativeTarget "HueSnap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				660000B2 /* Debug */,
+				660000B3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		660000C1 /* Build configuration list for PBXProject "HueSnap" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				660000B0 /* Debug */,
+				660000B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 660000A0 /* Project object */;
+}

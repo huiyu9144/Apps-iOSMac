@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
     @StateObject private var scanVM = ScanViewModel()
+    @ObservedObject private var langManager = LocalizationManager.shared
 
     var body: some View {
         HSplitView {

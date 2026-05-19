@@ -29,10 +29,16 @@ class ScanViewModel: ObservableObject {
 
     private let fileScanner = FileScanner()
     private let duplicateFinder = DuplicateFinder()
+    private var scannedURL: URL?
+    private var isSecurityScoped = false
 
     nonisolated static let settingsViewModel = SettingsViewModel()
 
     func startScan(folder url: URL) {
+        stopAccessingIfNeeded()
+
+        scannedURL = url
+        isSecurityScoped = url.startAccessingSecurityScopedResource()
         scanState = .scanning
         scanPhase = .enumerating
         scannedFileCount = 0
@@ -66,9 +72,12 @@ class ScanViewModel: ObservableObject {
                 self.progress = 1.0
                 self.scanPhase = .hashing(progress: 1.0)
                 self.scanState = .completed
+                stopAccessingIfNeeded()
             } catch ScannerError.cancelled {
+                stopAccessingIfNeeded()
                 self.scanState = .idle
             } catch {
+                stopAccessingIfNeeded()
                 self.scanState = .idle
             }
         }
@@ -81,11 +90,20 @@ class ScanViewModel: ObservableObject {
     }
 
     func reset() {
+        stopAccessingIfNeeded()
         scanState = .idle
         scanPhase = .enumerating
         scannedFileCount = 0
         duplicateGroups = []
         progress = 0
         scannedFolderName = ""
+    }
+
+    private func stopAccessingIfNeeded() {
+        if isSecurityScoped, let url = scannedURL {
+            url.stopAccessingSecurityScopedResource()
+        }
+        isSecurityScoped = false
+        scannedURL = nil
     }
 }

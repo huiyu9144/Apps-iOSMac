@@ -3,11 +3,13 @@ import UniformTypeIdentifiers
 
 struct ScanPanelView: View {
     @ObservedObject var scanVM: ScanViewModel
+    @ObservedObject private var langManager = LocalizationManager.shared
     @State private var showFolderPicker = false
     @State private var rotationAngle: Double = 0
     @State private var rotationTimer: Timer?
 
     var body: some View {
+        let _ = langManager
         VStack(spacing: 20) {
             if scanVM.scanState == .idle {
                 idleView
