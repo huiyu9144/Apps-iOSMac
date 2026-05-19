@@ -583,16 +583,42 @@ extension TCPServer: CaptureEngineDelegate {
         guard stateLock.sync(execute: { isFrameConnected }) else { return }
 
         let pixelBuffer = frame.pixelBuffer
-
-        guard let ioSurface = frame.ioSurface else { return }
-
         let width = CVPixelBufferGetWidth(pixelBuffer)
         let height = CVPixelBufferGetHeight(pixelBuffer)
-        let bytesPerRow = IOSurfaceGetBytesPerRow(ioSurface)
         let pixelFormatType = CVPixelBufferGetPixelFormatType(pixelBuffer)
+
+        var bytesPerRow = 0
+        var baseAddress: UnsafeMutableRawPointer? = nil
+        var useIOSurface = false
+
+        if let surface = frame.ioSurface {
+            bytesPerRow = IOSurfaceGetBytesPerRow(surface)
+            if let addr = IOSurfaceGetBaseAddress(surface) {
+                baseAddress = addr
+                useIOSurface = true
+                IOSurfaceLock(surface, .readOnly, nil)
+                defer { IOSurfaceUnlock(surface, .readOnly, nil) }
+            }
+        }
+
+        if baseAddress == nil {
+            CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
+            defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
+
+            baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
+            bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+
+            if baseAddress == nil {
+                return
+            }
+        }
+
         let dataSize = bytesPerRow * height
 
-        guard dataSize > 0, dataSize <= JiaProtocol.ProtocolConstants.maxFrameSize else { return }
+        guard dataSize > 0, dataSize <= JiaProtocol.ProtocolConstants.maxFrameSize else {
+            print("[TCPServer] Frame dropped: invalid size \(dataSize) for \(width)x\(height)")
+            return
+        }
 
         let timestampValue = frame.displayTime.timescale > 0
             ? UInt64(frame.displayTime.value) * 1000 / UInt64(frame.displayTime.timescale)
@@ -607,12 +633,7 @@ extension TCPServer: CaptureEngineDelegate {
             dataLength: UInt64(dataSize)
         )
 
-        IOSurfaceLock(ioSurface, .readOnly, nil)
-        defer { IOSurfaceUnlock(ioSurface, .readOnly, nil) }
-
-        let baseAddress = IOSurfaceGetBaseAddress(ioSurface)
-
-        let pixelData = Data(bytes: baseAddress, count: dataSize)
+        let pixelData = Data(bytes: baseAddress!, count: dataSize)
         let fullFrame = header.encodeFrame(pixelData: pixelData)
 
         enqueueFrame(fullFrame)
@@ -638,6 +659,8 @@ extension TCPServer: CaptureEngineDelegate {
         sendNextFrame()
     }
 
+    private var frameSendCount: Int = 0
+
     private func sendNextFrame() {
         frameSendQueue.async { [weak self] in
             guard let self else { return }
@@ -654,13 +677,18 @@ extension TCPServer: CaptureEngineDelegate {
                   let connection = self.frameConnection else { return }
 
             self.isSendingFrame = true
+            self.frameSendCount += 1
 
             connection.send(content: data, completion: .contentProcessed({ [weak self] error in
                 guard let self else { return }
                 self.isSendingFrame = false
 
                 if let error {
-                    print("[TCPServer] Frame send error: \(error)")
+                    print("[TCPServer] Frame #\(self.frameSendCount) send error: \(error)")
+                } else {
+                    if self.frameSendCount % 30 == 1 {
+                        print("[TCPServer] Frame #\(self.frameSendCount) sent (\(data.count) bytes)")
+                    }
                 }
 
                 self.sendNextFrame()
