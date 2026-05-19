@@ -180,4 +180,25 @@ private struct DeleteOptionCard: View {
                 .font(.title3)
                 .foregroundStyle(isSelected ? .blue : .secondary)
             VStack(alignment: .leading, spacing: 2) {
-                Text
+                Text(verbatim: title)
+                    .font(.subheadline)
+                    .fontWeight(isSelected ? .medium : .regular)
+                Text(verbatim: subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            Spacer()
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.blue)
+            }
+        }
+        .padding(12)
+        .background(isSelected ? Color.blue.opacity(0.08) : Color.clear)
+        .cornerRadius(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(isSelected ? Color.blue : Color.gray.opacity(0.25), lineWidth: isSelected ? 1.5 : 0.5)
+        )
+    }
+}

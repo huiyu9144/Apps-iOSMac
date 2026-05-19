@@ -1,11 +1,21 @@
 import Foundation
 
 enum FileTypeFilter: String, CaseIterable {
-    case all = "全部文件"
-    case images = "图片"
-    case documents = "文档"
-    case videos = "视频"
-    case music = "音乐"
+    case all = "all"
+    case images = "images"
+    case documents = "documents"
+    case videos = "videos"
+    case music = "music"
+
+    var localizedName: String {
+        switch self {
+        case .all: return loc("全部文件", "All Files")
+        case .images: return loc("图片", "Images")
+        case .documents: return loc("文档", "Documents")
+        case .videos: return loc("视频", "Videos")
+        case .music: return loc("音乐", "Music")
+        }
+    }
 
     var extensions: [String] {
         switch self {
