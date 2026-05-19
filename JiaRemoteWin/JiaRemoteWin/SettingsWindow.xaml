@@ -152,6 +152,19 @@
                                 ToolTip="唤醒"/>
                     </UniformGrid>
 
+                    <!-- ═══ 🔍 调试 ═══ -->
+                    <TextBlock Text="🔍 调试" Style="{StaticResource SectionHdr}" Margin="0,28,0,10"/>
+                    <Border Style="{StaticResource Card2}" MouseLeftButtonDown="DebugLogRow_Click" Cursor="Hand">
+                        <Grid>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="打开调试日志窗口" FontSize="14" Foreground="#EEE"/>
+                                <TextBlock Text="查看 TCP/渲染/帧数据 诊断信息" FontSize="11" Foreground="#555" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="→" FontSize="16" Foreground="#555"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
                     <TextBlock Text="ScreenCaptureKit · IOSurface · CGEvent · D3D11"
                                FontSize="10" Foreground="#2A2A2A" HorizontalAlignment="Center"
                                Margin="0,28,0,8"/>

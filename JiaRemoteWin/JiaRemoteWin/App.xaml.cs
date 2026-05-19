@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,16 +9,29 @@ namespace JiaRemoteWin
     public partial class App : Application
     {
         private MainWindow _mainWindow;
+        private DebugLogListener _logListener;
+        private DebugLogWindow _logWindow;
+        private readonly List<string> _logBuffer = new List<string>();
+        private const int MaxBufferLines = 5000;
+
+        public static DebugLogListener SharedLogListener { get; private set; }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             try
             {
+                _logListener = new DebugLogListener();
+                _logListener.LogReceived += OnLogLine;
+                Trace.Listeners.Add(_logListener);
+                SharedLogListener = _logListener;
+
                 _mainWindow = new MainWindow();
                 _mainWindow.ConnectRequested += OnConnectRequested;
                 _mainWindow.DisconnectRequested += OnDisconnectRequested;
                 _mainWindow.ScanRequested += OnScanRequested;
                 _mainWindow.SettingsRequested += OnSettingsRequested;
+                _mainWindow.ShowDebugLog += () => ShowDebugLog();
+
                 _mainWindow.Show();
 
                 Debug.WriteLine("[JiaRemote] Windows 主控端已启动，窗口已显示");
@@ -31,6 +45,44 @@ namespace JiaRemoteWin
                 MessageBox.Show(err, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
+        }
+
+        private void OnLogLine(string line)
+        {
+            lock (_logBuffer)
+            {
+                _logBuffer.Add(line);
+                while (_logBuffer.Count > MaxBufferLines)
+                    _logBuffer.RemoveAt(0);
+            }
+
+            if (_logWindow != null && _logWindow.IsVisible)
+            {
+                _logWindow.AppendLine(line);
+            }
+        }
+
+        public void ShowDebugLog()
+        {
+            if (_logWindow == null || !_logWindow.IsLoaded)
+            {
+                _logWindow = new DebugLogWindow
+                {
+                    Owner = _mainWindow,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
+            }
+
+            lock (_logBuffer)
+            {
+                foreach (var line in _logBuffer)
+                {
+                    _logWindow.AppendLine(line);
+                }
+            }
+
+            _logWindow.Show();
+            _logWindow.Activate();
         }
 
         private async void OnConnectRequested(string host, int port)

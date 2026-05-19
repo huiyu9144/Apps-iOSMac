@@ -103,6 +103,11 @@ namespace JiaRemoteWin
             await _main.SendSystemCommand("clipboardPull");
         }
 
+        private void DebugLogRow_Click(object sender, MouseButtonEventArgs e)
+        {
+            _main.RequestShowDebugLog();
+        }
+
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             var anim = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(180))

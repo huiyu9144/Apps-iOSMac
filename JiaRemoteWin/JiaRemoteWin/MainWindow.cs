@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace JiaRemoteWin
         public event Action DisconnectRequested;
         public event Action<int> ScanRequested;
         public event Action SettingsRequested;
+        public event Action ShowDebugLog;
 
         public int CurrentPort
         {
@@ -40,6 +42,8 @@ namespace JiaRemoteWin
         public MainWindow()
         {
             InitializeComponent();
+
+            ManualIpInput.Text = "192.168.3.19";
 
             _client = new TCPClient();
             _client.ConnectionStateChanged += OnConnectionStateChanged;
@@ -111,6 +115,11 @@ namespace JiaRemoteWin
             });
         }
 
+        public void RequestShowDebugLog()
+        {
+            ShowDebugLog?.Invoke();
+        }
+
         private void OnConnectionStateChanged(object sender, ConnectionStateChangedEventArgs e)
         {
             Dispatcher.Invoke(() =>
@@ -144,22 +153,29 @@ namespace JiaRemoteWin
             _renderer?.Dispose();
             _renderer = new D3D11Renderer();
 
+            _renderer.BitmapChanged += (s, bitmap) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (RenderPanel.Source != bitmap)
+                    {
+                        RenderPanel.Source = bitmap;
+                        Debug.WriteLine($"[MainWindow] 🔄 Bitmap rebound to RenderPanel (new size)");
+                    }
+                });
+            };
+
             _renderer.Initialize(1920, 1080);
 
             RenderPanel.Source = _renderer.Bitmap;
 
-            System.Diagnostics.Debug.WriteLine("[MainWindow] Renderer initialized, bitmap bound to Image");
+            Debug.WriteLine("[MainWindow] ✅ Renderer initialized, bitmap bound to Image");
         }
 
         private void OnFrameReceived(object sender, FrameReceivedEventArgs e)
         {
             if (_renderer == null || !_renderer.IsInitialized) return;
             _renderer.UpdateFrameTexture(e.PixelData, e.Header.Width, e.Header.Height, e.Header.BytesPerRow);
-
-            if (_renderer.Bitmap != null && RenderPanel.Source != _renderer.Bitmap)
-            {
-                RenderPanel.Source = _renderer.Bitmap;
-            }
 
             _frameCount++;
         }

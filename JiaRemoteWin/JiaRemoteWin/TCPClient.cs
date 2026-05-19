@@ -160,6 +160,8 @@ namespace JiaRemoteWin
 
                     await ReadExactAsync(_frameStream, pixelBuf, 0, (int)header.Value.DataLength, ct);
 
+                    Debug.WriteLine($"[TCP] 📦 收到帧: {header.Value.Width}x{header.Value.Height}, {pixelBuf.Length} bytes");
+
                     FrameReceived?.Invoke(this, new FrameReceivedEventArgs
                     {
                         Header = header.Value,

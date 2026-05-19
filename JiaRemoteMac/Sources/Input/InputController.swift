@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import AppKit
 import CoreGraphics
 import ApplicationServices
@@ -559,7 +559,7 @@ final class InputController {
         configuration.activates = true
         NSWorkspace.shared.openApplication(at: appURL, configuration: configuration) { _, error in
             if let error {
-                print("[InputController] Failed to launch app \(bundleID): \(error)")
+                JiaLog("[InputController] Failed to launch app \(bundleID): \(error)")
             }
         }
         return true
@@ -881,7 +881,7 @@ extension InputController {
             configuration.activates = true
             NSWorkspace.shared.openApplication(at: appURL, configuration: configuration) { _, error in
                 if let error {
-                    print("[InputController] Failed to launch app \(bundleID): \(error)")
+                    JiaLog("[InputController] Failed to launch app \(bundleID): \(error)")
                 }
             }
         }

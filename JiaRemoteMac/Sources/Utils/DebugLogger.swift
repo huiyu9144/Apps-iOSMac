@@ -1,57 +1,39 @@
 import Cocoa
 import Foundation
 
+func JiaLog(_ message: String) {
+    let timestamp = DateFormatter.logDateFormatter.string(from: Date())
+    let line = "[\(timestamp)] \(message)\n"
+    
+    // 写入内存数组
+    DebugLogger.shared.entries.append(line)
+    
+    // 同时写入文件（100%可靠）
+    let logPath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
+    if let handle = FileHandle(forWritingAtPath: logPath) {
+        handle.seekToEndOfFile()
+        handle.write(Data(line.utf8))
+        handle.closeFile()
+    } else {
+        FileManager.default.createFile(atPath: logPath, contents: Data(line.utf8), attributes: nil)
+    }
+}
+
 final class DebugLogger {
     static let shared = DebugLogger()
-
-    private var entries: [String] = []
-    private let maxEntries = 5000
-    private let queue = DispatchQueue(label: "com.jiaremote.debuglogger", qos: .utility)
-
-    var onNewEntry: ((String) -> Void)?
-    var onClear: (() -> Void)?
-
-    private init() {
-        redirectStdout()
-    }
+    var entries: [String] = []
+    let maxEntries = 5000
+    
+    private init() {}
 
     var fullLog: String {
-        queue.sync { entries.joined(separator: "\n") }
-    }
-
-    func log(_ message: String) {
-        let timestamp = DateFormatter.logDateFormatter.string(from: Date())
-        let entry = "[\(timestamp)] \(message)"
-        queue.sync {
-            entries.append(entry)
-            if entries.count > maxEntries {
-                entries.removeFirst(entries.count - maxEntries)
-            }
-        }
-        DispatchQueue.main.async { [weak self] in
-            self?.onNewEntry?(entry)
-        }
+        String(entries.prefix(maxEntries).joined())
     }
 
     func clear() {
-        queue.sync { entries.removeAll() }
-        DispatchQueue.main.async { [weak self] in
-            self?.onClear?()
-        }
-    }
-
-    private func redirectStdout() {
-        let pipe = Pipe()
-        setvbuf(stdout, nil, _IOLBF, 0)
-        dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
-
-        pipe.fileHandleForReading.readabilityHandler = { [weak self] handle in
-            let data = handle.availableData
-            if let line = String(data: data, encoding: .utf8)?
-                .trimmingCharacters(in: .whitespacesAndNewlines), !line.isEmpty {
-                self?.log(line)
-            }
-        }
+        entries.removeAll()
+        let logPath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
+        try? "".write(toFile: logPath, atomically: true, encoding: .utf8)
     }
 }
 
@@ -71,10 +53,9 @@ final class DebugLogWindowController: NSWindowController, NSWindowDelegate {
         let tv = NSTextView()
         tv.isEditable = false
         tv.isSelectable = true
-        tv.font = NSFont(name: "Menlo", size: 12)
+        tv.font = NSFont(name: "Menlo", size: 12) ?? NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
         tv.textColor = NSColor(white: 0.92, alpha: 1)
         tv.backgroundColor = NSColor(red: 0.06, green: 0.06, blue: 0.07, alpha: 1)
-        tv.string = DebugLogger.shared.fullLog
         self.textView = tv
 
         let scrollView = NSScrollView()
@@ -106,7 +87,6 @@ final class DebugLogWindowController: NSWindowController, NSWindowDelegate {
             scrollView.leadingAnchor.constraint(equalTo: splitView.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: splitView.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: bottomBar.topAnchor),
-
             bottomBar.leadingAnchor.constraint(equalTo: splitView.leadingAnchor),
             bottomBar.trailingAnchor.constraint(equalTo: splitView.trailingAnchor),
             bottomBar.bottomAnchor.constraint(equalTo: splitView.bottomAnchor),
@@ -132,52 +112,45 @@ final class DebugLogWindowController: NSWindowController, NSWindowDelegate {
         clearBtn.target = self
         clearBtn.action = #selector(clearLog)
 
-        DebugLogger.shared.onNewEntry = { [weak self] entry in
-            guard let self else { return }
-            let attrStr = NSAttributedString(
-                string: entry + "\n",
-                attributes: [
-                    .font: NSFont(name: "Menlo", size: 12) ?? NSFont.systemFont(ofSize: 12),
-                    .foregroundColor: NSColor(white: 0.92, alpha: 1)
-                ]
-            )
-            self.textView.textStorage?.append(attrStr)
-            self.textView.scrollToEndOfDocument(nil)
-        }
-
-        DebugLogger.shared.onClear = { [weak self] in
-            self?.textView.string = ""
-        }
+        refreshLogs()
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func refreshLogs() {
+        let logText = DebugLogger.shared.fullLog
+        if !logText.isEmpty {
+            textView.string = logText
+            textView.scrollToEndOfDocument(nil)
+        }
+        
+        let filePath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
+        if let fileContent = try? String(contentsOfFile: filePath, encoding: .utf8), !fileContent.isEmpty {
+            if textView.string.isEmpty || fileContent.count > textView.string.count {
+                textView.string = fileContent
+                textView.scrollToEndOfDocument(nil)
+            }
+        }
+    }
+
     @objc private func copyAll() {
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(DebugLogger.shared.fullLog, forType: .string)
+        let content = DebugLogger.shared.fullLog
+        let filePath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
+        let fileContent = (try? String(contentsOfFile: filePath, encoding: .utf8)) ?? ""
+        NSPasteboard.general.setString(content.isEmpty ? fileContent : content, forType: .string)
     }
 
     @objc private func clearLog() {
         DebugLogger.shared.clear()
+        textView.string = ""
     }
 
     func windowDidBecomeKey(_ notification: Notification) {
-        DebugLogger.shared.onNewEntry = { [weak self] entry in
-            guard let self else { return }
-            let attrStr = NSAttributedString(
-                string: entry + "\n",
-                attributes: [
-                    .font: NSFont(name: "Menlo", size: 12) ?? NSFont.systemFont(ofSize: 12),
-                    .foregroundColor: NSColor(white: 0.92, alpha: 1)
-                ]
-            )
-            self.textView.textStorage?.append(attrStr)
-            self.textView.scrollToEndOfDocument(nil)
-        }
+        refreshLogs()
     }
 
-    func windowDidResignKey(_ notification: Notification) {
-    }
+    func windowDidResignKey(_ notification: Notification) {}
 }

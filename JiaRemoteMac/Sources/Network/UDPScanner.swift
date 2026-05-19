@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import Network
 
 final class UDPScanner {
@@ -17,7 +17,7 @@ final class UDPScanner {
             params.allowLocalEndpointReuse = true
 
             guard let nwPort = NWEndpoint.Port(rawValue: port) else {
-                print("[UDPScanner] Invalid port: \(port)")
+                JiaLog("[UDPScanner] Invalid port: \(port)")
                 return
             }
 
@@ -27,13 +27,13 @@ final class UDPScanner {
                 switch state {
                 case .ready:
                     self?.isRunning = true
-                    print("[UDPScanner] Listening on UDP port \(self?.listeningPort ?? 0)")
+                    JiaLog("[UDPScanner] Listening on UDP port \(self?.listeningPort ?? 0)")
                 case .failed(let error):
-                    print("[UDPScanner] Listener failed: \(error)")
+                    JiaLog("[UDPScanner] Listener failed: \(error)")
                     self?.restart()
                 case .cancelled:
                     self?.isRunning = false
-                    print("[UDPScanner] Stopped")
+                    JiaLog("[UDPScanner] Stopped")
                 default:
                     break
                 }
@@ -45,7 +45,7 @@ final class UDPScanner {
 
             listener?.start(queue: queue)
         } catch {
-            print("[UDPScanner] Failed to create listener: \(error)")
+            JiaLog("[UDPScanner] Failed to create listener: \(error)")
         }
     }
 
@@ -62,7 +62,7 @@ final class UDPScanner {
             if state == .ready, let c = conn {
                 self.receiveProbe(on: c)
             } else if case .failed(let err) = state, let c = conn {
-                print("[UDPScanner] Connection error: \(err)")
+                JiaLog("[UDPScanner] Connection error: \(err)")
                 c.cancel()
             } else if state == .cancelled {
             }
@@ -75,7 +75,7 @@ final class UDPScanner {
             defer { connection.cancel() }
 
             if let error {
-                print("[UDPScanner] Receive error: \(error)")
+                JiaLog("[UDPScanner] Receive error: \(error)")
                 return
             }
 
@@ -97,9 +97,9 @@ final class UDPScanner {
 
         connection.send(content: response.data(using: .utf8), completion: .contentProcessed({ error in
             if let error {
-                print("[UDPScanner] Send response error: \(error)")
+                JiaLog("[UDPScanner] Send response error: \(error)")
             } else {
-                print("[UDPScanner] Responded to JR_SCAN probe from \(connection.endpoint)")
+                JiaLog("[UDPScanner] Responded to JR_SCAN probe from \(connection.endpoint)")
             }
         }))
     }

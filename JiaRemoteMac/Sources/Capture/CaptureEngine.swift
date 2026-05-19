@@ -1,4 +1,4 @@
-import ScreenCaptureKit
+﻿import ScreenCaptureKit
 import CoreMedia
 import CoreVideo
 import IOSurface
@@ -134,7 +134,7 @@ final class CaptureEngine: NSObject {
         do {
             return try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
         } catch {
-            print("[CaptureEngine] SCShareableContent failed: \(error)")
+            JiaLog("[CaptureEngine] SCShareableContent failed: \(error)")
             throw CaptureEngineError.contentUnavailable
         }
     }

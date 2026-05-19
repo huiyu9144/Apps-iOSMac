@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 
 protocol BonjourServiceDelegate: AnyObject {
     func bonjourServiceDidPublish(_ service: BonjourService)
@@ -69,7 +69,7 @@ final class BonjourService: NSObject {
             self.netService = service
             service.publish()
 
-            print("[BonjourService] Publishing \(self.serviceName) on port \(port)")
+            JiaLog("[BonjourService] Publishing \(self.serviceName) on port \(port)")
         }
     }
 
@@ -82,7 +82,7 @@ final class BonjourService: NSObject {
             self.netService = nil
             self.isPublished = false
 
-            print("[BonjourService] Stopped publishing")
+            JiaLog("[BonjourService] Stopped publishing")
         }
     }
 
@@ -103,7 +103,7 @@ final class BonjourService: NSObject {
 
             browser.searchForServices(ofType: Self.serviceType, inDomain: Self.serviceDomain)
 
-            print("[BonjourService] Browsing for \(Self.serviceType) services")
+            JiaLog("[BonjourService] Browsing for \(Self.serviceType) services")
         }
     }
 
@@ -123,7 +123,7 @@ final class BonjourService: NSObject {
             self.discoveredServices.removeAll()
             self.isBrowsing = false
 
-            print("[BonjourService] Stopped browsing")
+            JiaLog("[BonjourService] Stopped browsing")
         }
     }
 
@@ -140,7 +140,7 @@ extension BonjourService: NetServiceDelegate {
             self?.isPublished = true
         }
 
-        print("[BonjourService] Successfully published \(sender.name)")
+        JiaLog("[BonjourService] Successfully published \(sender.name)")
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -155,7 +155,7 @@ extension BonjourService: NetServiceDelegate {
             NSLocalizedDescriptionKey: "Failed to publish (code: \(code), domain: \(domain))"
         ])
 
-        print("[BonjourService] Failed to publish: \(error)")
+        JiaLog("[BonjourService] Failed to publish: \(error)")
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -168,7 +168,7 @@ extension BonjourService: NetServiceDelegate {
             self?.isPublished = false
         }
 
-        print("[BonjourService] Service stopped: \(sender.name)")
+        JiaLog("[BonjourService] Service stopped: \(sender.name)")
     }
 
     func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
@@ -204,7 +204,7 @@ extension BonjourService: NetServiceBrowserDelegate {
 
             let name = service.name
 
-            print("[BonjourService] Service removed: \(name)")
+            JiaLog("[BonjourService] Service removed: \(name)")
 
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
@@ -218,7 +218,7 @@ extension BonjourService: NetServiceBrowserDelegate {
             self?.isBrowsing = true
         }
 
-        print("[BonjourService] Browser will search")
+        JiaLog("[BonjourService] Browser will search")
     }
 
     func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
@@ -226,14 +226,14 @@ extension BonjourService: NetServiceBrowserDelegate {
             self?.isBrowsing = false
         }
 
-        print("[BonjourService] Browser stopped search")
+        JiaLog("[BonjourService] Browser stopped search")
     }
 
     func netServiceBrowser(_ browser: NetServiceBrowser, didNotSearch errorDict: [String: NSNumber]) {
         let code = errorDict[NetService.errorCode]?.intValue ?? -1
         let domain = errorDict[NetService.errorDomain].map { "\($0)" } ?? "Unknown"
 
-        print("[BonjourService] Browser did not search (code: \(code), domain: \(domain))")
+        JiaLog("[BonjourService] Browser did not search (code: \(code), domain: \(domain))")
 
         stateQueue.async { [weak self] in
             self?.isBrowsing = false
@@ -242,7 +242,7 @@ extension BonjourService: NetServiceBrowserDelegate {
 
     func netServiceDidResolveAddress(_ sender: NetService) {
         guard let addresses = sender.addresses, !addresses.isEmpty else {
-            print("[BonjourService] No addresses resolved for \(sender.name)")
+            JiaLog("[BonjourService] No addresses resolved for \(sender.name)")
             return
         }
 
@@ -272,10 +272,10 @@ extension BonjourService: NetServiceBrowserDelegate {
             let entries = txtDict.map { key, value in
                 "\(key)=\(String(data: value, encoding: .utf8) ?? "<data>")"
             }
-            print("[BonjourService] Resolved \(name) at \(resolvedHost):\(port) TXT: {\(entries.joined(separator: ", "))}")
+            JiaLog("[BonjourService] Resolved \(name) at \(resolvedHost):\(port) TXT: {\(entries.joined(separator: ", "))}")
         }
 
-        print("[BonjourService] Resolved \(name) at \(resolvedHost):\(port)")
+        JiaLog("[BonjourService] Resolved \(name) at \(resolvedHost):\(port)")
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -286,7 +286,7 @@ extension BonjourService: NetServiceBrowserDelegate {
     func netService(_ sender: NetService, didNotResolve errorDict: [String: NSNumber]) {
         let code = errorDict[NetService.errorCode]?.intValue ?? -1
 
-        print("[BonjourService] Failed to resolve \(sender.name) (code: \(code))")
+        JiaLog("[BonjourService] Failed to resolve \(sender.name) (code: \(code))")
 
         stateQueue.async { [weak self] in
             guard let self else { return }

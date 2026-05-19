@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import Network
 import IOSurface
 import CoreVideo
@@ -62,6 +62,7 @@ final class TCPServer {
     private let maxFrameBufferSize = 3
     private var frameRingBuffer: [Data] = []
     private var isSendingFrame = false
+    private var frameSendCount: Int = 0
 
     private var activePort: UInt16 = JiaProtocol.ProtocolConstants.defaultPort
 
@@ -133,19 +134,19 @@ final class TCPServer {
                 break
 
             case .waiting(let error):
-                print("[TCPServer] Listener waiting: \(error)")
+                JiaLog("[TCPServer] Listener waiting: \(error)")
 
             case .ready:
-                print("[TCPServer] Listener ready on port \(self.activePort)")
+                JiaLog("[TCPServer] Listener ready on port \(self.activePort)")
                 self.stateLock.sync { self.isRunning = true }
 
             case .failed(let error):
-                print("[TCPServer] Listener failed: \(error)")
+                JiaLog("[TCPServer] Listener failed: \(error)")
                 self.stateLock.sync { self.isRunning = false }
                 self.stop()
 
             case .cancelled:
-                print("[TCPServer] Listener cancelled")
+                JiaLog("[TCPServer] Listener cancelled")
                 self.stateLock.sync { self.isRunning = false }
 
             @unknown default:
@@ -216,7 +217,7 @@ final class TCPServer {
 
         connection.send(content: sendData, completion: .contentProcessed({ error in
             if let error {
-                print("[TCPServer] Command response send error: \(error)")
+                JiaLog("[TCPServer] Command response send error: \(error)")
             }
         }))
     }
@@ -227,7 +228,7 @@ final class TCPServer {
     }
 
     private func handleNewConnection(_ connection: NWConnection) {
-        print("[TCPServer] 📥 New incoming connection from \(connection.endpoint)")
+        JiaLog("[TCPServer] 📥 New incoming connection from \(connection.endpoint)")
 
         connection.stateUpdateHandler = { [weak self, weak connection] state in
             guard let self, let connection else { return }
@@ -237,17 +238,17 @@ final class TCPServer {
                 break
 
             case .waiting(let error):
-                print("[TCPServer] Connection waiting: \(error)")
+                JiaLog("[TCPServer] Connection waiting: \(error)")
 
             case .preparing:
                 break
 
             case .ready:
-                print("[TCPServer] Connection ready: \(connection.endpoint) → starting handshake")
+                JiaLog("[TCPServer] Connection ready: \(connection.endpoint) → starting handshake")
                 self.classifyConnection(connection)
 
             case .failed(let error):
-                print("[TCPServer] Connection failed: \(error)")
+                JiaLog("[TCPServer] Connection failed: \(error)")
                 connection.cancel()
 
             case .cancelled:
@@ -268,12 +269,12 @@ final class TCPServer {
             guard let self, let connection else { return }
 
             if let error {
-                print("[TCPServer] Failed to send ready message: \(error)")
+                JiaLog("[TCPServer] Failed to send ready message: \(error)")
                 connection.cancel()
                 return
             }
 
-            print("[TCPServer] Sent JR_READY to \(connection.endpoint), waiting for channel ID...")
+            JiaLog("[TCPServer] Sent JR_READY to \(connection.endpoint), waiting for channel ID...")
             self.receiveChannelIdentification(from: connection)
         }))
     }
@@ -283,13 +284,13 @@ final class TCPServer {
             guard let self, let connection else { return }
 
             if let error {
-                print("[TCPServer] Channel identification error: \(error)")
+                JiaLog("[TCPServer] Channel identification error: \(error)")
                 connection.cancel()
                 return
             }
 
             if isComplete {
-                print("[TCPServer] Channel ID recv: connection completed before identification")
+                JiaLog("[TCPServer] Channel ID recv: connection completed before identification")
                 connection.cancel()
                 return
             }
@@ -300,13 +301,13 @@ final class TCPServer {
                 return
             }
 
-            print("[TCPServer] Received channel identifier: '\(identifier)' from \(connection.endpoint)")
+            JiaLog("[TCPServer] Received channel identifier: '\(identifier)' from \(connection.endpoint)")
 
             if identifier.hasPrefix(JiaProtocol.ProtocolConstants.frameChannelPrefix) {
-                print("[TCPServer] → Classified as FRAME channel")
+                JiaLog("[TCPServer] → Classified as FRAME channel")
                 self.acceptFrameChannel(connection)
             } else if identifier.hasPrefix(JiaProtocol.ProtocolConstants.commandChannelPrefix) {
-                print("[TCPServer] → Classified as COMMAND channel")
+                JiaLog("[TCPServer] → Classified as COMMAND channel")
                 self.acceptCommandChannel(connection)
             } else if identifier == "JR_SCAN" {
                 let hostname = Host.current().localizedName ?? "JiaRemote"
@@ -315,7 +316,7 @@ final class TCPServer {
                     connection.cancel()
                 }))
             } else {
-                print("[TCPServer] → Unknown identifier '\(identifier)', closing in 0.5s")
+                JiaLog("[TCPServer] → Unknown identifier '\(identifier)', closing in 0.5s")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak connection] in
                     connection?.cancel()
                 }
@@ -328,14 +329,14 @@ final class TCPServer {
 
         frameConnection = connection
         stateLock.sync { isFrameConnected = true }
-        print("[TCPServer] ✅ Frame channel established (\(connection.endpoint))")
+        JiaLog("[TCPServer] ✅ Frame channel established (\(connection.endpoint))")
 
         connection.stateUpdateHandler = { [weak self] state in
             guard let self else { return }
 
             switch state {
             case .failed(let error):
-                print("[TCPServer] Frame connection failed: \(error)")
+                JiaLog("[TCPServer] Frame connection failed: \(error)")
                 self.handleFrameDisconnection()
             case .cancelled:
                 self.handleFrameDisconnection()
@@ -379,14 +380,14 @@ final class TCPServer {
         commandConnection = connection
         commandBuffer.removeAll(keepingCapacity: true)
         stateLock.sync { isCommandConnected = true }
-        print("[TCPServer] ✅ Command channel established (\(connection.endpoint))")
+        JiaLog("[TCPServer] ✅ Command channel established (\(connection.endpoint))")
 
         connection.stateUpdateHandler = { [weak self] state in
             guard let self else { return }
 
             switch state {
             case .failed(let error):
-                print("[TCPServer] Command connection failed: \(error)")
+                JiaLog("[TCPServer] Command connection failed: \(error)")
                 self.handleCommandDisconnection()
             case .cancelled:
                 self.handleCommandDisconnection()
@@ -431,7 +432,7 @@ final class TCPServer {
             }
 
             if let error {
-                print("[TCPServer] Command receive error: \(error)")
+                JiaLog("[TCPServer] Command receive error: \(error)")
                 self.handleCommandDisconnection()
                 return
             }
@@ -509,7 +510,7 @@ final class TCPServer {
 
     private func checkFullConnection() {
         let isFull = stateLock.sync { isFrameConnected && isCommandConnected }
-        print("[TCPServer] checkFullConnection: frame=\(stateLock.sync { isFrameConnected }), cmd=\(stateLock.sync { isCommandConnected }) → \(isFull ? "FULLY CONNECTED!" : "waiting...")")
+        JiaLog("[TCPServer] checkFullConnection: frame=\(stateLock.sync { isFrameConnected }), cmd=\(stateLock.sync { isCommandConnected }) → \(isFull ? "FULLY CONNECTED!" : "waiting...")")
 
         guard isFull else { return }
 
@@ -523,7 +524,7 @@ final class TCPServer {
         if case .hostPort(let host, _) = remoteEndpoint {
             let hostStr = "\(host)"
             stateLock.sync { connectedClientHost = hostStr }
-            print("[TCPServer] 🎉 Client fully connected: \(hostStr)")
+            JiaLog("[TCPServer] 🎉 Client fully connected: \(hostStr)")
             delegate?.tcpServerDidAcceptClient(self, host: hostStr)
         }
     }
@@ -554,7 +555,7 @@ final class TCPServer {
         let attempt = reconnectAttempts
         let port = activePort
 
-        print("[TCPServer] Auto-reconnect attempt \(attempt)/\(maxReconnectAttempts)")
+        JiaLog("[TCPServer] Auto-reconnect attempt \(attempt)/\(maxReconnectAttempts)")
 
         DispatchQueue.global().asyncAfter(deadline: .now() + reconnectDelay) { [weak self] in
             guard let self else { return }
@@ -568,7 +569,7 @@ final class TCPServer {
                     try self.start(port: port)
                     self.autoReconnectEnabled = true
                 } catch {
-                    print("[TCPServer] Reconnect attempt \(attempt) failed: \(error)")
+                    JiaLog("[TCPServer] Reconnect attempt \(attempt) failed: \(error)")
                     self.stateLock.sync { self.reconnectAttempts = attempt }
                     self.checkClientDisconnection()
                 }
@@ -589,22 +590,20 @@ extension TCPServer: CaptureEngineDelegate {
 
         var bytesPerRow = 0
         var baseAddress: UnsafeMutableRawPointer? = nil
-        var useIOSurface = false
+        var lockedSurface: IOSurface? = nil
 
         if let surface = frame.ioSurface {
             bytesPerRow = IOSurfaceGetBytesPerRow(surface)
-            if let addr = IOSurfaceGetBaseAddress(surface) {
+            let addr = IOSurfaceGetBaseAddress(surface)
+            if addr != nil {
                 baseAddress = addr
-                useIOSurface = true
                 IOSurfaceLock(surface, .readOnly, nil)
-                defer { IOSurfaceUnlock(surface, .readOnly, nil) }
+                lockedSurface = surface
             }
         }
 
         if baseAddress == nil {
             CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
-            defer { CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly) }
-
             baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
             bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
 
@@ -613,10 +612,18 @@ extension TCPServer: CaptureEngineDelegate {
             }
         }
 
+        defer {
+            if let surface = lockedSurface {
+                IOSurfaceUnlock(surface, .readOnly, nil)
+            } else {
+                CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
+            }
+        }
+
         let dataSize = bytesPerRow * height
 
         guard dataSize > 0, dataSize <= JiaProtocol.ProtocolConstants.maxFrameSize else {
-            print("[TCPServer] Frame dropped: invalid size \(dataSize) for \(width)x\(height)")
+            JiaLog("[TCPServer] Frame dropped: invalid size \(dataSize) for \(width)x\(height)")
             return
         }
 
@@ -640,7 +647,7 @@ extension TCPServer: CaptureEngineDelegate {
     }
 
     func captureEngine(_ engine: CaptureEngine, didEncounterError error: Error) {
-        print("[TCPServer] Capture error: \(error)")
+        JiaLog("[TCPServer] Capture error: \(error)")
     }
 
     func captureEngineDidStop(_ engine: CaptureEngine) {
@@ -658,8 +665,6 @@ extension TCPServer: CaptureEngineDelegate {
         }
         sendNextFrame()
     }
-
-    private var frameSendCount: Int = 0
 
     private func sendNextFrame() {
         frameSendQueue.async { [weak self] in
@@ -684,10 +689,10 @@ extension TCPServer: CaptureEngineDelegate {
                 self.isSendingFrame = false
 
                 if let error {
-                    print("[TCPServer] Frame #\(self.frameSendCount) send error: \(error)")
+                    JiaLog("[TCPServer] Frame #\(self.frameSendCount) send error: \(error)")
                 } else {
                     if self.frameSendCount % 30 == 1 {
-                        print("[TCPServer] Frame #\(self.frameSendCount) sent (\(data.count) bytes)")
+                        JiaLog("[TCPServer] Frame #\(self.frameSendCount) sent (\(data.count) bytes)")
                     }
                 }
 

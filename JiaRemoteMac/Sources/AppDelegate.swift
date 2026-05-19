@@ -1,4 +1,4 @@
-import Cocoa
+﻿import Cocoa
 import SwiftUI
 import Combine
 import Network
@@ -13,7 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let tcpServer = TCPServer()
     let bonjourService = BonjourService()
     let udpScanner = UDPScanner()
-    lazy var debugLogController = DebugLogWindowController()
+    var debugLogController: DebugLogWindowController?
     let config = ConfigManager.shared
 
     private var cancellables = Set<AnyCancellable>()
@@ -24,6 +24,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         config.load()
+
+        JiaLog("🚀 JiaRemote Mac 被控端启动")
+        JiaLog("📝 日志系统已初始化")
 
         setupStatusBar()
         setupCaptureDelegate()
@@ -139,8 +142,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func showDebugLog() {
-        debugLogController.showWindow(nil)
-        debugLogController.window?.makeKeyAndOrderFront(nil)
+        if debugLogController == nil {
+            debugLogController = DebugLogWindowController()
+        }
+        debugLogController?.showWindow(nil)
+        debugLogController?.window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }
 
@@ -193,7 +199,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         do {
             try tcpServer.start(port: UInt16(config.listenPort))
         } catch {
-            print("[JiaRemote] TCP server failed to start: \(error)")
+            JiaLog("[JiaRemote] TCP server failed to start: \(error)")
             return
         }
 
@@ -209,6 +215,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startCaptureWithRetry() {
         Task {
+            if !CGPreflightScreenCaptureAccess() {
+                JiaLog("[JiaRemote] ⚠️ 屏幕录制权限未授权，无法启动采集。请在 系统设置→隐私与安全性→屏幕录制 中允许 JiaRemote，然后重启应用。")
+                JiaLog("[JiaRemote] 提示：如果是 Xcode 调试运行，需要在授权后完全退出应用（Cmd+Q）再重新 Run（Xcode 每次编译会改变二进制签名）")
+                return
+            }
+
             for attempt in 1...5 {
                 do {
                     if config.captureMode == "window", config.selectedWindowID != 0 {
@@ -218,20 +230,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                         let targetID = config.selectedDisplayID != 0 ? config.selectedDisplayID : displays.first?.displayID ?? 0
                         try captureEngine.start(target: .display(displayID: targetID))
                     }
-                    print("[JiaRemote] Capture started successfully")
+                    JiaLog("[JiaRemote] ✅ Capture started successfully")
                     return
                 } catch {
-                    print("[JiaRemote] Capture attempt \(attempt)/5 failed: \(error)")
-                    if attempt == 3 {
-                        print("[JiaRemote] Re-requesting screen recording permission...")
-                        _ = await config.requestScreenRecordingPermission()
-                    }
+                    JiaLog("[JiaRemote] Capture attempt \(attempt)/5 failed: \(error)")
                     if attempt < 5 {
-                        try? await Task.sleep(nanoseconds: 3_000_000_000)
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
                     }
                 }
             }
-            print("[JiaRemote] All capture attempts failed. Please restart the app after confirming Screen Recording permission in System Settings.")
+            JiaLog("[JiaRemote] ❌ All capture attempts failed.")
         }
     }
 
@@ -296,15 +304,15 @@ extension AppDelegate: TCPServerDelegate {
 // MARK: - BonjourServiceDelegate
 extension AppDelegate: BonjourServiceDelegate {
     func bonjourServiceDidPublish(_ service: BonjourService) {
-        print("[JiaRemote] Bonjour published as: \(service.currentServiceName)")
+        JiaLog("[JiaRemote] Bonjour published as: \(service.currentServiceName)")
     }
 
     func bonjourService(_ service: BonjourService, didFailToPublish error: Error) {
-        print("[JiaRemote] Bonjour publish failed: \(error)")
+        JiaLog("[JiaRemote] Bonjour publish failed: \(error)")
     }
 
     func bonjourService(_ service: BonjourService, didDiscoverService name: String, host: String, port: Int) {
-        print("[JiaRemote] Discovered: \(name) @ \(host):\(port)")
+        JiaLog("[JiaRemote] Discovered: \(name) @ \(host):\(port)")
     }
 }
 
