@@ -12,8 +12,8 @@ class ScanViewModel: ObservableObject {
 
         var localizedDescription: String {
             switch self {
-            case .enumerating: return "正在扫描文件…"
-            case .hashing(let p): return "正在比对哈希… \(Int(p * 100))%"
+            case .enumerating: return loc("正在扫描文件…", "Scanning files…")
+            case .hashing(let p): return loc("正在比对哈希… ", "Hashing… ") + "\(Int(p * 100))%"
             }
         }
     }

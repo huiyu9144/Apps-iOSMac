@@ -48,16 +48,16 @@ struct ScanPanelView: View {
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
 
-            Text("查找重复文件")
+            Text(verbatim: loc("查找重复文件", "Find Duplicate Files"))
                 .font(.title2)
                 .fontWeight(.medium)
 
-            Text("选择一个文件夹开始扫描")
+            Text(verbatim: loc("选择一个文件夹开始扫描", "Select a folder to start scanning"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
             Button(action: { showFolderPicker = true }) {
-                Label("选择文件夹", systemImage: "folder.badge.plus")
+                Label(loc("选择文件夹", "Select Folder"), systemImage: "folder.badge.plus")
                     .font(.headline)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 10)
@@ -74,7 +74,7 @@ struct ScanPanelView: View {
                         Image(systemName: "arrow.down.doc.fill")
                             .font(.title3)
                             .foregroundStyle(.secondary)
-                        Text("或拖拽文件夹到此处")
+                        Text(verbatim: loc("或拖拽文件夹到此处", "Or drag a folder here"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
@@ -104,11 +104,11 @@ struct ScanPanelView: View {
                     .rotationEffect(.degrees(rotationAngle))
             }
 
-            Text("正在扫描「\(scanVM.scannedFolderName)」")
+            Text(verbatim: loc("正在扫描「", "Scanning 「") + scanVM.scannedFolderName + "」")
                 .font(.title3)
                 .fontWeight(.medium)
 
-            Text(scanVM.scanPhase.localizedDescription)
+            Text(verbatim: scanVM.scanPhase.localizedDescription)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
@@ -122,13 +122,13 @@ struct ScanPanelView: View {
                     .frame(maxWidth: 300)
             }
 
-            Text("已扫描 \(scanVM.scannedFileCount) 个文件")
+            Text(verbatim: loc("已扫描 ", "Scanned ") + "\(scanVM.scannedFileCount) " + loc("个文件", "files"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Button("取消", role: .cancel) {
-                scanVM.cancelScan()
-            }
+            Button(action: { scanVM.cancelScan() }, label: {
+                Text(verbatim: loc("取消", "Cancel"))
+            })
             .buttonStyle(.bordered)
 
             Spacer()

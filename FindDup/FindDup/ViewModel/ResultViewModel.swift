@@ -3,8 +3,8 @@ import Foundation
 @MainActor
 class ResultViewModel: ObservableObject {
     enum SelectMode: String, CaseIterable {
-        case extras = "保留一个"
-        case allFiles = "全部选中"
+        case extras = "KeepOne"
+        case allFiles = "SelectAll"
     }
 
     @Published var selectedFileIDs: Set<UUID> = []
@@ -164,9 +164,9 @@ class ResultViewModel: ObservableObject {
             formatter.countStyle = .file
 
             if result.failureCount > 0 {
-                deleteResultText = "已释放 \(formatter.string(fromByteCount: result.freedSpace))，\(result.failureCount) 个文件删除失败"
+                deleteResultText = loc("已释放 ", "Freed ") + "\(formatter.string(fromByteCount: result.freedSpace))，" + "\(result.failureCount) " + loc("个文件删除失败", "files failed to delete")
             } else {
-                deleteResultText = "已释放 \(formatter.string(fromByteCount: result.freedSpace))"
+                deleteResultText = loc("已释放 ", "Freed ") + formatter.string(fromByteCount: result.freedSpace)
             }
 
             isDeleting = false

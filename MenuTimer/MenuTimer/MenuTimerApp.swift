@@ -26,7 +26,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         timerIcon = NSImage(
             systemSymbolName: "timer",
-            accessibilityDescription: "MenuTimer"
+            accessibilityDescription: "DashTimer"
         )
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)

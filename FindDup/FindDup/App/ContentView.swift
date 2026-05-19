@@ -31,8 +31,7 @@ struct ContentView: View {
     }
 
     private var shouldShowSidebar: Bool {
-        if scanVM.scanState != .completed { return true }
-        return !scanVM.duplicateGroups.isEmpty
+        true
     }
 
     private var sidebarView: some View {
@@ -60,7 +59,7 @@ struct ContentView: View {
             VStack(spacing: 4) {
                 Divider()
                 Button(action: { scanVM.showSettings = true }) {
-                    Label("设置", systemImage: "gearshape")
+                    Label(loc("设置", "Settings"), systemImage: "gearshape")
                         .font(.subheadline)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -75,7 +74,7 @@ struct ContentView: View {
     private var idleSidebarContent: some View {
         VStack(spacing: 4) {
             Button(action: { scanVM.showFolderPicker = true }) {
-                Label("选择文件夹", systemImage: "folder.badge.plus")
+                Label(loc("选择文件夹", "Select Folder"), systemImage: "folder.badge.plus")
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -97,7 +96,7 @@ struct ContentView: View {
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .lineLimit(1)
-                    Text("\(scanVM.duplicateGroups.count) 组重复")
+                    Text(verbatim: "\(scanVM.duplicateGroups.count) " + loc("组重复", "groups"))
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
                 }
@@ -107,7 +106,7 @@ struct ContentView: View {
             .padding(.vertical, 8)
 
             Button(action: { scanVM.reset() }) {
-                Label("新建扫描", systemImage: "arrow.counterclockwise")
+                Label(loc("新建扫描", "New Scan"), systemImage: "arrow.counterclockwise")
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }

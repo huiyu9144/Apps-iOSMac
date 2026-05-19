@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CF000001 /* ClipFlowApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000020 /* ClipFlowApp.swift */; };
+		CF000001 /* PasteLiteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000020 /* PasteLiteApp.swift */; };
 		CF000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000021 /* AppDelegate.swift */; };
 		CF000003 /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000022 /* MenuBarController.swift */; };
 		CF000004 /* ClipboardMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF000023 /* ClipboardMonitor.swift */; };
@@ -27,7 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		CF000020 /* ClipFlowApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipFlowApp.swift; sourceTree = "<group>"; };
+		CF000020 /* PasteLiteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteLiteApp.swift; sourceTree = "<group>"; };
 		CF000021 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CF000022 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		CF000023 /* ClipboardMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardMonitor.swift; sourceTree = "<group>"; };
@@ -45,11 +45,12 @@
 		CF000032 /* Formatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Formatters.swift; sourceTree = "<group>"; };
 		CF000033 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CF000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		CF000035 /* ClipFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF000035 /* PasteLite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PasteLite.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF000052 /* PasteLite.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasteLite.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		CF000040 /* ClipFlow */ = {
+		CF000040 /* PasteLite */ = {
 			isa = PBXGroup;
 			children = (
 				CF000041 /* App */,
@@ -60,6 +61,7 @@
 				CF000046 /* Utils */,
 				CF000033 /* Assets.xcassets */,
 				CF000034 /* Info.plist */,
+				CF000052 /* PasteLite.entitlements */,
 			);
 			path = ClipFlow;
 			sourceTree = "<group>";
@@ -67,7 +69,7 @@
 		CF000041 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				CF000020 /* ClipFlowApp.swift */,
+				CF000020 /* PasteLiteApp.swift */,
 				CF000021 /* AppDelegate.swift */,
 			);
 			path = App;
@@ -125,7 +127,7 @@
 		CF000048 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				CF000035 /* ClipFlow.app */,
+				CF000035 /* PasteLite.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -133,7 +135,7 @@
 		CF000049 = {
 			isa = PBXGroup;
 			children = (
-				CF000040 /* ClipFlow */,
+				CF000040 /* PasteLite */,
 				CF000048 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -141,9 +143,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		CF000050 /* ClipFlow */ = {
+		CF000050 /* PasteLite */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = CF000090 /* Build configuration list for PBXNativeTarget "ClipFlow" */;
+			buildConfigurationList = CF000090 /* Build configuration list for PBXNativeTarget "PasteLite" */;
 			buildPhases = (
 				CF000071 /* Sources */,
 				CF000070 /* Resources */,
@@ -152,9 +154,9 @@
 			);
 			dependencies = (
 			);
-			name = ClipFlow;
-			productName = ClipFlow;
-			productReference = CF000035 /* ClipFlow.app */;
+			name = PasteLite;
+			productName = PasteLite;
+			productReference = CF000035 /* PasteLite.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -167,12 +169,12 @@
 				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 			};
-			buildConfigurationList = CF000091 /* Build configuration list for PBXProject "ClipFlow" */;
+			buildConfigurationList = CF000091 /* Build configuration list for PBXProject "PasteLite" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = "en-US";
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en-US,
+				"en-US",
 				Base,
 			);
 			mainGroup = CF000049;
@@ -180,7 +182,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				CF000050 /* ClipFlow */,
+				CF000050 /* PasteLite */,
 			);
 		};
 /* End PBXProject section */
@@ -227,13 +229,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ClipFlow/PasteLite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "ClipFlow/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "ClipFlow";
-				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_FILE = ClipFlow/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteLite;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -241,7 +245,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.clipflow.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PasteLite.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -253,13 +257,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = ClipFlow/PasteLite.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "ClipFlow/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "ClipFlow";
-				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
+				INFOPLIST_FILE = ClipFlow/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PasteLite;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -267,7 +273,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.clipflow.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.PasteLite.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -328,7 +334,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CF000090 /* Build configuration list for PBXNativeTarget "ClipFlow" */ = {
+		CF000090 /* Build configuration list for PBXNativeTarget "PasteLite" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CF000080 /* Debug */,
@@ -337,7 +343,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		CF000091 /* Build configuration list for PBXProject "ClipFlow" */ = {
+		CF000091 /* Build configuration list for PBXProject "PasteLite" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				CF000082 /* Debug */,

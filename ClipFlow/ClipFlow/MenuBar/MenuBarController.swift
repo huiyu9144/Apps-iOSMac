@@ -28,7 +28,7 @@ class MenuBarController {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
 
         if let button = statusItem?.button {
-            let image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "ClipFlow")
+            let image = NSImage(systemSymbolName: "doc.on.clipboard", accessibilityDescription: "PasteLite")
             image?.isTemplate = true
             button.image = image
         }
@@ -73,7 +73,7 @@ class MenuBarController {
 
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit ClipFlow", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "Quit PasteLite", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         statusItem?.menu = menu

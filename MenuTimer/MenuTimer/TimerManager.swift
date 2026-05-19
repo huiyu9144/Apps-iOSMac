@@ -192,7 +192,7 @@ class TimerManager: ObservableObject {
             }
 
             let content = UNMutableNotificationContent()
-            content.title = "MenuTimer"
+            content.title = "DashTimer"
             content.body = body
             content.sound = hasSound ? .default : nil
             let request = UNNotificationRequest(

@@ -24,20 +24,20 @@ struct ResultPanelView: View {
                 groupListView
             }
         }
-        .alert("确认删除", isPresented: $resultVM.showConfirmDelete) {
-            Button("取消", role: .cancel) { }
-            Button("删除", role: .destructive) {
+        .alert(loc("确认删除", "Confirm Delete"), isPresented: $resultVM.showConfirmDelete) {
+            Button(loc("取消", "Cancel"), role: .cancel) { }
+            Button(loc("删除", "Delete"), role: .destructive) {
                 resultVM.confirmDelete { updated in
                     scanVM.duplicateGroups = updated
                 }
             }
         } message: {
-            Text("确定删除 \(resultVM.selectedFileIDs.count) 个文件，释放 \(resultVM.formattedWastedSpace(for: scanVM.duplicateGroups)) 空间？")
+            Text(verbatim: loc("确定删除 ", "Delete ") + "\(resultVM.selectedFileIDs.count) " + loc("个文件，释放 ", " files, free up ") + "\(resultVM.formattedWastedSpace(for: scanVM.duplicateGroups))" + loc(" 空间？", "?"))
         }
-        .alert("删除结果", isPresented: $resultVM.showDeleteAlert) {
-            Button("好的", role: .cancel) { }
+        .alert(loc("删除结果", "Delete Result"), isPresented: $resultVM.showDeleteAlert) {
+            Button(loc("好的", "OK"), role: .cancel) { }
         } message: {
-            Text(resultVM.deleteResultText ?? "")
+            Text(verbatim: resultVM.deleteResultText ?? "")
         }
         .onAppear {
             resultVM.defaultSelection(in: scanVM.duplicateGroups)
@@ -52,22 +52,23 @@ struct ResultPanelView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.green)
 
-            Text("没有发现重复文件")
+            Text(verbatim: loc("没有发现重复文件", "No Duplicates Found"))
                 .font(.title3)
                 .fontWeight(.medium)
 
-            Text("「\(scanVM.scannedFolderName)」中未找到重复文件")
+            Text(verbatim: "「\(scanVM.scannedFolderName)」" + loc("中未找到重复文件", ": No duplicate files found"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
             Button(action: { scanVM.showFolderPicker = true }) {
-                Label("扫描其他位置", systemImage: "arrow.counterclockwise")
+                Label(loc("扫描其他位置", "Scan Another Location"), systemImage: "arrow.counterclockwise")
             }
             .buttonStyle(.bordered)
             .controlSize(.large)
 
             Spacer()
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var headerView: some View {
@@ -75,13 +76,13 @@ struct ResultPanelView: View {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
-                Text("扫描完成 — 「\(scanVM.scannedFolderName)」")
+                Text(verbatim: loc("扫描完成 — 「", "Scan Complete — 「") + scanVM.scannedFolderName + "」")
                     .font(.headline)
                 Spacer()
             }
 
             HStack {
-                Text("找到 \(scanVM.duplicateGroups.count) 组重复文件")
+                Text(verbatim: loc("找到 ", "Found ") + "\(scanVM.duplicateGroups.count) " + loc("组重复文件", " duplicate groups"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 Spacer()
@@ -96,7 +97,7 @@ struct ResultPanelView: View {
         formatter.countStyle = .file
         return HStack {
             let allSelected = resultVM.areAllSelected(in: scanVM.duplicateGroups)
-            Button(allSelected ? "取消全选" : "全选") {
+            Button(allSelected ? loc("取消全选", "Deselect All") : loc("全选", "Select All")) {
                 if allSelected {
                     resultVM.deselectAll(in: scanVM.duplicateGroups)
                 } else {
@@ -107,8 +108,8 @@ struct ResultPanelView: View {
             .buttonStyle(.borderless)
 
             Picker("", selection: $resultVM.selectMode) {
-                Text("保留一个").tag(ResultViewModel.SelectMode.extras)
-                Text("全部选中").tag(ResultViewModel.SelectMode.allFiles)
+                Text(verbatim: loc("保留一个", "Keep One")).tag(ResultViewModel.SelectMode.extras)
+                Text(verbatim: loc("全部选中", "Select All")).tag(ResultViewModel.SelectMode.allFiles)
             }
             .pickerStyle(.segmented)
             .labelsHidden()
@@ -119,7 +120,7 @@ struct ResultPanelView: View {
             Button(action: {
                 resultVM.requestDelete(from: scanVM.duplicateGroups)
             }, label: {
-                Label("删除选中 (\(formatter.string(fromByteCount: totalWastedSpace)))", systemImage: "trash")
+                Label(loc("删除选中 (", "Delete Selected (") + formatter.string(fromByteCount: totalWastedSpace) + ")", systemImage: "trash")
                     .font(.subheadline)
             })
             .buttonStyle(.borderedProminent)

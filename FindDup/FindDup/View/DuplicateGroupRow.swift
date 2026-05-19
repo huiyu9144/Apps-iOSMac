@@ -38,7 +38,7 @@ struct DuplicateGroupRow: View {
                             .lineLimit(1)
                             .foregroundStyle(.primary)
 
-                        Text("\(group.fileCount) 个副本 · 共 \(group.formattedTotalSize)")
+                        Text(verbatim: "\(group.fileCount) " + loc("个副本 · 共 ", " copies · ") + group.formattedTotalSize)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -48,7 +48,7 @@ struct DuplicateGroupRow: View {
                     HStack(spacing: 4) {
                         Image(systemName: "arrow.down.circle")
                             .font(.caption)
-                        Text("可节省 \(group.formattedWastedSize)")
+                        Text(verbatim: loc("可节省 ", "Save ") + group.formattedWastedSize)
                             .font(.caption)
                     }
                     .foregroundStyle(.green)

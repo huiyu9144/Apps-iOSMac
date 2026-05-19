@@ -79,8 +79,8 @@ enum ScannerError: Error, LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .cancelled: return "扫描已取消"
-        case .directoryAccessFailed: return "无法访问该文件夹"
+        case .cancelled: return loc("扫描已取消", "Scan cancelled")
+        case .directoryAccessFailed: return loc("无法访问该文件夹", "Cannot access the folder")
         }
     }
 }

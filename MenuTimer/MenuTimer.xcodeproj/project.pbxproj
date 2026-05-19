@@ -11,8 +11,9 @@
 		66000002 /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6600000B /* TimerManager.swift */; };
 		66000003 /* MenuBarPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6600000C /* MenuBarPopoverView.swift */; };
 		66000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6600000D /* SettingsView.swift */; };
-		66000020 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000021 /* Localized.swift */; };
 		66000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6600000E /* Assets.xcassets */; };
+		66000020 /* Localized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66000021 /* Localized.swift */; };
+		66000022 /* MenuTimer.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 66000023 /* MenuTimer.entitlements */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,8 +23,9 @@
 		6600000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6600000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6600000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		66000021 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
 		66000010 /* MenuTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66000021 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
+		66000023 /* MenuTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MenuTimer.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -37,6 +39,7 @@
 				66000021 /* Localized.swift */,
 				6600000E /* Assets.xcassets */,
 				6600000F /* Info.plist */,
+				66000023 /* MenuTimer.entitlements */,
 			);
 			path = MenuTimer;
 			sourceTree = "<group>";
@@ -60,9 +63,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		66000009 /* MenuTimer */ = {
+		66000009 /* DashTimer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 66000015 /* Build configuration list for PBXNativeTarget "MenuTimer" */;
+			buildConfigurationList = 66000015 /* Build configuration list for PBXNativeTarget "DashTimer" */;
 			buildPhases = (
 				66000011 /* Sources */,
 				66000012 /* Resources */,
@@ -71,8 +74,8 @@
 			);
 			dependencies = (
 			);
-			name = MenuTimer;
-			productName = MenuTimer;
+			name = DashTimer;
+			productName = DashTimer;
 			productReference = 66000010 /* MenuTimer.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -86,12 +89,12 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 			};
-			buildConfigurationList = 66000016 /* Build configuration list for PBXProject "MenuTimer" */;
+			buildConfigurationList = 66000016 /* Build configuration list for PBXProject "DashTimer" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = "en-US";
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en-US,
+				"en-US",
 				Base,
 				"zh-Hans",
 				"zh-Hant",
@@ -106,7 +109,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				66000009 /* MenuTimer */,
+				66000009 /* DashTimer */,
 			);
 		};
 /* End PBXProject section */
@@ -117,6 +120,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66000005 /* Assets.xcassets in Resources */,
+				66000022 /* MenuTimer.entitlements in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,21 +146,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MenuTimer/MenuTimer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MenuTimer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "MenuTimer";
-				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 MenuTimer. All rights reserved.";
+				INFOPLIST_KEY_CFBundleDisplayName = DashTimer;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 DashTimer. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.menutimer.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DashTimer.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -168,21 +174,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MenuTimer/MenuTimer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 4DPU4Y3776;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MenuTimer/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "MenuTimer";
-				INFOPLIST_KEY_LSMinimumSystemVersion = "14.0";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 MenuTimer. All rights reserved.";
+				INFOPLIST_KEY_CFBundleDisplayName = DashTimer;
+				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 DashTimer. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.menutimer.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.DashTimer.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -252,7 +260,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		66000016 /* Build configuration list for PBXProject "MenuTimer" */ = {
+		66000016 /* Build configuration list for PBXProject "DashTimer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66000018 /* Debug */,

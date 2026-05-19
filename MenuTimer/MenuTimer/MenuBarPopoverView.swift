@@ -140,7 +140,7 @@ struct MenuBarPopoverView: View {
                 Image(systemName: "timer")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.orange.gradient)
-                Text("MenuTimer")
+                Text("DashTimer")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
             }
             Spacer()

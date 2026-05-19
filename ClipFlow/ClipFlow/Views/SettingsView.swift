@@ -51,7 +51,7 @@ struct SettingsView: View {
             
             Divider()
             
-            Text("ClipFlow runs in your menu bar. Use ⌘⇧V to open history panel.")
+            Text("PasteLite runs in your menu bar. Use ⌘⇧V to open history panel.")
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -91,7 +91,7 @@ struct SettingsView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.accentColor)
             
-            Text("ClipFlow")
+            Text("PasteLite")
                 .font(.title2)
                 .fontWeight(.semibold)
             

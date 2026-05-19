@@ -3,11 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var langManager = LocalizationManager.shared
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("设置")
+                Text(verbatim: loc("设置", "Settings"))
                     .font(.headline)
                 Spacer()
                 Button(action: { dismiss() }) {
@@ -24,12 +25,12 @@ struct SettingsView: View {
 
             ScrollView {
                 VStack(spacing: 0) {
-                    groupHeader(icon: "magnifyingglass", title: "扫描")
+                    groupHeader(icon: "magnifyingglass", title: loc("扫描", "Scan"))
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("最小文件大小")
+                        Text(verbatim: loc("最小文件大小", "Minimum File Size"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Picker("", selection: $viewModel.minimumFileSize) {
@@ -41,7 +42,7 @@ struct SettingsView: View {
                         }
                         .pickerStyle(.segmented)
                         .labelsHidden()
-                        Text("小于此大小的文件将被跳过")
+                        Text(verbatim: loc("小于此大小的文件将被跳过", "Files smaller than this will be skipped"))
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
@@ -51,7 +52,7 @@ struct SettingsView: View {
                     Divider()
                         .padding(.horizontal, 20)
 
-                    groupHeader(icon: "trash", title: "删除")
+                    groupHeader(icon: "trash", title: loc("删除", "Delete"))
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
 
@@ -60,16 +61,16 @@ struct SettingsView: View {
                             DeleteOptionCard(
                                 isSelected: viewModel.deleteToTrash,
                                 icon: "trash",
-                                title: "移到废纸篓",
-                                subtitle: "安全，可还原"
+                                title: loc("移到废纸篓", "Move to Trash"),
+                                subtitle: loc("安全，可还原", "Safe, Recoverable")
                             )
                             .onTapGesture { viewModel.deleteToTrash = true }
 
                             DeleteOptionCard(
                                 isSelected: !viewModel.deleteToTrash,
                                 icon: "xmark.bin",
-                                title: "直接删除",
-                                subtitle: "不可恢复"
+                                title: loc("直接删除", "Delete Permanently"),
+                                subtitle: loc("不可恢复", "Irreversible")
                             )
                             .onTapGesture { viewModel.deleteToTrash = false }
                         }
@@ -79,7 +80,7 @@ struct SettingsView: View {
                             Image(systemName: "info.circle.fill")
                                 .font(.caption)
                                 .foregroundStyle(.tertiary)
-                            Text("推荐「移到废纸篓」，误删可从废纸篓找回")
+                            Text(verbatim: loc("推荐「移到废纸篓」，误删可从废纸篓找回", "Recommended: Move to Trash, recoverable if deleted by mistake"))
                                 .font(.caption)
                                 .foregroundStyle(.tertiary)
                         }
@@ -91,22 +92,44 @@ struct SettingsView: View {
                     Divider()
                         .padding(.horizontal, 20)
 
-                    groupHeader(icon: "line.3.horizontal.decrease", title: "筛选")
+                    groupHeader(icon: "line.3.horizontal.decrease", title: loc("筛选", "Filter"))
                         .padding(.horizontal, 20)
                         .padding(.top, 16)
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("文件类型")
+                        Text(verbatim: loc("文件类型", "File Types"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Picker("", selection: $viewModel.fileTypeFilter) {
                             ForEach(FileTypeFilter.allCases, id: \.self) { filter in
-                                Text(filter.rawValue).tag(filter)
+                                Text(verbatim: filter.localizedName).tag(filter)
                             }
                         }
                         .pickerStyle(.radioGroup)
                         .labelsHidden()
-                        Text("仅扫描所选类型的文件，设为「全部文件」则扫描所有类型")
+                        Text(verbatim: loc("仅扫描所选类型的文件，设为「全部文件」则扫描所有类型", "Only scan selected file types. Set to 'All Files' to scan everything"))
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+
+                    Divider()
+                        .padding(.horizontal, 20)
+
+                    groupHeader(icon: "globe", title: loc("语言", "Language"))
+                        .padding(.horizontal, 20)
+                        .padding(.top, 16)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Picker("", selection: $langManager.currentLanguage) {
+                            ForEach(AppLanguage.allCases, id: \.self) { lang in
+                                Text(verbatim: lang.displayName).tag(lang)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                        Text(verbatim: loc("选择App显示语言", "Choose the display language for the app"))
                             .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
@@ -119,9 +142,9 @@ struct SettingsView: View {
 
             HStack {
                 Spacer()
-                Button("完成") {
-                    dismiss()
-                }
+                Button(action: { dismiss() }, label: {
+                    Text(verbatim: loc("完成", "Done"))
+                })
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .keyboardShortcut(.defaultAction)
@@ -129,7 +152,7 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
         }
-        .frame(width: 480, height: 480)
+        .frame(width: 520, height: 540)
     }
 
     private func groupHeader(icon: String, title: String) -> some View {
@@ -137,7 +160,7 @@ struct SettingsView: View {
             Image(systemName: icon)
                 .font(.subheadline)
                 .foregroundStyle(.blue)
-            Text(title)
+            Text(verbatim: title)
                 .font(.subheadline)
                 .fontWeight(.medium)
             Spacer()
@@ -157,25 +180,4 @@ private struct DeleteOptionCard: View {
                 .font(.title3)
                 .foregroundStyle(isSelected ? .blue : .secondary)
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(isSelected ? .medium : .regular)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
-            Spacer()
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.blue)
-            }
-        }
-        .padding(12)
-        .background(isSelected ? Color.blue.opacity(0.08) : Color.clear)
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(isSelected ? Color.blue : Color.gray.opacity(0.25), lineWidth: isSelected ? 1.5 : 0.5)
-        )
-    }
-}
+                Text

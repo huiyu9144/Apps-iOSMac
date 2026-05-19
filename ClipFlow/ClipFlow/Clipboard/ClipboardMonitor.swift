@@ -8,7 +8,7 @@ private class FileStorageService {
 
     private var storageDir: URL {
         let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("ClipFlow", isDirectory: true)
+        let dir = appSupport.appendingPathComponent("PasteLite", isDirectory: true)
         if !fileManager.fileExists(atPath: dir.path) {
             try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
         }

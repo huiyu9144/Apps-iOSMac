@@ -15,7 +15,7 @@ enum Language: String, CaseIterable {
 }
 
 private let translations: [String: [String: String]] = [
-    "MenuTimer": ["en": "MenuTimer", "zh-Hans": "MenuTimer"],
+    "DashTimer": ["en": "DashTimer", "zh-Hans": "DashTimer"],
     "自定义": ["en": "Custom", "zh-Hans": "自定义"],
     "输入分钟...": ["en": "Enter minutes...", "zh-Hans": "输入分钟..."],
     "番茄钟模式": ["en": "Pomodoro", "zh-Hans": "番茄钟模式"],
@@ -36,7 +36,7 @@ private let translations: [String: [String: String]] = [
     " 分钟": ["en": " min", "zh-Hans": " 分钟"],
     "关于": ["en": "About", "zh-Hans": "关于"],
     "版本": ["en": "Version", "zh-Hans": "版本"],
-    "MenuTimer — 菜单栏极简倒计时器": ["en": "MenuTimer — Minimal menu bar timer", "zh-Hans": "MenuTimer — 菜单栏极简倒计时器"],
+    "DashTimer — 菜单栏极简倒计时器": ["en": "DashTimer — Minimal menu bar timer", "zh-Hans": "DashTimer — 菜单栏极简倒计时器"],
     "外观": ["en": "Appearance", "zh-Hans": "外观"],
     "跟随系统": ["en": "Follow System", "zh-Hans": "跟随系统"],
     "浅色": ["en": "Light", "zh-Hans": "浅色"],

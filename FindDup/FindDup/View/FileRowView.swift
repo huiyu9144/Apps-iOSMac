@@ -33,7 +33,7 @@ struct FileRowView: View {
                         .lineLimit(1)
                         .foregroundStyle(isPreserved ? .tertiary : .primary)
                     if isPreserved {
-                        Text("保留")
+                        Text(verbatim: loc("保留", "Preserved"))
                             .font(.caption2)
                             .foregroundStyle(.blue)
                             .padding(.horizontal, 5)

@@ -48,17 +48,17 @@
 - **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/clean-shot/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/clean-shot/privacy.html)
 - **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/clean-shot/about.html](https://huiyu9144.github.io/Apps-iOSMac/clean-shot/about.html)
 
-### ClipFlow
-- **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/clip-flow/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/clip-flow/privacy.html)
-- **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/clip-flow/about.html](https://huiyu9144.github.io/Apps-iOSMac/clip-flow/about.html)
+### PasteLite
+- **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/paste-lite/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/paste-lite/privacy.html)
+- **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/paste-lite/about.html](https://huiyu9144.github.io/Apps-iOSMac/paste-lite/about.html)
 
 ### FindDup
 - **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/find-dup/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/find-dup/privacy.html)
 - **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/find-dup/about.html](https://huiyu9144.github.io/Apps-iOSMac/find-dup/about.html)
 
-### MenuTimer
-- **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/menu-timer/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/menu-timer/privacy.html)
-- **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/menu-timer/about.html](https://huiyu9144.github.io/Apps-iOSMac/menu-timer/about.html)
+### DashTimer
+- **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/dash-timer/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/dash-timer/privacy.html)
+- **产品说明**：[https://huiyu9144.github.io/Apps-iOSMac/dash-timer/about.html](https://huiyu9144.github.io/Apps-iOSMac/dash-timer/about.html)
 
 ### QuickOCR
 - **隐私政策**：[https://huiyu9144.github.io/Apps-iOSMac/quick-ocr/privacy.html](https://huiyu9144.github.io/Apps-iOSMac/quick-ocr/privacy.html)
