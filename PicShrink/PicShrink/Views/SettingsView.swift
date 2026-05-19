@@ -10,101 +10,129 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(locStr("设置"))
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .padding(.top, 16)
-                .padding(.bottom, 12)
+            HStack {
+                Text(locStr("设置"))
+                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                Spacer()
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 14)
 
             Divider()
-                .padding(.horizontal, 18)
+                .padding(.horizontal, 20)
 
-            VStack(spacing: 14) {
-                settingRow(label: locStr("输出格式")) {
-                    Picker("", selection: $outputFormatSetting) {
-                        Text("JPEG").tag("jpeg")
-                        Text("WebP").tag("webp")
-                        Text("PNG").tag("png")
+            ScrollView {
+                VStack(spacing: 0) {
+                    Group {
+                        SettingPickerRow(
+                            label: locStr("输出格式"),
+                            selection: $outputFormatSetting,
+                            options: [
+                                ("JPEG", "jpeg"),
+                                ("WebP", "webp"),
+                                ("PNG", "png"),
+                            ]
+                        )
+
+                        SettingToggleRow(label: locStr("保留 EXIF"), isOn: $preserveEXIF)
+
+                        SettingToggleRow(label: locStr("压缩后自动打开文件夹"), isOn: $autoOpenFolder)
                     }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 120)
-                }
-
-                settingRow(label: locStr("保留 EXIF")) {
-                    Toggle("", isOn: $preserveEXIF)
-                        .toggleStyle(.switch)
-                }
-
-                settingRow(label: locStr("压缩后自动打开文件夹")) {
-                    Toggle("", isOn: $autoOpenFolder)
-                        .toggleStyle(.switch)
-                }
-
-                Divider()
-                    .padding(.horizontal, -18)
-
-                settingRow(label: locStr("外观")) {
-                    Picker("", selection: $appearance) {
-                        Text(locStr("跟随系统")).tag("system")
-                        Text(locStr("浅色")).tag("light")
-                        Text(locStr("深色")).tag("dark")
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 120)
-                }
-
-                settingRow(label: locStr("语言 Language 言語")) {
-                    Picker("", selection: $appLanguage) {
-                        ForEach(Language.allCases, id: \.rawValue) { lang in
-                            Text(lang.displayName).tag(lang.rawValue)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .labelsHidden()
-                    .frame(width: 120)
-                }
-
-                Divider()
-                    .padding(.horizontal, -18)
-
-                VStack(spacing: 10) {
-                    Text("PicShrink v1.0")
-                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                        .foregroundStyle(.tertiary)
 
                     Divider()
-                        .padding(.horizontal, -18)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+
+                    Group {
+                        SettingPickerRow(
+                            label: locStr("外观"),
+                            selection: $appearance,
+                            options: [
+                                (locStr("跟随系统"), "system"),
+                                (locStr("浅色"), "light"),
+                                (locStr("深色"), "dark"),
+                            ]
+                        )
+
+                        SettingPickerRow(
+                            label: locStr("语言 Language 言語"),
+                            selection: $appLanguage,
+                            options: Language.allCases.map { ($0.displayName, $0.rawValue) }
+                        )
+                    }
+
+                    Divider()
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+
+                    VStack(spacing: 8) {
+                        Text("PicShrink v1.0")
+                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(.bottom, 16)
 
                     Button(locStr("完成")) {
                         dismiss()
                     }
-                    .buttonStyle(.plain)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color(.controlBackgroundColor)))
+                    .background(
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .fill(.blue.opacity(0.1))
+                    )
+                    .foregroundStyle(.blue)
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 20)
                 }
             }
-            .padding(.horizontal, 18)
-            .padding(.top, 10)
-            .padding(.bottom, 16)
         }
-        .frame(width: 340)
+        .frame(width: 340, height: 400)
     }
+}
 
-    private func settingRow<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
+private struct SettingToggleRow: View {
+    let label: String
+    @Binding var isOn: Bool
+
+    var body: some View {
         HStack {
             Text(label)
                 .font(.system(size: 13, weight: .medium, design: .rounded))
             Spacer()
-            content()
+            Toggle("", isOn: $isOn)
+                .toggleStyle(.switch)
+                .labelsHidden()
         }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
     }
 }
 
-enum AppearanceMode: String, CaseIterable {
-    case system
-    case light
-    case dark
+private struct SettingPickerRow: View {
+    let label: String
+    @Binding var selection: String
+    let options: [(String, String)]
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 13, weight: .medium, design: .rounded))
+            Spacer()
+            Picker("", selection: $selection) {
+                ForEach(options, id: \.1) { name, value in
+                    Text(name).tag(value)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .frame(width: 130)
+            .font(.system(size: 12, design: .rounded))
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
+    }
 }
