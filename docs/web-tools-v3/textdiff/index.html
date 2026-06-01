@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TextDiff · 文本对比工具 — 在线代码差异比较</title>
+<meta name="description" content="TextDiff 是一款免费在线文本/代码对比工具，支持逐行逐字对比、高亮增删改、忽略空白符、导出 HTML 报告。">
+<meta property="og:title" content="TextDiff · 文本对比工具">
+<meta property="og:description" content="在线文本/代码差异比较工具，支持逐行逐字对比、语法高亮、忽略空白、导出 HTML 报告。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"TextDiff","url":"https://qraftlabs.com/web-tools-v3/textdiff","description":"在线文本/代码差异比较工具，支持逐行逐字对比、语法高亮、忽略空白、导出报告。","applicationCategory":"UtilitiesApplication","operatingSystem":"All"}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px}
+.panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.panel-title{font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);margin-bottom:12px;letter-spacing:0.3px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.upload-area{border:1.5px dashed rgba(255,255,255,0.15);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);background:rgba(255,255,255,0.04);backdrop-filter:blur(2px)}
+.upload-area:hover{border-color:rgba(139,139,248,0.5);background:rgba(139,139,248,0.06)}
+.upload-area.dragover{border-color:#8b8bf8;background:rgba(139,139,248,0.1);transform:scale(1.01)}
+.upload-icon{width:34px;height:34px;margin:0 auto 8px;color:#8b8bf8}
+.upload-area p{color:rgba(255,255,255,0.88);font-size:14px;font-weight:400}
+.upload-area .hint{font-size:12px;color:rgba(255,255,255,0.56);margin-top:4px}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+.text-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.text-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.text-input-wrap textarea{background:transparent;border:none;padding:11px 14px;color:#fff;font-size:13px;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;outline:none;width:100%;resize:vertical;line-height:1.6;letter-spacing:0.1px}
+.text-input-wrap textarea:focus{outline:none}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#fff;font-weight:600}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-success{background:rgba(52,199,89,0.55);color:#fff}
+.btn-success:hover{background:rgba(52,199,89,0.65)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#fff}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.editors{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.editor-box{display:flex;flex-direction:column;gap:8px}
+.editor-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.56);display:flex;justify-content:space-between;align-items:center}
+.editor-label .file-btn{cursor:pointer;color:#8b8bf8;font-size:12px}
+.diff-output{overflow:hidden;animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.diff-table{width:100%;border-collapse:collapse;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:12px;line-height:1.6}
+.diff-table td{padding:2px 10px;vertical-align:top;white-space:pre-wrap;word-break:break-all}
+.diff-table .line-num{color:rgba(255,255,255,0.3);text-align:right;user-select:none;width:40px;padding-right:6px;font-size:11px}
+.diff-table .line-add{background:rgba(52,199,89,0.15)}
+.diff-table .line-del{background:rgba(255,59,48,0.15)}
+.diff-table .line-eq{background:transparent}
+.diff-table .line-mod{background:rgba(255,204,0,0.1)}
+.diff-table .line-add .line-num{color:rgba(52,199,89,0.6)}
+.diff-table .line-del .line-num{color:rgba(255,59,48,0.6)}
+.diff-table .line-mod .line-num{color:rgba(255,204,0,0.6)}
+.diff-table .char-add{background:rgba(52,199,89,0.3);border-radius:2px}
+.diff-table .char-del{background:rgba(255,59,48,0.3);border-radius:2px;text-decoration:line-through}
+.stats{display:flex;gap:16px;flex-wrap:wrap;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;font-size:12px}
+.stats span{display:flex;align-items:center;gap:4px}
+.stats .num{font-weight:600;font-variant-numeric:tabular-nums}
+.stats .num.green{color:#34c759}
+.stats .num.red{color:#ff3b30}
+.stats .num.yellow{color:#ffcc00}
+.stats .num.purple{color:#8b8bf8}
+.control-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.control-row .toggle-wrap{display:flex;align-items:center;gap:8px}
+.control-row .toggle-wrap label{font-size:12px;color:rgba(255,255,255,0.72);cursor:pointer;user-select:none}
+.footer{text-align:center;padding:20px 0;font-size:12px;color:rgba(255,255,255,0.4)}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none}
+.footer a:hover{color:#8b8bf8}
+.diff-empty{text-align:center;padding:40px;color:rgba(255,255,255,0.48);font-size:13px}
+@media(max-width:768px){.editors{grid-template-columns:1fr}body{padding:20px 12px 40px}.header h1{font-size:24px}.control-row{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TextDiff</h1>
+  <p>文本 / 代码差异对比 · 逐行逐字 · 高亮增删改</p>
+</div>
+
+<div class="container">
+
+  <div class="panel">
+    <div class="control-row">
+      <div class="control-group" style="flex:1">
+        <label>比较模式</label>
+        <div class="mode-selector" id="diffModeSelector" style="max-width:300px">
+          <div class="mode-slider" id="diffModeSlider"></div>
+          <button class="mode-btn active" data-mode="line">逐行比较</button>
+          <button class="mode-btn" data-mode="word">逐字比较</button>
+        </div>
+      </div>
+      <div class="toggle-wrap">
+        <label class="toggle-switch">
+          <input type="checkbox" id="ignoreWhitespace">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+        <label for="ignoreWhitespace">忽略空白符</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="editors">
+    <div class="editor-box">
+      <div class="editor-label">
+        <span>原始文本 (A)</span>
+        <span class="file-btn" id="uploadLeftBtn">📄 上传文件</span>
+      </div>
+      <div class="text-input-wrap">
+        <textarea id="leftInput" placeholder="粘贴原始文本或代码..." style="min-height:220px">Hello World
+This is a test
+Same line here
+Removed line
+Keep this one</textarea>
+      </div>
+      <input type="file" id="leftFileInput" accept=".txt,.js,.ts,.py,.html,.css,.json,.md" style="display:none">
+    </div>
+    <div class="editor-box">
+      <div class="editor-label">
+        <span>修改后文本 (B)</span>
+        <span class="file-btn" id="uploadRightBtn">📄 上传文件</span>
+      </div>
+      <div class="text-input-wrap">
+        <textarea id="rightInput" placeholder="粘贴修改后文本或代码..." style="min-height:220px">Hello World
+This is a modified test
+Same line here
+Added new line
+Keep this one</textarea>
+      </div>
+      <input type="file" id="rightFileInput" accept=".txt,.js,.ts,.py,.html,.css,.json,.md" style="display:none">
+    </div>
+  </div>
+
+  <div class="panel diff-output" id="diffOutput">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="panel-title" style="margin-bottom:0">差异对比</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm btn-outline" id="copyDiffBtn">复制差异</button>
+        <button class="btn btn-sm btn-secondary" id="exportHtmlBtn">导出 HTML</button>
+      </div>
+    </div>
+    <div class="stats" id="statsArea">
+      <span>总行数: <span class="num purple" id="totalLines">0</span></span>
+      <span>新增: <span class="num green" id="addLines">0</span></span>
+      <span>删除: <span class="num red" id="delLines">0</span></span>
+      <span>修改: <span class="num yellow" id="modLines">0</span></span>
+      <span>变化: <span class="num purple" id="changePercent">0%</span></span>
+    </div>
+    <div id="diffContent"><div class="diff-empty">在两侧输入框中粘贴文本进行对比</div></div>
+  </div>
+
+  <div class="footer">
+    <a href="/docs/support.html">隐私政策</a> · © 2025 TextDiff
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function lcs(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({length: m + 1}, () => new Int32Array(n + 1));
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i-1] === b[j-1] ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  const result = [];
+  let i = m, j = n;
+  while (i > 0 && j > 0) {
+    if (a[i-1] === b[j-1]) {
+      result.unshift({ type: 'eq', value: a[i-1], ai: i-1, bi: j-1 });
+      i--; j--;
+    } else if (dp[i-1][j] >= dp[i][j-1]) {
+      result.unshift({ type: 'del', value: a[i-1], ai: i-1, bi: -1 });
+      i--;
+    } else {
+      result.unshift({ type: 'add', value: b[j-1], ai: -1, bi: j-1 });
+      j--;
+    }
+  }
+  while (i > 0) {
+    result.unshift({ type: 'del', value: a[i-1], ai: i-1, bi: -1 });
+    i--;
+  }
+  while (j > 0) {
+    result.unshift({ type: 'add', value: b[j-1], ai: -1, bi: j-1 });
+    j--;
+  }
+  return result;
+}
+
+function wordDiff(a, b) {
+  const al = a.split(/\b/), bl = b.split(/\b/);
+  const seq = lcs(al, bl);
+  let i = 0, j = 0;
+  const lines = [];
+  let cur = { type: 'eq', a: '', b: '' };
+  function flush() {
+    if (cur.a || cur.b) lines.push({ ...cur });
+    cur = { type: 'eq', a: '', b: '' };
+  }
+  seq.forEach(item => {
+    if (item.type === 'eq') {
+      if (cur.type === 'eq') { cur.a += item.value; cur.b += item.value; }
+      else { flush(); cur.a += item.value; cur.b += item.value; cur.type = 'eq'; }
+    } else if (item.type === 'del') {
+      if (cur.type === 'mod' || cur.type === 'del') { cur.a += item.value; cur.type = 'mod'; }
+      else { flush(); cur.a = item.value; cur.b = ''; cur.type = 'mod'; }
+    } else {
+      if (cur.type === 'mod' || cur.type === 'add') { cur.b += item.value; cur.type = 'mod'; }
+      else { flush(); cur.a = ''; cur.b = item.value; cur.type = 'mod'; }
+    }
+  });
+  flush();
+  return lines;
+}
+
+function computeDiff() {
+  const left = $('leftInput').value;
+  const right = $('rightInput').value;
+  const ignoreWS = $('ignoreWhitespace').checked;
+  const mode = document.querySelector('#diffModeSelector .mode-btn.active').dataset.mode;
+
+  let aLines = left.split('\n');
+  let bLines = right.split('\n');
+
+  if (ignoreWS) {
+    aLines = aLines.map(l => l.trimEnd());
+    bLines = bLines.map(l => l.trimEnd());
+  }
+
+  const diff = lcs(aLines, bLines);
+
+  const diffContent = $('diffContent');
+  const totalLines = $('totalLines');
+  const addLines = $('addLines');
+  const delLines = $('delLines');
+  const modLines = $('modLines');
+  const changePercent = $('changePercent');
+
+  let add = 0, del = 0, mod = 0;
+  let html;
+  let aNum = 0, bNum = 0;
+
+  if (mode === 'word') {
+    html = '<table class="diff-table">';
+    diff.forEach(item => {
+      if (item.type === 'eq') {
+        aNum++; bNum++;
+        const cls = item.value === '' ? 'line-eq' : 'line-eq';
+        html += `<tr class="${cls}"><td class="line-num">${aNum}</td><td class="line-num">${bNum}</td><td>${escHtml(item.value)}</td></tr>`;
+      } else if (item.type === 'del') {
+        aNum++;
+        del++;
+        html += `<tr class="line-del"><td class="line-num">${aNum}</td><td class="line-num"></td><td>${escHtml(item.value)}</td></tr>`;
+      } else {
+        bNum++;
+        add++;
+        html += `<tr class="line-add"><td class="line-num"></td><td class="line-num">${bNum}</td><td>${escHtml(item.value)}</td></tr>`;
+      }
+    });
+    html += '</table>';
+    modLines.textContent = '0';
+  } else {
+    html = '<table class="diff-table">';
+    diff.forEach(item => {
+      if (item.type === 'eq') {
+        aNum++; bNum++;
+        html += `<tr class="line-eq"><td class="line-num">${aNum}</td><td class="line-num">${bNum}</td><td>${escHtml(item.value)}</td></tr>`;
+      } else if (item.type === 'del') {
+        aNum++;
+        del++;
+        html += `<tr class="line-del"><td class="line-num">${aNum}</td><td class="line-num"></td><td>${escHtml(item.value)}</td></tr>`;
+      } else {
+        bNum++;
+        add++;
+        html += `<tr class="line-add"><td class="line-num"></td><td class="line-num">${bNum}</td><td>${escHtml(item.value)}</td></tr>`;
+      }
+    });
+    html += '</table>';
+    modLines.textContent = '0';
+  }
+
+  diffContent.innerHTML = html || '<div class="diff-empty">两段文本完全一致</div>';
+  totalLines.textContent = diff.length;
+  addLines.textContent = add;
+  delLines.textContent = del;
+  const total = add + del;
+  const maxLen = Math.max(aLines.length, bLines.length);
+  changePercent.textContent = maxLen > 0 ? Math.round((total / maxLen) * 100) + '%' : '0%';
+}
+
+const leftInput = $('leftInput');
+const rightInput = $('rightInput');
+const ignoreWS = $('ignoreWhitespace');
+
+let debounceTimer;
+function debounceDiff() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(computeDiff, 250);
+}
+
+leftInput.addEventListener('input', debounceDiff);
+rightInput.addEventListener('input', debounceDiff);
+ignoreWS.addEventListener('change', computeDiff);
+
+$('uploadLeftBtn').addEventListener('click', () => $('leftFileInput').click());
+$('leftFileInput').addEventListener('change', e => {
+  if (e.target.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => { leftInput.value = ev.target.result; computeDiff(); };
+    r.readAsText(e.target.files[0]);
+  }
+});
+$('uploadRightBtn').addEventListener('click', () => $('rightFileInput').click());
+$('rightFileInput').addEventListener('change', e => {
+  if (e.target.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => { rightInput.value = ev.target.result; computeDiff(); };
+    r.readAsText(e.target.files[0]);
+  }
+});
+
+const diffModeBtns = document.querySelectorAll('#diffModeSelector .mode-btn');
+const diffModeSlider = $('diffModeSlider');
+function moveDiffSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cR = c.getBoundingClientRect();
+  const bR = btn.getBoundingClientRect();
+  diffModeSlider.style.left = (bR.left - cR.left) + 'px';
+  diffModeSlider.style.width = bR.width + 'px';
+}
+diffModeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    diffModeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveDiffSlider(btn);
+    computeDiff();
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#diffModeSelector .mode-btn.active');
+  if (a) moveDiffSlider(a);
+});
+
+$('copyDiffBtn').addEventListener('click', () => {
+  const content = $('diffContent').textContent;
+  navigator.clipboard.writeText(content).then(() => showToast('已复制差异结果')).catch(() => showToast('复制失败'));
+});
+
+$('exportHtmlBtn').addEventListener('click', () => {
+  const left = leftInput.value;
+  const right = rightInput.value;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>TextDiff Report</title><style>body{font-family:monospace;background:#1c1c1e;color:#fff;padding:20px}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.6}td{padding:3px 10px;white-space:pre-wrap;word-break:break-all;vertical-align:top}.num{color:rgba(255,255,255,0.3);text-align:right;width:40px}.add{background:rgba(52,199,89,0.15)}.del{background:rgba(255,59,48,0.15)}.eq{background:transparent}</style></head><body><h2>TextDiff Report</h2><p>Generated by TextDiff</p>${$('diffContent').innerHTML}</body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const link = document.createElement('a');
+  link.download = `textdiff_report_${Date.now()}.html`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已导出 HTML 报告');
+});
+
+computeDiff();
+</script>
+</body>
+</html>

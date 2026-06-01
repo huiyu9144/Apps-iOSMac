@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PrivacyGen · 隐私政策生成器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000; color: #fff; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+}
+.header { text-align: center; margin-bottom: 32px; padding: 0 8px; }
+.header h1 {
+  font-size: 30px; font-weight: 700; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p { color: rgba(255,255,255,0.72); font-size: 14px; margin-top: 6px; letter-spacing: 0.2px; }
+.container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; }
+
+.frost-panel { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  display: inline-flex; align-items: center; gap: 6px; font-family: inherit; letter-spacing: 0.3px;
+  position: relative; overflow: hidden;
+}
+.btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.3s; }
+.btn:hover::after { background: rgba(255,255,255,0.06); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: rgba(139,139,248,0.6); color: #fff; }
+.btn-primary:hover { background: rgba(139,139,248,0.7); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+.btn-success { background: rgba(52,199,89,0.55); color: #fff; }
+.btn-success:hover { background: rgba(52,199,89,0.65); }
+.btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+
+/* Input */
+.input-wrap {
+  position: relative; display: flex; align-items: stretch; border-radius: 10px; overflow: hidden;
+  border: 1.5px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-wrap:focus-within { border-color: #8b8bf8; box-shadow: 0 0 0 3px rgba(139,139,248,0.2); }
+.input-wrap input {
+  background: transparent; border: none; padding: 10px 12px; color: #fff; font-size: 14px;
+  outline: none; width: 100%; font-family: inherit;
+}
+
+/* Progress steps */
+.step-indicator {
+  display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 16px;
+}
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4);
+  transition: all 0.3s; flex-shrink: 0;
+}
+.step-dot.active { background: rgba(139,139,248,0.6); color: #fff; }
+.step-dot.done { background: rgba(52,199,89,0.55); color: #fff; }
+.step-line { flex: 1; max-width: 40px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 1px; }
+.step-line.done { background: rgba(52,199,89,0.55); }
+
+/* Selection cards (grid multi-select) */
+.option-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px;
+}
+.option-card {
+  padding: 12px 10px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); cursor: pointer; text-align: center;
+  font-size: 13px; color: rgba(255,255,255,0.78); transition: all 0.25s;
+  user-select: none;
+}
+.option-card:hover { border-color: rgba(139,139,248,0.4); background: rgba(139,139,248,0.06); }
+.option-card.selected { border-color: #8b8bf8; background: rgba(139,139,248,0.15); color: #fff; font-weight: 500; }
+
+/* Radio cards */
+.option-grid-radio .option-card.selected { border-color: #8b8bf8; background: rgba(139,139,248,0.15); color: #fff; box-shadow: 0 0 0 1px rgba(139,139,248,0.3); }
+
+/* Yes/No pills */
+.yesno-group { display: flex; gap: 10px; justify-content: center; }
+.yesno-btn {
+  padding: 10px 28px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); cursor: pointer; font-size: 14px; font-weight: 500;
+  color: rgba(255,255,255,0.6); transition: all 0.25s; font-family: inherit;
+}
+.yesno-btn:hover { border-color: rgba(139,139,248,0.4); }
+.yesno-btn.selected { border-color: #8b8bf8; background: rgba(139,139,248,0.15); color: #fff; }
+.yesno-btn.yes.selected { border-color: #34c759; background: rgba(52,199,89,0.2); color: #34c759; }
+.yesno-btn.no.selected { border-color: #ff3b30; background: rgba(255,59,48,0.2); color: #ff3b30; }
+
+/* Document preview */
+.doc-preview {
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.88); border-radius: 12px; padding: 24px;
+  font-size: 13px; line-height: 1.7; max-height: 500px; overflow-y: auto;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+.doc-preview::-webkit-scrollbar { width: 4px; }
+.doc-preview::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.doc-preview h1 { font-size: 20px; font-weight: 700; margin-bottom: 16px; text-align: center; color: #c084fc; }
+.doc-preview h2 { font-size: 15px; font-weight: 700; margin-top: 16px; margin-bottom: 8px; color: #8b8bf8; }
+.doc-preview p { margin-bottom: 8px; color: rgba(255,255,255,0.82); }
+.doc-preview ul { margin: 6px 0 10px 20px; }
+.doc-preview li { margin-bottom: 4px; color: rgba(255,255,255,0.72); }
+.doc-preview strong { color: #fff; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(30,30,30,0.95); color: #fff; padding: 12px 24px; border-radius: 12px;
+  font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; z-index: 100;
+  backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-in { animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+
+@media (max-width: 768px) {
+  body { padding: 20px 12px 40px; }
+  .header h1 { font-size: 24px; }
+  .container { gap: 14px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PrivacyGen</h1>
+  <p>隐私政策生成器</p>
+</div>
+
+<div class="container">
+  <!-- Step indicator -->
+  <div class="step-indicator" id="stepIndicator"></div>
+
+  <div class="flex flex-col lg:flex-row gap-5">
+    <!-- Left: Q&A area -->
+    <div class="flex-1 flex flex-col gap-4">
+      <div class="frost-panel anim-in" style="min-height: 340px;">
+        <div class="text-[13px] font-medium text-[rgba(255,255,255,0.78)] mb-3" id="questionTitle">问题 1 / 7</div>
+        <div id="questionContent"></div>
+        <div class="flex justify-between mt-6" id="navButtons">
+          <button class="btn btn-outline" id="prevBtn" disabled>上一步</button>
+          <div class="flex gap-2">
+            <button class="btn btn-secondary" id="resetBtn">重新开始</button>
+            <button class="btn btn-primary" id="nextBtn">下一步</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Document preview -->
+    <div class="w-full lg:w-[460px] flex flex-col gap-4">
+      <div class="frost-panel anim-in">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-[13px] font-medium text-[rgba(255,255,255,0.78)]">文档预览</span>
+          <span id="docStats" class="text-[11px] text-[rgba(255,255,255,0.5)]">0 字</span>
+        </div>
+        <div class="doc-preview" id="docPreview">
+          <div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px 0;">完成问答后，文档将在此实时生成</div>
+        </div>
+        <div class="flex gap-2 mt-3 flex-wrap">
+          <button class="btn btn-sm btn-primary" id="copyBtn">复制全文</button>
+          <button class="btn btn-sm btn-success" id="downloadHtmlBtn">下载 HTML</button>
+          <button class="btn btn-sm btn-secondary" id="printBtn">打印 / PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const questions = [
+  {
+    id: 'appType',
+    title: '你的 App / 网站类型？',
+    type: 'radio',
+    options: ['电商 / 零售', 'SaaS / 工具', '社交 / 社区', '内容 / 媒体', '其他']
+  },
+  {
+    id: 'dataCollected',
+    title: '收集哪些数据？（可多选）',
+    type: 'multi',
+    options: ['姓名', '邮箱', '设备信息', '位置', '支付信息', 'Cookies']
+  },
+  {
+    id: 'thirdParty',
+    title: '使用哪些第三方服务？（可多选）',
+    type: 'multi',
+    options: ['Google Analytics', 'Stripe', 'PayPal', 'Facebook SDK', '其他']
+  },
+  {
+    id: 'gdpr',
+    title: '是否面向欧盟用户（GDPR）？',
+    type: 'yesno'
+  },
+  {
+    id: 'ccpa',
+    title: '是否面向加州用户（CCPA）？',
+    type: 'yesno'
+  },
+  {
+    id: 'hasRegistration',
+    title: '是否有用户注册功能？',
+    type: 'yesno'
+  },
+  {
+    id: 'useCookies',
+    title: '是否使用 Cookies？',
+    type: 'yesno'
+  },
+  {
+    id: 'contactEmail',
+    title: '隐私政策联系邮箱',
+    type: 'email',
+    placeholder: 'privacy@example.com'
+  }
+];
+
+let answers = {};
+let currentStep = 0;
+
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// Step indicator
+function renderSteps() {
+  const container = $('stepIndicator');
+  let html = '';
+  for (let i = 0; i < questions.length; i++) {
+    let cls = 'step-dot';
+    if (i === currentStep) cls += ' active';
+    else if (answers[questions[i].id]) cls += ' done';
+    html += `<div class="step-dot ${cls}">${i + 1}</div>`;
+    if (i < questions.length - 1) {
+      const lineCls = answers[questions[i].id] ? 'step-line done' : 'step-line';
+      html += `<div class="${lineCls}"></div>`;
+    }
+  }
+  container.innerHTML = html;
+}
+
+// Render current question
+function renderQuestion() {
+  const q = questions[currentStep];
+  $('questionTitle').textContent = `问题 ${currentStep + 1} / ${questions.length}`;
+  const content = $('questionContent');
+  const val = answers[q.id];
+
+  if (q.type === 'radio') {
+    content.innerHTML = `
+      <div class="option-grid option-grid-radio">
+        ${q.options.map(o => `<div class="option-card ${val === o ? 'selected' : ''}" data-value="${o}">${o}</div>`).join('')}
+      </div>`;
+    content.querySelectorAll('.option-card').forEach(el => {
+      el.addEventListener('click', () => {
+        answers[q.id] = el.dataset.value;
+        renderQuestion();
+        renderSteps();
+        generateDocument();
+      });
+    });
+  } else if (q.type === 'multi') {
+    const selected = val || [];
+    content.innerHTML = `
+      <div class="option-grid">
+        ${q.options.map(o => `<div class="option-card ${selected.includes(o) ? 'selected' : ''}" data-value="${o}">${o}</div>`).join('')}
+      </div>`;
+    content.querySelectorAll('.option-card').forEach(el => {
+      el.addEventListener('click', () => {
+        let arr = answers[q.id] || [];
+        const v = el.dataset.value;
+        if (arr.includes(v)) arr = arr.filter(x => x !== v);
+        else arr.push(v);
+        answers[q.id] = arr;
+        renderQuestion();
+        renderSteps();
+        generateDocument();
+      });
+    });
+  } else if (q.type === 'yesno') {
+    content.innerHTML = `
+      <div class="yesno-group">
+        <button class="yesno-btn yes ${val === 'yes' ? 'selected' : ''}" data-value="yes">是</button>
+        <button class="yesno-btn no ${val === 'no' ? 'selected' : ''}" data-value="no">否</button>
+      </div>`;
+    content.querySelectorAll('.yesno-btn').forEach(el => {
+      el.addEventListener('click', () => {
+        answers[q.id] = el.dataset.value;
+        renderQuestion();
+        renderSteps();
+        generateDocument();
+      });
+    });
+  } else if (q.type === 'email') {
+    content.innerHTML = `
+      <div style="margin-top:4px;">
+        <div class="input-wrap">
+          <input type="email" id="emailInput" value="${val || ''}" placeholder="${q.placeholder || ''}" style="width:100%">
+        </div>
+        <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;">此邮箱将显示在生成的隐私政策文档中</p>
+      </div>`;
+    const inp = document.getElementById('emailInput');
+    inp.addEventListener('input', () => {
+      answers[q.id] = inp.value;
+      generateDocument();
+    });
+  }
+
+  $('prevBtn').disabled = currentStep === 0;
+}
+
+$('prevBtn').addEventListener('click', () => {
+  if (currentStep > 0) { currentStep--; renderQuestion(); renderSteps(); }
+});
+
+$('nextBtn').addEventListener('click', () => {
+  if (currentStep < questions.length - 1) { currentStep++; renderQuestion(); renderSteps(); }
+});
+
+$('resetBtn').addEventListener('click', () => {
+  answers = {};
+  currentStep = 0;
+  renderQuestion();
+  renderSteps();
+  generateDocument();
+  showToast('已重置');
+});
+
+// Generate document
+function generateDocument() {
+  const preview = $('docPreview');
+
+  // Check if all answered
+  const allAnswered = questions.every(q => {
+    const v = answers[q.id];
+    if (!v) return false;
+    if (Array.isArray(v)) return v.length > 0;
+    return true;
+  });
+
+  if (!allAnswered) {
+    preview.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px 0;">完成所有问答后，隐私政策文档将在此实时生成</div>';
+    $('docStats').textContent = '0 字';
+    return;
+  }
+
+  const appType = answers.appType || '应用/网站';
+  const dataList = answers.dataCollected || [];
+  const thirdPartyList = answers.thirdParty || [];
+  const gdpr = answers.gdpr === 'yes';
+  const ccpa = answers.ccpa === 'yes';
+  const hasReg = answers.hasRegistration === 'yes';
+  const useCook = answers.useCookies === 'yes';
+  const email = answers.contactEmail || 'privacy@example.com';
+
+  const now = new Date();
+  const dateStr = now.toISOString().split('T')[0];
+
+  let sectionNum = 2;
+  let doc = `<h1>隐私政策</h1>`;
+  doc += `<p><strong>最后更新日期：${dateStr}</strong></p>`;
+
+  doc += `<h2>1. 引言</h2>`;
+  doc += `<p>欢迎使用我们的${appType}服务。我们非常重视您的隐私。本隐私政策旨在向您说明我们如何收集、使用、存储和保护您的个人信息。</p>`;
+
+  doc += `<h2>2. 信息收集</h2>`;
+  doc += `<p>我们可能收集以下类型的信息：</p><ul>`;
+  if (dataList.length > 0) {
+    dataList.forEach(d => doc += `<li>${d}</li>`);
+  } else {
+    doc += `<li>您在使用过程中主动提供的信息</li>`;
+  }
+  doc += `</ul>`;
+
+  if (hasReg) {
+    sectionNum++;
+    doc += `<h2>${sectionNum}. 账户注册</h2>`;
+    doc += `<p>当您注册账户时，我们会收集您提供的注册信息，包括但不限于用户名、邮箱地址和密码。这些信息用于创建和维护您的账户。</p>`;
+  }
+
+  if (useCook) {
+    sectionNum++;
+    doc += `<h2>${sectionNum}. Cookies 政策</h2>`;
+    doc += `<p>我们使用Cookies和类似技术来改善用户体验、分析流量和提供个性化内容。您可以在浏览器设置中控制Cookies的使用。</p>`;
+  }
+
+  sectionNum++;
+  doc += `<h2>${sectionNum}. 第三方服务</h2>`;
+  if (thirdPartyList.length > 0) {
+    doc += `<p>我们使用了以下第三方服务：</p><ul>`;
+    thirdPartyList.forEach(t => doc += `<li>${t}</li>`);
+    doc += `</ul>`;
+    doc += `<p>这些服务提供商可能会收集和使用您的数据，其数据处理行为受其各自的隐私政策约束。我们不会将您的个人数据出售给第三方。</p>`;
+  } else {
+    doc += `<p>我们不会将您的个人数据出售给第三方。在未获得您明确同意的情况下，我们不会将您的数据用于本隐私政策未载明的其他用途。</p>`;
+  }
+
+  if (gdpr) {
+    sectionNum++;
+    doc += `<h2>${sectionNum}. GDPR 合规（欧盟用户）</h2>`;
+    doc += `<p>根据《通用数据保护条例》（GDPR），欧盟用户享有以下权利：</p><ul>`;
+    doc += `<li>知情权：您有权了解我们如何处理您的个人数据</li>`;
+    doc += `<li>访问权：您有权访问我们持有的关于您的个人数据</li>`;
+    doc += `<li>更正权：您有权要求更正不准确的个人数据</li>`;
+    doc += `<li>删除权（被遗忘权）：您有权要求删除您的个人数据</li>`;
+    doc += `<li>数据可移植权：您有权获取您的个人数据的结构化副本</li>`;
+    doc += `</ul>`;
+  }
+
+  if (ccpa) {
+    sectionNum++;
+    doc += `<h2>${sectionNum}. CCPA 合规（加州用户）</h2>`;
+    doc += `<p>根据《加州消费者隐私法案》（CCPA），加州居民享有以下权利：</p><ul>`;
+    doc += `<li>知情权：您有权了解我们收集了哪些个人信息以及使用方式</li>`;
+    doc += `<li>删除权：您有权要求删除我们收集的个人信息</li>`;
+    doc += `<li>选择退出权：您有权选择退出个人信息的出售</li>`;
+    doc += `<li>非歧视权：行使以上权利不会受到歧视性对待</li>`;
+    doc += `</ul>`;
+  }
+
+  sectionNum++;
+  doc += `<h2>${sectionNum}. 数据安全</h2>`;
+  doc += `<p>我们采取合理的技术和组织措施来保护您的个人信息免遭未经授权的访问、修改、披露或销毁。</p>`;
+
+  sectionNum++;
+  doc += `<h2>${sectionNum}. 联系我们</h2>`;
+  doc += `<p>如果您对本隐私政策有任何疑问或关切，请通过以下方式联系我们：</p>`;
+  doc += `<p>邮箱：<a href="mailto:${email}" style="color:#8b8bf8">${email}</a></p>`;
+
+  preview.innerHTML = doc;
+  const text = preview.textContent;
+  $('docStats').textContent = text.length + ' 字';
+}
+
+// Copy
+$('copyBtn').addEventListener('click', () => {
+  const text = $('docPreview').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板')).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制到剪贴板');
+  });
+});
+
+// Download HTML
+$('downloadHtmlBtn').addEventListener('click', () => {
+  const html = $('docPreview').innerHTML;
+  const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>隐私政策</title><style>
+    body{font-family:Georgia,'Times New Roman',serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#222}
+    h1{font-size:22px;text-align:center;margin-bottom:16px}
+    h2{font-size:16px;margin-top:20px;margin-bottom:8px}
+    p{margin-bottom:8px}
+    ul{margin:6px 0 10px 20px}
+    li{margin-bottom:4px}
+  </style></head><body>${html}</body></html>`;
+  const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'privacy_policy.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('HTML 已下载');
+});
+
+// Print / PDF
+$('printBtn').addEventListener('click', () => {
+  const html = $('docPreview').innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>隐私政策</title><style>
+    body{font-family:Georgia,'Times New Roman',serif;max-width:800px;margin:0 auto;padding:40px 20px;line-height:1.7;color:#222}
+    h1{font-size:22px;text-align:center;margin-bottom:16px}
+    h2{font-size:16px;margin-top:20px;margin-bottom:8px}
+    p{margin-bottom:8px}
+    ul{margin:6px 0 10px 20px}
+    li{margin-bottom:4px}
+    @media print{body{padding:20px}}
+  </style></head><body>${html}</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 500);
+});
+
+// Init
+renderQuestion();
+renderSteps();
+generateDocument();
+</script>
+</body>
+</html>

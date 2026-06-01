@@ -2,39 +2,54 @@ import Cocoa
 import Foundation
 
 func JiaLog(_ message: String) {
-    let timestamp = DateFormatter.logDateFormatter.string(from: Date())
-    let line = "[\(timestamp)] \(message)\n"
-    
-    // 写入内存数组
-    DebugLogger.shared.entries.append(line)
-    
-    // 同时写入文件（100%可靠）
-    let logPath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
-    if let handle = FileHandle(forWritingAtPath: logPath) {
-        handle.seekToEndOfFile()
-        handle.write(Data(line.utf8))
-        handle.closeFile()
-    } else {
-        FileManager.default.createFile(atPath: logPath, contents: Data(line.utf8), attributes: nil)
-    }
+    DebugLogger.shared.log(message)
 }
 
 final class DebugLogger {
     static let shared = DebugLogger()
-    var entries: [String] = []
-    let maxEntries = 5000
-    
-    private init() {}
+
+    private var entries: [String] = []
+    private let maxEntries = 5000
+    private let queue = DispatchQueue(label: "com.jiaremote.logger", qos: .utility)
+    private let logURL: URL
+
+    private init() {
+        logURL = URL(fileURLWithPath: NSHomeDirectory() + "/Desktop/jia_remote_debug.log")
+        try? "".write(to: logURL, atomically: false, encoding: .utf8)
+    }
 
     var fullLog: String {
-        String(entries.prefix(maxEntries).joined())
+        queue.sync { entries.joined() }
+    }
+
+    func log(_ message: String) {
+        let timestamp = DateFormatter.logDateFormatter.string(from: Date())
+        let line = "[\(timestamp)] \(message)\n"
+
+        queue.sync {
+            entries.append(line)
+            if entries.count > maxEntries {
+                entries.removeFirst(entries.count - maxEntries)
+            }
+        }
+
+        if let data = line.data(using: .utf8) {
+            if let handle = try? FileHandle(forWritingTo: logURL) {
+                handle.seekToEndOfFile()
+                handle.write(data)
+                try? handle.close()
+            } else {
+                try? data.write(to: logURL, options: .withoutOverwriting)
+            }
+        }
     }
 
     func clear() {
-        entries.removeAll()
-        let logPath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
-        try? "".write(toFile: logPath, atomically: true, encoding: .utf8)
+        queue.sync { entries.removeAll() }
+        try? "".write(to: logURL, atomically: false, encoding: .utf8)
     }
+
+    deinit {}
 }
 
 extension DateFormatter {
@@ -121,26 +136,18 @@ final class DebugLogWindowController: NSWindowController, NSWindowDelegate {
 
     func refreshLogs() {
         let logText = DebugLogger.shared.fullLog
-        if !logText.isEmpty {
-            textView.string = logText
-            textView.scrollToEndOfDocument(nil)
-        }
-        
-        let filePath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
-        if let fileContent = try? String(contentsOfFile: filePath, encoding: .utf8), !fileContent.isEmpty {
-            if textView.string.isEmpty || fileContent.count > textView.string.count {
-                textView.string = fileContent
-                textView.scrollToEndOfDocument(nil)
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.textView.string = logText
+            if !logText.isEmpty {
+                self.textView.scrollToEndOfDocument(nil)
             }
         }
     }
 
     @objc private func copyAll() {
         NSPasteboard.general.clearContents()
-        let content = DebugLogger.shared.fullLog
-        let filePath = NSHomeDirectory() + "/Desktop/jia_remote_debug.log"
-        let fileContent = (try? String(contentsOfFile: filePath, encoding: .utf8)) ?? ""
-        NSPasteboard.general.setString(content.isEmpty ? fileContent : content, forType: .string)
+        NSPasteboard.general.setString(DebugLogger.shared.fullLog, forType: .string)
     }
 
     @objc private func clearLog() {

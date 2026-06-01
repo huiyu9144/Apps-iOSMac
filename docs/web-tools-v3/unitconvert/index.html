@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>UnitConvert - 开发者单位转换器 | 在线工具</title>
+<meta name="description" content="免费在线开发者单位转换工具，支持数据存储、时间、像素、网络、温度、长度等分类，实时换算，双向转换，精度可调。">
+<meta property="og:title" content="UnitConvert - 开发者单位转换器" />
+<meta property="og:description" content="免费在线开发者单位转换器，多分类多单位实时换算，双向转换，精度可调。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"UnitConvert 开发者单位转换器",
+  "description":"支持数据存储、时间、像素、网络、温度、长度等多种单位的实时换算工具",
+  "applicationCategory":"DeveloperApplication",
+  "operatingSystem":"All",
+  "browserRequirements":"Requires JavaScript"
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000000;color:#ffffff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 6px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:11px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#ffffff;font-weight:600}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;font-family:inherit;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#ffffff}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.section-title{font-size:15px;font-weight:600;color:rgba(255,255,255,0.88);margin-bottom:10px;letter-spacing:0.2px}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-slide{animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+/* Unit grid */
+.unit-grid{display:grid;gap:8px}
+.unit-grid.two-col{grid-template-columns:1fr 1fr}
+.unit-grid.three-col{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:600px){.unit-grid.two-col,.unit-grid.three-col{grid-template-columns:1fr}}
+.unit-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px;border:1px solid rgba(255,255,255,0.06);transition:border-color 0.3s}
+.unit-item:hover{border-color:rgba(139,139,248,0.2)}
+.unit-item .unit-label{font-size:11px;font-weight:500;color:rgba(139,139,248,0.7);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px}
+.unit-item .number-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s}
+.unit-item .number-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.unit-item .number-input-wrap input{background:transparent;border:none;padding:8px 10px;color:#fff;font-size:14px;font-weight:500;outline:none;width:100%;-moz-appearance:textfield;font-family:inherit;font-variant-numeric:tabular-nums}
+.unit-item .number-input-wrap input::-webkit-inner-spin-button,.unit-item .number-input-wrap input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.unit-item .number-input-wrap .copy-btn{background:rgba(255,255,255,0.05);border:none;border-left:1px solid rgba(255,255,255,0.06);padding:0 10px;color:rgba(255,255,255,0.4);cursor:pointer;font-size:12px;transition:all 0.2s;display:flex;align-items:center}
+.unit-item .number-input-wrap .copy-btn:hover{background:rgba(139,139,248,0.15);color:#8b8bf8}
+/* Recent */
+.recent-list{display:flex;gap:6px;flex-wrap:wrap}
+.recent-tag{background:rgba(255,255,255,0.06);border-radius:16px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.6);cursor:pointer;border:1px solid rgba(255,255,255,0.06);transition:all 0.2s}
+.recent-tag:hover{background:rgba(139,139,248,0.1);border-color:#8b8bf8;color:#fff}
+/* Precision selector */
+.precision-selector{display:flex;gap:4px}
+.precision-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:4px 10px;font-size:11px;color:rgba(255,255,255,0.6);cursor:pointer;font-family:inherit;transition:all 0.2s}
+.precision-btn.active,.precision-btn:hover{background:rgba(139,139,248,0.15);border-color:#8b8bf8;color:#fff}
+.temp-row{display:flex;gap:8px;flex-wrap:wrap}
+.temp-card{flex:1;min-width:120px;background:rgba(255,255,255,0.04);border-radius:10px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.06)}
+.temp-card .temp-label{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:4px}
+.temp-card .temp-value{font-size:24px;font-weight:700;color:#8b8bf8;font-variant-numeric:tabular-nums}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>UnitConvert</h1>
+  <p>开发者单位转换器 · 实时换算 · 双向输入 · 多精度</p>
+</div>
+
+<div class="container">
+  <div class="frost-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px">
+      <div class="mode-selector" id="catSelector" style="flex:1;max-width:600px">
+        <div class="mode-slider" id="catSlider"></div>
+        <button class="mode-btn active" data-cat="data">数据存储</button>
+        <button class="mode-btn" data-cat="time">时间</button>
+        <button class="mode-btn" data-cat="pixel">像素</button>
+        <button class="mode-btn" data-cat="network">网络</button>
+        <button class="mode-btn" data-cat="temp">温度</button>
+        <button class="mode-btn" data-cat="length">长度</button>
+      </div>
+      <div class="precision-selector" id="precisionGroup">
+        <button class="precision-btn" data-p="0">0</button>
+        <button class="precision-btn active" data-p="2">2</button>
+        <button class="precision-btn" data-p="4">4</button>
+        <button class="precision-btn" data-p="6">6</button>
+      </div>
+    </div>
+
+    <div id="recentArea" style="margin-top:8px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:4px">最近使用</div>
+      <div class="recent-list" id="recentList"></div>
+    </div>
+  </div>
+
+  <div class="frost-panel" id="converterPanel">
+    <div id="converterContent"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATEGORIES = {
+  data: {
+    label: '数据存储',
+    units: ['Byte','KB','MB','GB','TB','PB','EB'],
+    base: 'Byte',
+    toBase: { Byte:1, KB:1024, MB:1048576, GB:1073741824, TB:1099511627776, PB:1125899906842624, EB:1152921504606846976 },
+  },
+  time: {
+    label: '时间',
+    units: ['ms','秒','分','时','天','周','月(30d)','年(365d)'],
+    base: '秒',
+    toBase: { ms:0.001, '秒':1, '分':60, '时':3600, '天':86400, '周':604800, '月(30d)':2592000, '年(365d)':31536000 },
+  },
+  pixel: {
+    label: '像素',
+    units: ['px','pt','em','rem','% (基准16px)','vw','vh'],
+    base: 'px',
+    toBase: { px:1, pt:1.33333, em:16, rem:16, '% (基准16px)':0.16, vw:1, vh:1 },
+  },
+  network: {
+    label: '网络',
+    units: ['bps','Kbps','Mbps','Gbps','MB/s','KB/s','GB/s'],
+    base: 'bps',
+    toBase: { bps:1, Kbps:1000, Mbps:1000000, Gbps:1000000000, 'KB/s':8000, 'MB/s':8000000, 'GB/s':8000000000 },
+  },
+  temp: {
+    label: '温度',
+    units: ['Celsius','Fahrenheit','Kelvin'],
+    base: 'Celsius',
+    toBase: {},
+    special: true,
+  },
+  length: {
+    label: '长度',
+    units: ['mm','cm','m','km','in','ft','yd','mile'],
+    base: 'm',
+    toBase: { mm:0.001, cm:0.01, m:1, km:1000, in:0.0254, ft:0.3048, yd:0.9144, mile:1609.344 },
+  },
+};
+
+const STORAGE_KEY = 'unitconvert_recent';
+let toastTimer = null;
+const $ = id => document.getElementById(id);
+
+function showToast(msg) {
+  const el = $('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+let state = {
+  category: 'data',
+  precision: 2,
+  values: {},
+};
+
+/* Category selector */
+const catBtns = document.querySelectorAll('#catSelector .mode-btn');
+const catSlider = $('catSlider');
+function moveCatSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cRect = c.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  catSlider.style.left = (bRect.left - cRect.left) + 'px';
+  catSlider.style.width = bRect.width + 'px';
+}
+catBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    catBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveCatSlider(btn);
+    state.category = btn.dataset.cat;
+    state.values = {};
+    renderConverter();
+    addRecent(state.category);
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#catSelector .mode-btn.active');
+  if (a) moveCatSlider(a);
+});
+
+/* Precision */
+document.querySelectorAll('.precision-btn').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.precision-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    state.precision = parseInt(el.dataset.p);
+    renderConverter();
+  });
+});
+
+/* Recent */
+function getRecent() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
+}
+function saveRecent(r) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(r));
+}
+function addRecent(cat) {
+  let r = getRecent().filter(x => x !== cat);
+  r.unshift(cat);
+  if (r.length > 6) r.length = 6;
+  saveRecent(r);
+  renderRecent();
+}
+function renderRecent() {
+  const list = $('recentList');
+  const r = getRecent();
+  if (r.length === 0) {
+    list.innerHTML = '<span style="font-size:12px;color:rgba(255,255,255,0.3)">暂无</span>';
+    return;
+  }
+  list.innerHTML = r.map(c => {
+    const cat = CATEGORIES[c];
+    if (!cat) return '';
+    return `<span class="recent-tag" data-cat="${c}">${cat.label}</span>`;
+  }).join('');
+  list.querySelectorAll('.recent-tag').forEach(el => {
+    el.addEventListener('click', () => {
+      const cat = el.dataset.cat;
+      catBtns.forEach(b => {
+        b.classList.toggle('active', b.dataset.cat === cat);
+      });
+      state.category = cat;
+      state.values = {};
+      moveCatSlider(document.querySelector(`#catSelector .mode-btn[data-cat="${cat}"]`));
+      renderConverter();
+    });
+  });
+}
+
+/* Converter */
+function renderConverter() {
+  const container = $('converterContent');
+  const cat = CATEGORIES[state.category];
+  if (!cat) return;
+
+  if (cat.special) {
+    renderTemperature(container);
+    return;
+  }
+
+  const p = state.precision;
+  const units = cat.units;
+  const vals = state.values;
+  const cols = units.length <= 4 ? 'two-col' : units.length <= 7 ? 'three-col' : '';
+
+  container.innerHTML = `<div class="unit-grid ${cols}">${units.map(u => {
+    const val = vals[u] !== undefined ? vals[u] : '';
+    return `<div class="unit-item">
+      <div class="unit-label">${u}</div>
+      <div class="number-input-wrap">
+        <input type="number" class="unit-input" data-unit="${u}" value="${val}" step="any" placeholder="0">
+        <button class="copy-btn" data-unit="${u}" title="复制值">📋</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+
+  container.querySelectorAll('.unit-input').forEach(el => {
+    el.addEventListener('input', () => {
+      const unit = el.dataset.unit;
+      const raw = el.value;
+      if (raw === '' || raw === '-') {
+        state.values = {};
+        renderConverter();
+        return;
+      }
+      const num = parseFloat(raw);
+      if (isNaN(num)) return;
+
+      const baseVal = num * cat.toBase[unit];
+      const newVals = {};
+      units.forEach(u => {
+        newVals[u] = baseVal / cat.toBase[u];
+      });
+      state.values = newVals;
+      // Re-render to update all fields
+      const prev = el;
+      renderConverter();
+      // Restore focus
+      const newInput = document.querySelector(`.unit-input[data-unit="${unit}"]`);
+      if (newInput) { newInput.focus(); newInput.value = raw; }
+    });
+  });
+
+  container.querySelectorAll('.copy-btn').forEach(el => {
+    el.addEventListener('click', () => {
+      const unit = el.dataset.unit;
+      const val = state.values[unit];
+      if (val === undefined) return;
+      const text = formatVal(val, p);
+      if (navigator.clipboard) navigator.clipboard.writeText(text);
+      else { const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+      showToast(`已复制: ${text} ${unit}`);
+    });
+  });
+}
+
+function renderTemperature(container) {
+  const p = state.precision;
+  const vals = state.values;
+
+  const cVal = vals.Celsius !== undefined ? vals.Celsius : '';
+  const fVal = vals.Fahrenheit !== undefined ? vals.Fahrenheit : '';
+  const kVal = vals.Kelvin !== undefined ? vals.Kelvin : '';
+
+  container.innerHTML = `<div class="temp-row">
+    <div class="temp-card">
+      <div class="temp-label">Celsius (°C)</div>
+      <div class="number-input-wrap" style="display:flex;align-items:stretch;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5)">
+        <input type="number" id="tempC" value="${cVal}" step="any" placeholder="0" style="background:transparent;border:none;padding:8px 10px;color:#fff;font-size:16px;font-weight:500;outline:none;width:100%;-moz-appearance:textfield;font-family:inherit;font-variant-numeric:tabular-nums">
+      </div>
+    </div>
+    <div class="temp-card">
+      <div class="temp-label">Fahrenheit (°F)</div>
+      <div class="number-input-wrap" style="display:flex;align-items:stretch;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5)">
+        <input type="number" id="tempF" value="${fVal}" step="any" placeholder="32" style="background:transparent;border:none;padding:8px 10px;color:#fff;font-size:16px;font-weight:500;outline:none;width:100%;-moz-appearance:textfield;font-family:inherit;font-variant-numeric:tabular-nums">
+      </div>
+    </div>
+    <div class="temp-card">
+      <div class="temp-label">Kelvin (K)</div>
+      <div class="number-input-wrap" style="display:flex;align-items:stretch;border-radius:8px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5)">
+        <input type="number" id="tempK" value="${kVal}" step="any" placeholder="273.15" style="background:transparent;border:none;padding:8px 10px;color:#fff;font-size:16px;font-weight:500;outline:none;width:100%;-moz-appearance:textfield;font-family:inherit;font-variant-numeric:tabular-nums">
+      </div>
+    </div>
+  </div>`;
+
+  const cInput = $('tempC');
+  const fInput = $('tempF');
+  const kInput = $('tempK');
+
+  function fromC(c) {
+    if (isNaN(c)) return;
+    state.values = {};
+    fInput.value = formatVal(c * 9/5 + 32, p);
+    kInput.value = formatVal(c + 273.15, p);
+    state.values.Celsius = c;
+  }
+  function fromF(f) {
+    if (isNaN(f)) return;
+    state.values = {};
+    const c = (f - 32) * 5/9;
+    cInput.value = formatVal(c, p);
+    kInput.value = formatVal(c + 273.15, p);
+    state.values.Fahrenheit = f;
+  }
+  function fromK(k) {
+    if (isNaN(k)) return;
+    state.values = {};
+    const c = k - 273.15;
+    cInput.value = formatVal(c, p);
+    fInput.value = formatVal(c * 9/5 + 32, p);
+    state.values.Kelvin = k;
+  }
+
+  cInput.oninput = () => fromC(parseFloat(cInput.value));
+  fInput.oninput = () => fromF(parseFloat(fInput.value));
+  kInput.oninput = () => fromK(parseFloat(kInput.value));
+}
+
+function formatVal(val, p) {
+  if (val === undefined || val === null) return '';
+  if (p === 0) return Math.round(val).toString();
+  const factor = Math.pow(10, p);
+  const rounded = Math.round(val * factor) / factor;
+  return rounded.toFixed(p);
+}
+
+function escHtml(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+/* Init */
+renderConverter();
+renderRecent();
+</script>
+</body>
+</html>

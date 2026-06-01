@@ -43,6 +43,7 @@ swiftc \
     -framework ScreenCaptureKit \
     -framework CoreGraphics \
     -framework CoreVideo \
+    -framework VideoToolbox \
     -framework IOSurface \
     -framework ApplicationServices \
     -framework IOKit \

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CSVViewer · CSV/JSON 数据查看器 — 在线表格浏览工具</title>
+<meta name="description" content="CSVViewer 是一款免费在线 CSV/JSON 数据查看器，支持自动检测分隔符、可排序表格、搜索过滤、数据统计、导出多种格式。">
+<meta property="og:title" content="CSVViewer · CSV/JSON 数据查看器">
+<meta property="og:description" content="在线 CSV/JSON 数据查看器，自动检测分隔符、可排序表格、搜索过滤、数据统计、导出 Markdown/HTML/JSON。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"CSVViewer","url":"https://qraftlabs.com/web-tools-v3/csvviewer","description":"在线 CSV/JSON 数据查看器，自动检测分隔符、可排序表格、搜索过滤、数据统计、多格式导出。","applicationCategory":"UtilitiesApplication","operatingSystem":"All"}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px}
+.panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.panel-title{font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);margin-bottom:12px;letter-spacing:0.3px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.upload-area{border:1.5px dashed rgba(255,255,255,0.15);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);background:rgba(255,255,255,0.04);backdrop-filter:blur(2px)}
+.upload-area:hover{border-color:rgba(139,139,248,0.5);background:rgba(139,139,248,0.06)}
+.upload-area.dragover{border-color:#8b8bf8;background:rgba(139,139,248,0.1);transform:scale(1.01)}
+.upload-icon{width:34px;height:34px;margin:0 auto 8px;color:#8b8bf8}
+.upload-area p{color:rgba(255,255,255,0.88);font-size:14px;font-weight:400}
+.upload-area .hint{font-size:12px;color:rgba(255,255,255,0.56);margin-top:4px}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+.text-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.text-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.text-input-wrap textarea{background:transparent;border:none;padding:11px 14px;color:#fff;font-size:13px;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;outline:none;width:100%;resize:vertical;line-height:1.5;min-height:140px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#fff}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#fff;font-weight:600}
+.control-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.table-wrap{overflow-x:auto;max-height:480px;overflow-y:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.06)}
+.table-wrap::-webkit-scrollbar{width:4px;height:4px}
+.table-wrap::-webkit-scrollbar-track{background:transparent}
+.table-wrap::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.data-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+.data-table th{background:rgba(139,139,248,0.15);color:rgba(255,255,255,0.9);font-weight:600;padding:8px 12px;text-align:left;cursor:pointer;user-select:none;position:sticky;top:0;z-index:2}
+.data-table th:hover{background:rgba(139,139,248,0.25)}
+.data-table th .sort-arrow{display:inline-block;margin-left:4px;color:rgba(255,255,255,0.35)}
+.data-table th .sort-arrow.active{color:#8b8bf8}
+.data-table td{padding:6px 12px;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.76);max-width:300px;overflow:hidden;text-overflow:ellipsis}
+.data-table tr:hover td{background:rgba(139,139,248,0.05)}
+.data-table tr:nth-child(even) td{background:rgba(255,255,255,0.02)}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.stat-card{background:rgba(255,255,255,0.04);border-radius:10px;padding:12px 14px}
+.stat-card .stat-label{font-size:11px;color:rgba(255,255,255,0.52);margin-bottom:2px}
+.stat-card .stat-value{font-size:16px;font-weight:600;color:#fff}
+.stat-card .stat-value.purple{color:#8b8bf8}
+.stat-card .stat-value.green{color:#34c759}
+.footer{text-align:center;padding:20px 0;font-size:12px;color:rgba(255,255,255,0.4)}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none}
+.footer a:hover{color:#8b8bf8}
+.search-input{background:transparent;border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;outline:none;font-family:inherit;width:200px;transition:border-color 0.3s}
+.search-input:focus{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.sep-label{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.56);cursor:pointer}
+.sep-label input[type="radio"]{accent-color:#8b8bf8}
+@media(max-width:768px){body{padding:20px 12px 40px}.header h1{font-size:24px}.stats-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>CSVViewer</h1>
+  <p>CSV / JSON 数据查看器 · 可排序表格 · 搜索过滤 · 数据统计 · 多格式导出</p>
+</div>
+
+<div class="container">
+
+  <div class="panel">
+    <div style="display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;align-items:center;gap:4px">
+        <label class="sep-label"><input type="radio" name="sep" value="," checked> 逗号</label>
+        <label class="sep-label"><input type="radio" name="sep" value="\t"> 制表符</label>
+        <label class="sep-label"><input type="radio" name="sep" value=";"> 分号</label>
+        <label class="sep-label"><input type="radio" name="sep" value="auto"> 自动检测</label>
+      </div>
+      <div style="flex:1"></div>
+      <button class="btn btn-sm btn-outline" id="loadSampleBtn">加载示例数据</button>
+      <button class="btn btn-sm btn-primary" id="parseBtn">解析数据</button>
+    </div>
+    <div class="control-group">
+      <label>粘贴 CSV / TSV / JSON 数据，或上传文件</label>
+      <div class="text-input-wrap">
+        <textarea id="dataInput" placeholder="name,email,age,country&#10;Alice,alice@example.com,28,USA&#10;Bob,bob@test.com,35,UK&#10;Charlie,charlie@mail.com,42,Canada&#10;Diana,diana@web.org,31,Germany"></textarea>
+      </div>
+    </div>
+    <div class="upload-area" id="csvUploadArea" style="padding:14px;margin-top:8px">
+      <span style="font-size:12px;color:rgba(255,255,255,0.56)">📄 点击上传 .csv 或 .json 文件</span>
+      <input type="file" id="csvFileInput" accept=".csv,.tsv,.json,.txt" style="display:none">
+    </div>
+    <div class="control-row" style="margin-top:10px">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜索过滤...">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">
+        <button class="btn btn-sm btn-secondary" id="exportJsonBtn">导出 JSON</button>
+        <button class="btn btn-sm btn-secondary" id="exportMarkdownBtn">导出 Markdown</button>
+        <button class="btn btn-sm btn-secondary" id="exportHtmlBtn">导出 HTML</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="tablePanel" style="display:none">
+    <div class="panel-title">数据表格 <span style="font-weight:400;color:rgba(255,255,255,0.4);font-size:12px" id="tableInfo"></span></div>
+    <div class="table-wrap" id="tableWrap"><div style="text-align:center;padding:40px;color:rgba(255,255,255,0.48);font-size:13px">点击"解析数据"查看表格</div></div>
+  </div>
+
+  <div class="panel" id="statsPanel" style="display:none">
+    <div class="panel-title">数据统计</div>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+
+  <div class="footer">
+    <a href="/docs/support.html">隐私政策</a> · © 2025 CSVViewer
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+let currentData = [];
+let currentHeaders = [];
+let sortKey = null;
+let sortDir = 1;
+
+function detectSep(text) {
+  const auto = document.querySelector('input[name="sep"]:checked');
+  if (auto && auto.value !== 'auto') {
+    if (auto.value === '\\t') return '\t';
+    return auto.value;
+  }
+  const firstLine = text.split('\n')[0] || '';
+  const comma = (firstLine.match(/,/g) || []).length;
+  const tab = (firstLine.match(/\t/g) || []).length;
+  const semi = (firstLine.match(/;/g) || []).length;
+  if (tab > comma && tab > semi) return '\t';
+  if (semi > comma && semi > tab) return ';';
+  return ',';
+}
+
+function parseCSV(text, sep) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (lines.length < 1) return { headers: [], rows: [] };
+  const headers = lines[0].split(sep).map(h => h.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = lines[i].split(sep).map(c => c.trim());
+    if (cells.length === 1 && cells[0] === '') continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = cells[idx] || ''; });
+    rows.push(row);
+  }
+  return { headers, rows };
+}
+
+function parseJSON(text) {
+  try {
+    const data = JSON.parse(text);
+    const arr = Array.isArray(data) ? data : [data];
+    if (arr.length === 0) return { headers: [], rows: [] };
+    const headers = Object.keys(arr[0]);
+    const rows = arr.map(obj => {
+      const row = {};
+      headers.forEach(h => { row[h] = obj[h] !== undefined ? String(obj[h]) : ''; });
+      return row;
+    });
+    return { headers, rows };
+  } catch(e) {
+    return null;
+  }
+}
+
+function parseData() {
+  const text = $('dataInput').value.trim();
+  if (!text) { showToast('请粘贴数据或上传文件'); return; }
+
+  let jsonResult = parseJSON(text);
+  if (jsonResult) {
+    currentHeaders = jsonResult.headers;
+    currentData = jsonResult.rows;
+  } else {
+    const sep = detectSep(text);
+    const result = parseCSV(text, sep);
+    currentHeaders = result.headers;
+    currentData = result.rows;
+  }
+
+  if (currentHeaders.length === 0) { showToast('未解析到数据'); return; }
+
+  sortKey = null;
+  sortDir = 1;
+  renderTable();
+  renderStats();
+  $('tablePanel').style.display = 'block';
+  $('statsPanel').style.display = 'block';
+}
+
+function renderTable() {
+  const wrap = $('tableWrap');
+  const info = $('tableInfo');
+  const searchVal = $('searchInput').value.toLowerCase();
+
+  let filtered = currentData;
+  if (searchVal) {
+    filtered = currentData.filter(row =>
+      currentHeaders.some(h => (row[h] || '').toLowerCase().includes(searchVal))
+    );
+  }
+
+  if (sortKey) {
+    filtered = [...filtered].sort((a, b) => {
+      const va = (a[sortKey] || ''), vb = (b[sortKey] || '');
+      const na = parseFloat(va), nb = parseFloat(vb);
+      if (!isNaN(na) && !isNaN(nb)) return (na - nb) * sortDir;
+      return va.localeCompare(vb) * sortDir;
+    });
+  }
+
+  info.textContent = `(${filtered.length} 条记录，共 ${currentData.length} 条)`;
+
+  if (filtered.length === 0) {
+    wrap.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.48);font-size:13px">无匹配数据</div>';
+    return;
+  }
+
+  let html = '<table class="data-table"><thead><tr>';
+  currentHeaders.forEach(h => {
+    const arrow = sortKey === h ? (sortDir === 1 ? ' ▲' : ' ▼') : ' ⇅';
+    const cls = sortKey === h ? 'active' : '';
+    html += `<th data-key="${escHtml(h)}">${escHtml(h)}<span class="sort-arrow ${cls}">${arrow}</span></th>`;
+  });
+  html += '</tr></thead><tbody>';
+  filtered.forEach(row => {
+    html += '<tr>';
+    currentHeaders.forEach(h => {
+      html += `<td title="${escHtml(row[h] || '')}">${escHtml((row[h] || '').substring(0, 120))}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('th').forEach(th => {
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if (sortKey === key) sortDir *= -1;
+      else { sortKey = key; sortDir = 1; }
+      renderTable();
+    });
+  });
+}
+
+function renderStats() {
+  const grid = $('statsGrid');
+  const totalRows = currentData.length;
+  const totalCols = currentHeaders.length;
+
+  let html = `
+    <div class="stat-card"><div class="stat-label">总行数</div><div class="stat-value purple">${totalRows}</div></div>
+    <div class="stat-card"><div class="stat-label">总列数</div><div class="stat-value purple">${totalCols}</div></div>
+  `;
+
+  currentHeaders.forEach(h => {
+    const values = currentData.map(r => r[h] || '');
+    const nonEmpty = values.filter(v => v.trim());
+    const emptyRate = totalRows > 0 ? Math.round(((totalRows - nonEmpty.length) / totalRows) * 100) : 0;
+    const nums = values.map(v => parseFloat(v)).filter(v => !isNaN(v));
+    const type = nums.length > totalRows * 0.7 ? 'Number' : 'Text';
+    html += `
+      <div class="stat-card">
+        <div class="stat-label">${escHtml(h)}</div>
+        <div class="stat-value" style="font-size:14px">${type} · 空值 ${emptyRate}%</div>
+      </div>
+    `;
+  });
+
+  grid.innerHTML = html;
+}
+
+$('parseBtn').addEventListener('click', parseData);
+
+$('loadSampleBtn').addEventListener('click', () => {
+  $('dataInput').value = `name,email,age,country,score
+Alice Johnson,alice@example.com,28,USA,92.5
+Bob Smith,bob@test.com,35,UK,87.3
+Charlie Brown,charlie@mail.com,42,Canada,91.8
+Diana Prince,diana@web.org,31,Germany,95.1
+Eve Williams,eve@demo.com,26,Australia,88.6
+Frank Miller,frank@sample.com,39,France,84.2
+Grace Lee,grace@test.org,33,South Korea,93.7
+Henry Davis,henry@mail.com,45,UK,79.4
+Iris Chen,iris@web.com,29,Taiwan,90.0
+Jack Wilson,jack@demo.org,37,Ireland,86.5`;
+  parseData();
+});
+
+const csvUploadArea = $('csvUploadArea');
+const csvFileInput = $('csvFileInput');
+csvUploadArea.addEventListener('click', () => csvFileInput.click());
+csvFileInput.addEventListener('change', e => {
+  if (e.target.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => {
+      $('dataInput').value = ev.target.result;
+      parseData();
+    };
+    r.readAsText(e.target.files[0]);
+  }
+});
+csvUploadArea.addEventListener('dragover', e => { e.preventDefault(); csvUploadArea.classList.add('dragover'); });
+csvUploadArea.addEventListener('dragleave', () => csvUploadArea.classList.remove('dragover'));
+csvUploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  csvUploadArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) {
+    const r = new FileReader();
+    r.onload = ev => {
+      $('dataInput').value = ev.target.result;
+      parseData();
+    };
+    r.readAsText(e.dataTransfer.files[0]);
+  }
+});
+
+document.querySelectorAll('input[name="sep"]').forEach(el => {
+  el.addEventListener('change', () => {
+    if ($('dataInput').value.trim()) parseData();
+  });
+});
+
+$('searchInput').addEventListener('input', () => {
+  if (currentHeaders.length > 0) renderTable();
+});
+
+$('exportJsonBtn').addEventListener('click', () => {
+  if (currentData.length === 0) { showToast('无数据可导出'); return; }
+  const json = JSON.stringify(currentData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.download = 'data_export.json';
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已导出 JSON');
+});
+
+$('exportMarkdownBtn').addEventListener('click', () => {
+  if (currentData.length === 0) { showToast('无数据可导出'); return; }
+  let md = '| ' + currentHeaders.join(' | ') + ' |\n';
+  md += '| ' + currentHeaders.map(() => '---').join(' | ') + ' |\n';
+  currentData.forEach(row => {
+    md += '| ' + currentHeaders.map(h => (row[h] || '').replace(/\|/g, '\\|')).join(' | ') + ' |\n';
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const link = document.createElement('a');
+  link.download = 'data_export.md';
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已导出 Markdown');
+});
+
+$('exportHtmlBtn').addEventListener('click', () => {
+  if (currentData.length === 0) { showToast('无数据可导出'); return; }
+  let html = '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;font-family:sans-serif;font-size:13px">';
+  html += '<thead><tr>' + currentHeaders.map(h => `<th style="background:#f0f0f0;text-align:left">${escHtml(h)}</th>`).join('') + '</tr></thead><tbody>';
+  currentData.forEach(row => {
+    html += '<tr>' + currentHeaders.map(h => `<td style="border-bottom:1px solid #ddd">${escHtml(row[h] || '')}</td>`).join('') + '</tr>';
+  });
+  html += '</tbody></table>';
+  const blob = new Blob([html], { type: 'text/html' });
+  const link = document.createElement('a');
+  link.download = 'data_export.html';
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已导出 HTML 表格');
+});
+
+$('dataInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) parseData();
+});
+</script>
+</body>
+</html>

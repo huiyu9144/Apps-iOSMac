@@ -1,8 +1,10 @@
-﻿import Foundation
+import Foundation
+import Cocoa
 import Network
 import IOSurface
 import CoreVideo
 import CoreMedia
+import VideoToolbox
 
 enum TCPServerError: Error, LocalizedError {
     case invalidPort
@@ -54,14 +56,16 @@ final class TCPServer {
     private var commandConnection: NWConnection?
 
     private let serverQueue = DispatchQueue(label: "com.jiaremote.tcp.server", qos: .userInitiated)
-    private let frameSendQueue = DispatchQueue(label: "com.jiaremote.tcp.frame", qos: .userInteractive)
     private let commandQueue = DispatchQueue(label: "com.jiaremote.tcp.command", qos: .userInitiated)
     private let stateLock = DispatchQueue(label: "com.jiaremote.tcp.state")
-    private let frameBufferLock = DispatchQueue(label: "com.jiaremote.tcp.framebuffer")
+    private let vtEncodeQueue = DispatchQueue(label: "com.jiaremote.vtencode", qos: .userInteractive)
+    private var vtSession: VTCompressionSession?
 
-    private let maxFrameBufferSize = 3
-    private var frameRingBuffer: [Data] = []
-    private var isSendingFrame = false
+    private let latestFrameLock = DispatchQueue(label: "com.jiaremote.latestframe")
+    private var frameTimer: DispatchSourceTimer?
+    private var latestPixelBuffer: CVPixelBuffer?
+    private var latestFormat: UInt32 = 0
+    private var latestTimestamp: UInt64 = 0
     private var frameSendCount: Int = 0
 
     private var activePort: UInt16 = JiaProtocol.ProtocolConstants.defaultPort
@@ -179,13 +183,14 @@ final class TCPServer {
         disconnectFrameChannel()
         disconnectCommandChannel()
 
-        frameBufferLock.sync {
-            frameRingBuffer.removeAll()
-        }
-
         stateLock.sync {
             connectedClientHost = nil
         }
+
+        latestFrameLock.sync {
+            latestPixelBuffer = nil
+        }
+        stopFrameTimer()
     }
 
     func startBonjour() {
@@ -350,15 +355,10 @@ final class TCPServer {
     }
 
     private func disconnectFrameChannel() {
-        frameConnection?.stateUpdateHandler = nil
         frameConnection?.cancel()
         frameConnection = nil
         stateLock.sync { isFrameConnected = false }
         unsubscribeFromCaptureEngine()
-
-        frameBufferLock.sync {
-            frameRingBuffer.removeAll()
-        }
     }
 
     private func handleFrameDisconnection() {
@@ -366,10 +366,6 @@ final class TCPServer {
         frameConnection = nil
         stateLock.sync { isFrameConnected = false }
         unsubscribeFromCaptureEngine()
-
-        frameBufferLock.sync {
-            frameRingBuffer.removeAll()
-        }
 
         checkClientDisconnection()
     }
@@ -527,12 +523,15 @@ final class TCPServer {
             JiaLog("[TCPServer] 🎉 Client fully connected: \(hostStr)")
             delegate?.tcpServerDidAcceptClient(self, host: hostStr)
         }
+
+        startFrameTimer()
     }
 
     private func checkClientDisconnection() {
         let isAnyConnected = stateLock.sync { isFrameConnected || isCommandConnected }
 
         if !isAnyConnected {
+            stopFrameTimer()
             let previousHost = stateLock.sync { connectedClientHost }
             stateLock.sync { connectedClientHost = nil }
 
@@ -580,124 +579,138 @@ final class TCPServer {
 
 extension TCPServer: CaptureEngineDelegate {
 
+    private func ensureVTSession(width: Int, height: Int) -> VTCompressionSession? {
+        if let session = vtSession { return session }
+        var session: VTCompressionSession?
+        let status = VTCompressionSessionCreate(
+            allocator: kCFAllocatorDefault,
+            width: Int32(width), height: Int32(height),
+            codecType: kCMVideoCodecType_JPEG,
+            encoderSpecification: nil,
+            imageBufferAttributes: nil,
+            compressedDataAllocator: kCFAllocatorDefault,
+            outputCallback: nil,
+            refcon: nil,
+            compressionSessionOut: &session
+        )
+        guard status == noErr, let session else {
+            JiaLog("[TCPServer] VTCompressionSessionCreate failed: \(status)")
+            return nil
+        }
+        VTSessionSetProperty(session, key: kVTCompressionPropertyKey_Quality, value: NSNumber(value: 0.4))
+        VTSessionSetProperty(session, key: kVTCompressionPropertyKey_RealTime, value: kCFBooleanTrue)
+        vtSession = session
+        return session
+    }
+
+    private func encodeJPEG(pixelBuffer: CVPixelBuffer) -> Data? {
+        guard let session = ensureVTSession(
+            width: CVPixelBufferGetWidth(pixelBuffer),
+            height: CVPixelBufferGetHeight(pixelBuffer)
+        ) else { return nil }
+
+        var resultData: Data?
+        let sema = DispatchSemaphore(value: 0)
+        var infoFlags = VTEncodeInfoFlags()
+
+        let status = VTCompressionSessionEncodeFrame(
+            session,
+            imageBuffer: pixelBuffer,
+            presentationTimeStamp: CMTime.zero,
+            duration: CMTime.invalid,
+            frameProperties: nil,
+            infoFlagsOut: &infoFlags
+        ) { status, _, sampleBuffer in
+            defer { sema.signal() }
+            guard status == noErr, let sampleBuffer else { return }
+            guard let dataBuffer = sampleBuffer.dataBuffer else { return }
+            var length: Int = 0
+            var ptr: UnsafeMutablePointer<Int8>?
+            if CMBlockBufferGetDataPointer(dataBuffer, atOffset: 0, lengthAtOffsetOut: nil, totalLengthOut: &length, dataPointerOut: &ptr) == noErr, let ptr {
+                resultData = Data(bytes: ptr, count: length)
+            }
+        }
+
+        if status != noErr { return nil }
+        _ = sema.wait(timeout: .now() + .seconds(1))
+        return resultData
+    }
+
     func captureEngine(_ engine: CaptureEngine, didOutput frame: CaptureFrame) {
-        guard stateLock.sync(execute: { isFrameConnected }) else { return }
-
-        let pixelBuffer = frame.pixelBuffer
-        let width = CVPixelBufferGetWidth(pixelBuffer)
-        let height = CVPixelBufferGetHeight(pixelBuffer)
-        let pixelFormatType = CVPixelBufferGetPixelFormatType(pixelBuffer)
-
-        var bytesPerRow = 0
-        var baseAddress: UnsafeMutableRawPointer? = nil
-        var lockedSurface: IOSurface? = nil
-
-        if let surface = frame.ioSurface {
-            bytesPerRow = IOSurfaceGetBytesPerRow(surface)
-            let addr = IOSurfaceGetBaseAddress(surface)
-            if addr != nil {
-                baseAddress = addr
-                IOSurfaceLock(surface, .readOnly, nil)
-                lockedSurface = surface
-            }
-        }
-
-        if baseAddress == nil {
-            CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
-            baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
-            bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-
-            if baseAddress == nil {
-                return
-            }
-        }
-
-        defer {
-            if let surface = lockedSurface {
-                IOSurfaceUnlock(surface, .readOnly, nil)
-            } else {
-                CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
-            }
-        }
-
-        let dataSize = bytesPerRow * height
-
-        guard dataSize > 0, dataSize <= JiaProtocol.ProtocolConstants.maxFrameSize else {
-            JiaLog("[TCPServer] Frame dropped: invalid size \(dataSize) for \(width)x\(height)")
-            return
-        }
-
-        let timestampValue = frame.displayTime.timescale > 0
+        let pb = frame.pixelBuffer
+        let fmt = CVPixelBufferGetPixelFormatType(pb)
+        let ts = frame.displayTime.timescale > 0
             ? UInt64(frame.displayTime.value) * 1000 / UInt64(frame.displayTime.timescale)
             : UInt64(0)
 
-        let header = JiaProtocol.FrameHeader(
-            width: UInt32(width),
-            height: UInt32(height),
-            bytesPerRow: UInt32(bytesPerRow),
-            pixelFormat: pixelFormatType,
-            timestamp: timestampValue,
-            dataLength: UInt64(dataSize)
-        )
+        CVPixelBufferLockBaseAddress(pb, .readOnly)
+        let base = CVPixelBufferGetBaseAddress(pb)
+        CVPixelBufferUnlockBaseAddress(pb, .readOnly)
+        guard base != nil else { return }
 
-        let pixelData = Data(bytes: baseAddress!, count: dataSize)
-        let fullFrame = header.encodeFrame(pixelData: pixelData)
-
-        enqueueFrame(fullFrame)
+        latestFrameLock.sync {
+            latestPixelBuffer = pb
+            latestFormat = fmt
+            latestTimestamp = ts
+        }
     }
 
     func captureEngine(_ engine: CaptureEngine, didEncounterError error: Error) {
-        JiaLog("[TCPServer] Capture error: \(error)")
+        JiaLog("[TCPServer] ❌ Capture error: \(error)")
     }
 
     func captureEngineDidStop(_ engine: CaptureEngine) {
-        frameBufferLock.sync {
-            frameRingBuffer.removeAll()
+        JiaLog("[TCPServer] ⏹ Capture stopped")
+        if let session = vtSession {
+            VTCompressionSessionInvalidate(session)
+            vtSession = nil
         }
     }
 
-    private func enqueueFrame(_ frameData: Data) {
-        frameBufferLock.sync {
-            if frameRingBuffer.count >= maxFrameBufferSize {
-                frameRingBuffer.removeFirst()
-            }
-            frameRingBuffer.append(frameData)
-        }
-        sendNextFrame()
+    func startFrameTimer() {
+        stopFrameTimer()
+        let timer = DispatchSource.makeTimerSource(queue: vtEncodeQueue)
+        timer.schedule(deadline: .now(), repeating: .nanoseconds(8_333_333), leeway: .nanoseconds(500_000))
+        timer.setEventHandler { [weak self] in self?.onFrameTick() }
+        timer.activate()
+        frameTimer = timer
+        JiaLog("[TCPServer] ▶️ 120Hz frame timer started")
     }
 
-    private func sendNextFrame() {
-        frameSendQueue.async { [weak self] in
-            guard let self else { return }
-            guard !self.isSendingFrame else { return }
+    func stopFrameTimer() {
+        frameTimer?.cancel()
+        frameTimer = nil
+    }
 
-            var frameData: Data?
-            self.frameBufferLock.sync {
-                if !self.frameRingBuffer.isEmpty {
-                    frameData = self.frameRingBuffer.removeFirst()
-                }
-            }
+    private func onFrameTick() {
+        guard stateLock.sync(execute: { isFrameConnected }) else { return }
 
-            guard let data = frameData,
-                  let connection = self.frameConnection else { return }
-
-            self.isSendingFrame = true
-            self.frameSendCount += 1
-
-            connection.send(content: data, completion: .contentProcessed({ [weak self] error in
-                guard let self else { return }
-                self.isSendingFrame = false
-
-                if let error {
-                    JiaLog("[TCPServer] Frame #\(self.frameSendCount) send error: \(error)")
-                } else {
-                    if self.frameSendCount % 30 == 1 {
-                        JiaLog("[TCPServer] Frame #\(self.frameSendCount) sent (\(data.count) bytes)")
-                    }
-                }
-
-                self.sendNextFrame()
-            }))
+        var pb: CVPixelBuffer?
+        var fmt: UInt32 = 0
+        var ts: UInt64 = 0
+        latestFrameLock.sync {
+            pb = latestPixelBuffer
+            fmt = latestFormat
+            ts = latestTimestamp
         }
+        guard let pixelBuffer = pb else { return }
+
+        guard let jpegData = encodeJPEG(pixelBuffer: pixelBuffer) else { return }
+
+        let w = CVPixelBufferGetWidth(pixelBuffer)
+        let h = CVPixelBufferGetHeight(pixelBuffer)
+        let formatWithFlag = fmt | JiaProtocol.ProtocolConstants.compressionFlag
+        let header = JiaProtocol.FrameHeader(
+            width: UInt32(w), height: UInt32(h),
+            bytesPerRow: UInt32(w * 4),
+            pixelFormat: formatWithFlag,
+            timestamp: ts,
+            dataLength: UInt64(jpegData.count)
+        )
+        let frameData = header.encodeFrame(pixelData: jpegData)
+        frameSendCount += 1
+
+        guard let conn = frameConnection else { return }
+        conn.send(content: frameData, completion: .contentProcessed({ _ in }))
     }
 }

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>TimerFlow - 在线计时器 / 番茄钟 | 在线工具</title>
+<meta name="description" content="免费在线计时器和番茄钟工具，支持倒计时、番茄钟（25+5）、秒表三种模式，全屏显示，声音提醒，计时历史记录。" />
+<meta property="og:title" content="TimerFlow - 在线计时器/番茄钟" />
+<meta property="og:description" content="免费在线计时器和番茄钟工具，支持倒计时/番茄钟/秒表，全屏显示，历史记录。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"TimerFlow 在线计时器",
+  "description":"支持倒计时、番茄钟、秒表三种模式的在线计时工具，带有全屏显示和声音提醒",
+  "applicationCategory":"UtilitiesApplication",
+  "operatingSystem":"All",
+  "browserRequirements":"Requires JavaScript"
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000000;color:#ffffff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:800px;display:flex;flex-direction:column;gap:20px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden;max-width:400px;margin:0 auto}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#ffffff;font-weight:600}
+.timer-display{font-size:120px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1.1;padding:20px 0 10px;transition:color 0.3s;font-family:'SF Mono','Menlo','Consolas',monospace}
+.timer-display.work{color:#8b8bf8}
+.timer-display.break{color:#34c759}
+.timer-display.stopwatch{color:#ffd93d}
+.timer-phase{text-align:center;font-size:14px;color:rgba(255,255,255,0.56);margin-bottom:8px;min-height:20px}
+.controls-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.btn{padding:12px 28px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;font-family:inherit;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-success{background:rgba(52,199,89,0.55);color:#fff}
+.btn-success:hover{background:rgba(52,199,89,0.65)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#ffffff}
+.btn-sm{padding:7px 16px;font-size:12px;border-radius:8px}
+.presets{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+.preset-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:6px 16px;color:rgba(255,255,255,0.7);cursor:pointer;font-size:12px;font-family:inherit;transition:all 0.2s}
+.preset-btn:hover,.preset-btn.active{background:rgba(139,139,248,0.15);border-color:#8b8bf8;color:#fff}
+.preset-btn.active{background:rgba(139,139,248,0.2)}
+.preset-btn.active{box-shadow:0 0 0 1px #8b8bf8}
+.custom-input-wrap{display:flex;gap:8px;justify-content:center;align-items:center;margin:8px 0}
+.custom-input-wrap input{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:14px;width:70px;text-align:center;outline:none;font-family:inherit;font-variant-numeric:tabular-nums}
+.custom-input-wrap input:focus{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.custom-input-wrap span{font-size:13px;color:rgba(255,255,255,0.6)}
+/* Sections */
+.section-title{font-size:15px;font-weight:600;color:rgba(255,255,255,0.88);margin-bottom:10px;letter-spacing:0.2px}
+.history-list{max-height:200px;overflow-y:auto}
+.history-list::-webkit-scrollbar{width:4px}
+.history-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.history-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:rgba(255,255,255,0.72)}
+.history-item:last-child{border-bottom:none}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-slide{animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.progress-ring{width:280px;height:280px;margin:0 auto;position:relative}
+.progress-ring svg{transform:rotate(-90deg)}
+.progress-ring .bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:4}
+.progress-ring .fg{fill:none;stroke:#8b8bf8;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 0.5s}
+@media(max-width:500px){.timer-display{font-size:64px}.progress-ring{width:200px;height:200px}body{padding:20px 10px 40px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TimerFlow</h1>
+  <p>在线计时器 · 番茄钟 · 秒表 · 全屏专注</p>
+</div>
+
+<div class="container">
+  <div class="frost-panel" style="text-align:center">
+    <div class="mode-selector" id="modeSelector">
+      <div class="mode-slider" id="modeSlider"></div>
+      <button class="mode-btn active" data-mode="countdown">倒计时</button>
+      <button class="mode-btn" data-mode="pomodoro">番茄钟</button>
+      <button class="mode-btn" data-mode="stopwatch">秒表</button>
+    </div>
+
+    <div id="presetArea" style="margin-top:14px">
+      <div class="presets" id="presetBtns"></div>
+      <div class="custom-input-wrap" id="customTimeWrap">
+        <input type="number" id="customMin" value="5" min="1" max="999">
+        <span>分</span>
+        <input type="number" id="customSec" value="0" min="0" max="59">
+        <span>秒</span>
+        <button class="btn btn-sm btn-outline" id="customSetBtn">设置</button>
+      </div>
+    </div>
+
+    <div class="timer-phase" id="timerPhase">准备就绪</div>
+
+    <div class="progress-ring" id="progressRing">
+      <svg width="100%" height="100%" viewBox="0 0 120 120">
+        <circle class="bg" cx="60" cy="60" r="52"/>
+        <circle class="fg" id="progressCircle" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="0"/>
+      </svg>
+    </div>
+
+    <div class="timer-display" id="timerDisplay">00:00</div>
+
+    <div class="controls-row">
+      <button class="btn btn-primary" id="startBtn">开始</button>
+      <button class="btn btn-secondary" id="pauseBtn" style="display:none">暂停</button>
+      <button class="btn btn-outline" id="resetBtn">重置</button>
+    </div>
+    <div style="margin-top:8px">
+      <button class="btn btn-sm btn-outline" id="fullscreenBtn">⛶ 全屏（空格键）</button>
+    </div>
+  </div>
+
+  <div class="frost-panel" id="historyPanel">
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>计时历史</span>
+      <button class="btn btn-sm btn-outline" id="clearHistoryBtn">清空</button>
+    </div>
+    <div class="history-list" id="historyList">
+      <div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px;padding:20px 0">暂无记录</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MODE_PRESETS = {
+  countdown: [1,3,5,10,15,25,30,45,60],
+  pomodoro: [],
+  stopwatch: [],
+};
+const STORAGE_KEY = 'timerflow_history';
+
+let state = {
+  mode: 'countdown',
+  totalSeconds: 300,
+  remaining: 300,
+  isRunning: false,
+  isPaused: false,
+  isBreak: false,
+  pomoCycle: 0,
+  stopwatchTime: 0,
+  timerId: null,
+};
+
+let toastTimer = null;
+const $ = id => document.getElementById(id);
+
+function showToast(msg) {
+  const el = $('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* Web Audio beep */
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.5);
+    setTimeout(() => ctx.close(), 600);
+  } catch(e) {}
+}
+
+function beepRepeat() {
+  playBeep();
+  setTimeout(playBeep, 400);
+  setTimeout(playBeep, 800);
+}
+
+/* History */
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
+}
+function saveHistory(h) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(h));
+}
+function addHistory(entry) {
+  const h = getHistory();
+  h.unshift({ ...entry, time: Date.now() });
+  if (h.length > 100) h.length = 100;
+  saveHistory(h);
+  renderHistory();
+}
+function renderHistory() {
+  const h = getHistory();
+  const list = $('historyList');
+  if (h.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.4);font-size:13px;padding:20px 0">暂无记录</div>';
+    return;
+  }
+  list.innerHTML = h.slice(0,20).map(e => {
+    const d = new Date(e.time);
+    const timeStr = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    return `<div class="history-item fade-slide">
+      <span>${e.label} — ${e.duration}</span>
+      <span style="color:rgba(255,255,255,0.4)">${e.mode} · ${timeStr}</span>
+    </div>`;
+  }).join('');
+}
+$('clearHistoryBtn').addEventListener('click', () => {
+  saveHistory([]);
+  renderHistory();
+  showToast('历史已清空');
+});
+
+/* Presets */
+function renderPresets() {
+  const area = $('presetBtns');
+  const presets = MODE_PRESETS[state.mode] || [];
+  if (presets.length === 0) { area.innerHTML = ''; $('customTimeWrap').style.display = 'none'; return; }
+  $('customTimeWrap').style.display = 'flex';
+  area.innerHTML = presets.map(m => {
+    const label = m >= 60 ? `${(m/60).toFixed(0)}h` : `${m}min`;
+    const active = state.mode==='countdown' && m*60 === state.totalSeconds ? 'active' : '';
+    return `<button class="preset-btn ${active}" data-min="${m}">${label}</button>`;
+  }).join('');
+  area.querySelectorAll('.preset-btn').forEach(el => {
+    el.addEventListener('click', () => {
+      if (state.isRunning) return;
+      const min = parseInt(el.dataset.min);
+      state.totalSeconds = min * 60;
+      state.remaining = state.totalSeconds;
+      updateDisplay();
+      renderPresets();
+    });
+  });
+}
+
+$('customSetBtn').addEventListener('click', () => {
+  if (state.isRunning) return;
+  const min = parseInt($('customMin').value) || 0;
+  const sec = parseInt($('customSec').value) || 0;
+  const total = min * 60 + sec;
+  if (total < 1) { showToast('请输入有效时间'); return; }
+  state.totalSeconds = total;
+  state.remaining = total;
+  updateDisplay();
+  renderPresets();
+  showToast(`已设置为 ${min}分${sec}秒`);
+});
+
+/* Display */
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
+}
+function formatStopwatch(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const cent = Math.floor((ms % 1000) / 10);
+  return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${cent.toString().padStart(2,'0')}`;
+}
+
+function updateDisplay() {
+  const el = $('timerDisplay');
+  const phase = $('timerPhase');
+  if (state.mode === 'stopwatch') {
+    el.textContent = formatStopwatch(state.stopwatchTime);
+    el.className = 'timer-display stopwatch';
+    phase.textContent = '秒表运行中';
+    document.title = `TimerFlow - ${formatStopwatch(state.stopwatchTime)}`;
+    updateProgress(0);
+    return;
+  }
+  const display = state.mode === 'pomodoro' ? state.remaining : state.remaining;
+  el.textContent = formatTime(display);
+  if (state.mode === 'pomodoro') {
+    el.className = state.isBreak ? 'timer-display break' : 'timer-display work';
+    phase.textContent = state.isBreak ? `休息 #${state.pomoCycle}` : `工作 #${state.pomoCycle+1}`;
+  } else {
+    el.className = 'timer-display work';
+    phase.textContent = state.isRunning ? '倒计时中' : '准备就绪';
+  }
+  document.title = `TimerFlow - ${formatTime(display)}`;
+
+  if (state.totalSeconds > 0) {
+    const pct = 1 - (state.remaining / state.totalSeconds);
+    updateProgress(pct);
+  }
+}
+
+function updateProgress(pct) {
+  const circle = $('progressCircle');
+  const circ = 2 * Math.PI * 52;
+  const offset = circ * (1 - Math.min(pct, 1));
+  circle.style.strokeDashoffset = offset;
+  const color = state.mode==='pomodoro' && state.isBreak ? '#34c759' : '#8b8bf8';
+  circle.style.stroke = color;
+}
+
+/* Mode switching */
+const modeBtns = document.querySelectorAll('#modeSelector .mode-btn');
+const modeSlider = $('modeSlider');
+function moveSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cRect = c.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  modeSlider.style.left = (bRect.left - cRect.left) + 'px';
+  modeSlider.style.width = bRect.width + 'px';
+}
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (state.isRunning) { showToast('请先停止当前计时'); return; }
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn);
+    stopTimer();
+    state.mode = btn.dataset.mode;
+    state.isBreak = false;
+    state.pomoCycle = 0;
+    state.stopwatchTime = 0;
+    if (state.mode === 'countdown') {
+      state.totalSeconds = 300;
+      state.remaining = 300;
+    } else if (state.mode === 'pomodoro') {
+      state.totalSeconds = 25 * 60;
+      state.remaining = 25 * 60;
+    } else {
+      state.totalSeconds = 0;
+      state.remaining = 0;
+    }
+    renderPresets();
+    updateDisplay();
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#modeSelector .mode-btn.active');
+  if (a) moveSlider(a);
+});
+
+/* Timer logic */
+function startTimer() {
+  if (state.isRunning && !state.isPaused) return;
+  if (state.mode === 'stopwatch') {
+    if (!state.isRunning) {
+      state.isRunning = true;
+      state.isPaused = false;
+      state._swStart = Date.now() - state.stopwatchTime;
+      state.timerId = setInterval(() => {
+        state.stopwatchTime = Date.now() - state._swStart;
+        updateDisplay();
+      }, 30);
+      updateButtons();
+    } else if (state.isPaused) {
+      state.isPaused = false;
+      state._swStart = Date.now() - state.stopwatchTime;
+      state.timerId = setInterval(() => {
+        state.stopwatchTime = Date.now() - state._swStart;
+        updateDisplay();
+      }, 30);
+      updateButtons();
+    }
+    return;
+  }
+
+  if (state.remaining <= 0) {
+    state.remaining = state.totalSeconds;
+  }
+  state.isRunning = true;
+  state.isPaused = false;
+  state._startTime = Date.now();
+  state._initialRemaining = state.remaining;
+  tick();
+  updateButtons();
+}
+
+function tick() {
+  if (!state.isRunning) return;
+  const elapsed = (Date.now() - state._startTime) / 1000;
+  state.remaining = Math.max(0, state._initialRemaining - elapsed);
+  updateDisplay();
+
+  if (state.remaining <= 0) {
+    completeTimer();
+    return;
+  }
+  state.timerId = requestAnimationFrame(tick);
+}
+
+function completeTimer() {
+  state.isRunning = false;
+  updateButtons();
+
+  if (state.mode === 'pomodoro') {
+    const dur = state.isBreak ? '5分钟' : '25分钟';
+    addHistory({ label: state.isBreak ? `休息 #${state.pomoCycle} 完成` : `工作 #${state.pomoCycle+1} 完成`, duration: dur, mode: '番茄钟' });
+    if (!state.isBreak) {
+      state.isBreak = true;
+      state.pomoCycle++;
+      state.totalSeconds = 5 * 60;
+      state.remaining = 5 * 60;
+    } else {
+      state.isBreak = false;
+      state.totalSeconds = 25 * 60;
+      state.remaining = 25 * 60;
+    }
+    beepRepeat();
+    showToast(state.isBreak ? '🍅 工作完成，开始休息！' : '☕ 休息结束，开始工作！');
+    updateDisplay();
+    renderPresets();
+    // Auto start next phase
+    state._startTime = Date.now();
+    state._initialRemaining = state.remaining;
+    state.isRunning = true;
+    tick();
+    updateButtons();
+  } else {
+    const dur = formatTime(state.totalSeconds);
+    addHistory({ label: `倒计时完成`, duration: dur, mode: '倒计时' });
+    beepRepeat();
+    showToast('⏰ 倒计时结束！');
+    updateDisplay();
+  }
+}
+
+function stopTimer() {
+  state.isRunning = false;
+  state.isPaused = false;
+  if (state.timerId) {
+    if (typeof state.timerId === 'number') cancelAnimationFrame(state.timerId);
+    else clearInterval(state.timerId);
+    state.timerId = null;
+  }
+  updateButtons();
+}
+
+function pauseTimer() {
+  if (!state.isRunning || state.isPaused) return;
+  if (state.mode === 'stopwatch') {
+    state.isPaused = true;
+    state.isRunning = true;
+    clearInterval(state.timerId);
+    state.timerId = null;
+    updateButtons();
+    return;
+  }
+  state.isPaused = true;
+  state.isRunning = false;
+  if (state.timerId) cancelAnimationFrame(state.timerId);
+  state.timerId = null;
+  state._initialRemaining = state.remaining;
+  updateButtons();
+}
+
+function resetTimer() {
+  stopTimer();
+  if (state.mode === 'stopwatch') {
+    state.stopwatchTime = 0;
+  } else if (state.mode === 'pomodoro') {
+    state.isBreak = false;
+    state.pomoCycle = 0;
+    state.totalSeconds = 25 * 60;
+    state.remaining = 25 * 60;
+  } else {
+    state.remaining = state.totalSeconds;
+  }
+  updateDisplay();
+  renderPresets();
+  showToast('已重置');
+}
+
+function updateButtons() {
+  $('startBtn').style.display = (state.isRunning && !state.isPaused) ? 'none' : 'inline-flex';
+  $('pauseBtn').style.display = (state.isRunning && !state.isPaused) ? 'inline-flex' : 'none';
+  if (state.isPaused) {
+    $('startBtn').textContent = '继续';
+    $('startBtn').style.display = 'inline-flex';
+  } else if (state.mode === 'stopwatch' && state.stopwatchTime > 0 && !state.isRunning) {
+    $('startBtn').textContent = '继续';
+  } else {
+    $('startBtn').textContent = '开始';
+  }
+}
+
+$('startBtn').addEventListener('click', startTimer);
+$('pauseBtn').addEventListener('click', pauseTimer);
+$('resetBtn').addEventListener('click', resetTimer);
+
+/* Fullscreen */
+$('fullscreenBtn').addEventListener('click', toggleFullscreen);
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.code === 'Space') { e.preventDefault(); toggleFullscreen(); }
+});
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const btn = $('fullscreenBtn');
+  btn.textContent = document.fullscreenElement ? '⛶ 退出全屏' : '⛶ 全屏（空格键）';
+});
+
+/* Init */
+renderPresets();
+updateDisplay();
+renderHistory();
+</script>
+</body>
+</html>

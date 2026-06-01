@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FakeAPI · 假数据生成器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.control-group:last-child {
+  margin-bottom: 0;
+}
+
+.control-group > label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.3px;
+}
+
+.mode-selector {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 3px;
+  overflow: hidden;
+}
+
+.mode-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(139, 139, 248, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 8px 8px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+}
+
+.mode-btn.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.number-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.number-input-wrap:focus-within {
+  border-color: #8b8bf8;
+  box-shadow: 0 0 0 3px rgba(139, 139, 248, 0.2);
+}
+
+.number-input-wrap input[type="number"] {
+  background: transparent;
+  border: none;
+  padding: 11px 14px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+  -moz-appearance: textfield;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+}
+
+.number-input-wrap input[type="number"]::-webkit-inner-spin-button,
+.number-input-wrap input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.number-spinners {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.number-spinners button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.52);
+  cursor: pointer;
+  font-size: 8px;
+  padding: 0;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+.number-spinners button:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.number-spinners button:hover {
+  background: rgba(139, 139, 248, 0.15);
+  color: #8b8bf8;
+}
+
+.number-spinners button:active {
+  background: rgba(139, 139, 248, 0.25);
+  transform: scale(0.92);
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.3s;
+}
+
+.btn:hover::after {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: rgba(139, 139, 248, 0.6);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: rgba(139, 139, 248, 0.7);
+}
+
+.btn-success {
+  background: rgba(52, 199, 89, 0.55);
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: rgba(52, 199, 89, 0.65);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.preview-panel {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.preview-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.preview-header .stats {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.52);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-body {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 16px;
+  overflow: auto;
+  max-height: 500px;
+  min-height: 300px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  tab-size: 2;
+}
+
+.preview-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.preview-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  text-align: center;
+  gap: 8px;
+}
+
+.preview-placeholder svg {
+  width: 40px;
+  height: 40px;
+  color: rgba(139, 139, 248, 0.4);
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.field-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.field-checkbox:hover {
+  background: rgba(139, 139, 248, 0.08);
+  border-color: rgba(139, 139, 248, 0.2);
+}
+
+.field-checkbox.checked {
+  background: rgba(139, 139, 248, 0.12);
+  border-color: rgba(139, 139, 248, 0.3);
+}
+
+.field-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.field-checkbox .check-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.field-checkbox.checked .check-icon {
+  background: #8b8bf8;
+  border-color: #8b8bf8;
+}
+
+.field-checkbox .check-icon svg {
+  width: 9px;
+  height: 9px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.field-checkbox.checked .check-icon svg {
+  opacity: 1;
+}
+
+.toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30, 30, 30, 0.95);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-slide-up {
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Syntax highlighting */
+.token-key { color: #c084fc; }
+.token-string { color: #6ee7b7; }
+.token-number { color: #fbbf24; }
+.token-bool { color: #f472b6; }
+.token-punct { color: rgba(255,255,255,0.35); }
+.token-label { color: #93c5fd; }
+.csv-row { display: block; }
+.csv-cell { display: inline; }
+.csv-cell::after { content: ','; color: rgba(255,255,255,0.25); }
+.csv-cell:last-child::after { content: ''; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>FakeAPI</h1>
+  <p>假数据生成器 · 支持用户 / 文章 / 评论 / 产品 / 地址</p>
+</div>
+
+<div class="container">
+  <div class="main-layout">
+    <div class="panel fade-slide-up">
+      <div class="control-group">
+        <label>数据类型</label>
+        <div class="mode-selector" id="typeSelector">
+          <div class="mode-slider" id="typeSlider"></div>
+          <button class="mode-btn active" data-type="user">用户</button>
+          <button class="mode-btn" data-type="article">文章</button>
+          <button class="mode-btn" data-type="comment">评论</button>
+          <button class="mode-btn" data-type="product">产品</button>
+          <button class="mode-btn" data-type="address">地址</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>数量</label>
+        <div class="number-input-wrap">
+          <input type="number" id="countInput" value="5" min="1" max="1000" step="1">
+          <div class="number-spinners">
+            <button data-target="countInput" data-dir="up">
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button data-target="countInput" data-dir="down">
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>包含字段</label>
+        <div class="field-checkboxes" id="fieldCheckboxes"></div>
+      </div>
+
+      <div class="control-group">
+        <label>输出格式</label>
+        <div class="mode-selector" id="formatSelector" style="max-width:200px">
+          <div class="mode-slider" id="formatSlider"></div>
+          <button class="mode-btn active" data-format="json">JSON</button>
+          <button class="mode-btn" data-format="csv">CSV</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="generateBtn" style="width:100%;justify-content:center;margin-top:4px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        生成数据
+      </button>
+    </div>
+
+    <div class="panel preview-panel fade-slide-up">
+      <div class="preview-header">
+        <h3>预览</h3>
+        <span class="stats" id="statsInfo">等待生成</span>
+      </div>
+      <div class="preview-body" id="previewBody">
+        <div class="preview-placeholder" id="placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span>选择参数后点击「生成数据」</span>
+        </div>
+      </div>
+      <div class="actions-row" id="actionsRow">
+        <button class="btn btn-secondary btn-sm" id="copyBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          复制到剪贴板
+        </button>
+        <button class="btn btn-success btn-sm" id="downloadBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          下载文件
+        </button>
+        <button class="btn btn-outline btn-sm" id="regenerateBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          重新生成
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── Faker Engine ──────────────────────────────
+const firstNames = ['张','李','王','刘','陈','杨','黄','赵','周','吴','徐','孙','马','朱','胡','郭','何','高','林','罗','谢','梁','宋','唐','韩','冯','董','萧','曹','袁','邓','许','傅','沈','曾','彭','吕','苏','卢','蒋','蔡','贾','丁','魏','薛','叶','阎','余','潘','杜'];
+const lastNames = ['伟','芳','娜','敏','静','丽','强','磊','军','洋','勇','艳','杰','娟','涛','明','超','秀','霞','平','刚','华','飞','鑫','婷','雪','宇','浩','亮','颖','健','辉','琴','斌','琴','兰','峰','红','洁','晨','文','博','昊','欣','辰','熙','瑶','琪','霖','楠'];
+const domains = ['gmail.com','outlook.com','qq.com','163.com','icloud.com','foxmail.com','yahoo.com','hotmail.com'];
+const streets = ['中山路','人民路','解放路','建设路','和平路','长安街','南京路','淮海路','延安路','复兴路','科技大道','创新路','博学路','学府路','文化路','滨江路','湖滨路','花园路','玉兰路','紫荆路'];
+const districts = ['朝阳区','海淀区','浦东新区','天河区','南山区','西湖区','武侯区','雁塔区','鼓楼区','思明区','渝中区','锦江区','姑苏区','洪山区','历下区'];
+const cities = ['北京','上海','广州','深圳','杭州','成都','武汉','南京','西安','重庆','苏州','厦门','长沙','郑州','青岛','大连','宁波','昆明','合肥','福州'];
+const provinces = ['北京市','上海市','广东省','浙江省','江苏省','四川省','湖北省','陕西省','重庆市','福建省','湖南省','河南省','山东省','辽宁省','安徽省','云南省'];
+const articleTemplates = [
+  { title: '深入理解%s技术原理', words: '本文将从底层原理出发，深入探讨%s的核心机制与实现方案。通过分析%s的架构设计，帮助读者建立完整的知识体系。' },
+  { title: '%s最佳实践指南', words: '在实际项目中合理运用%s可以显著提升开发效率。本文总结了%s的多种最佳实践方案，涵盖性能优化、安全加固等关键环节。' },
+  { title: '从零开始学%s', words: '本系列教程将从零开始带领读者掌握%s的核心概念与操作方法。无论你是初学者还是进阶开发者，都能从中获得启发。' },
+  { title: '%s性能优化全攻略', words: '性能是用户体验的关键。本文将从多个维度剖析%s的性能瓶颈，并提供切实可行的优化方案与实战案例。' },
+  { title: '%s vs %s：全面对比分析', words: '在技术选型过程中，%s与%s的对比一直是开发者关注的焦点。本文将从性能、生态、学习曲线等角度进行全方位对比。' },
+];
+const techTerms = ['微服务','容器化','DevOps','云原生','Serverless','机器学习','深度学习','大数据','区块链','边缘计算','WebAssembly','Rust','Go','React','Vue','TypeScript','Node.js','Kubernetes','Docker','Git','RESTful','GraphQL','gRPC','MQTT','WebSocket'];
+const productAdjs = ['智能','便携','超薄','专业','轻量','高端','经典','时尚','全能','极速','静音','无线','节能','精准','舒适'];
+const productNouns = ['笔记本','键盘','鼠标','耳机','音箱','显示器','手机壳','充电器','数据线','支架','手表','手环','相机','背包','台灯','水杯','收纳盒','鼠标垫','电脑包','散热器'];
+const commentTexts = [
+  '非常棒的内容，受益匪浅！',
+  '写得很好，条理清晰，逻辑严谨。',
+  '赞！已经收藏了，期待更多更新。',
+  '有个小建议，如果能补充实际案例就更好了。',
+  '终于有人把这个讲清楚了，感谢作者！',
+  '干货满满，先收藏再慢慢看。',
+  '这个方案我已经在项目中实践了，效果很好。',
+  '文章质量很高，转给团队一起学习。',
+  '有点疑惑，这里能不能再详细解释一下？',
+  '对比分析很到位，解决了我的选型困惑。',
+  '太强了，这就是我一直找的解决方案！',
+  '虽然有些地方不太懂，但整体很有启发。',
+  '亲测有效，强烈推荐给各位同行。',
+  '写的很用心，每一个点都讲得很透彻。',
+  '好文！已分享到技术群里了。',
+];
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function randFloat(min, max, decimals) {
+  const val = Math.random() * (max - min) + min;
+  return parseFloat(val.toFixed(decimals || 2));
+}
+
+function genChineseName() {
+  return pick(firstNames) + pick(lastNames) + pick(lastNames);
+}
+
+function genEnglishName() {
+  const cons = 'bcdfghjklmnpqrstvwxyz';
+  const vows = 'aeiou';
+  const len = randInt(3, 7);
+  let name = '';
+  for (let i = 0; i < len; i++) {
+    name += i % 2 === 0 ? pick(cons) : pick(vows);
+  }
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function genEmail() {
+  return genEnglishName().toLowerCase() + randInt(10, 99) + '@' + pick(domains);
+}
+
+function genPhone() {
+  const prefixes = ['13','15','17','18','19'];
+  let phone = pick(prefixes) + randInt(0, 9);
+  for (let i = 0; i < 8; i++) phone += randInt(0, 9);
+  return phone;
+}
+
+function genAddress() {
+  const province = pick(provinces);
+  const city = pick(cities);
+  const district = pick(districts);
+  const street = pick(streets) + randInt(1, 999) + '号';
+  return province + city + district + street;
+}
+
+function genCompany() {
+  const prefixes = ['北京','上海','深圳','杭州','广州','成都','南京','武汉'];
+  const cores = ['云创','智联','数科','未来','星河','昆仑','星辰','天际','锐思','博远','明达','华创'];
+  const suffixes = ['科技有限公司','信息技术有限公司','网络科技有限公司','数据技术有限公司','智能科技有限公司','数字科技有限公司'];
+  return pick(prefixes) + pick(cores) + pick(suffixes);
+}
+
+function genArticleTitle() {
+  const tpl = pick(articleTemplates);
+  const terms = [pick(techTerms), pick(techTerms)];
+  let title = tpl.title.replace(/%s/g, () => terms.shift() || pick(techTerms));
+  return title;
+}
+
+function genArticleContent() {
+  const tpl = pick(articleTemplates);
+  const terms = [pick(techTerms), pick(techTerms), pick(techTerms)];
+  let content = tpl.words.replace(/%s/g, () => terms.shift() || pick(techTerms));
+  const extra = randInt(1, 3);
+  for (let i = 0; i < extra; i++) {
+    content += ' ' + pick(commentTexts);
+  }
+  return content;
+}
+
+function genProductName() {
+  return pick(productAdjs) + pick(productNouns);
+}
+
+function genProductDesc() {
+  const descs = [
+    '采用优质材料制造，经久耐用。',
+    '人体工学设计，使用舒适。',
+    '时尚简约外观，适合各种场景。',
+    '经过严格质检，品质有保障。',
+    '全新升级版本，性能更强劲。',
+    '环保材质，安全无毒。',
+    '多色可选，满足个性需求。',
+    '轻巧便携，随身携带无负担。',
+  ];
+  return pick(descs) + pick(descs);
+}
+
+function genComment() {
+  return pick(commentTexts);
+}
+
+function genDate(startYear, endYear) {
+  const y = randInt(startYear || 2022, endYear || 2025);
+  const m = String(randInt(1, 12)).padStart(2, '0');
+  const d = String(randInt(1, 28)).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function genUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+// ─── Field Definitions ─────────────────────────
+const fieldDefs = {
+  user: [
+    { key: 'id', label: 'ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'name', label: '姓名', gen: genChineseName },
+    { key: 'email', label: '邮箱', gen: genEmail },
+    { key: 'phone', label: '电话', gen: genPhone },
+    { key: 'address', label: '地址', gen: genAddress },
+    { key: 'company', label: '公司', gen: genCompany },
+    { key: 'age', label: '年龄', gen: () => randInt(18, 65) },
+    { key: 'createdAt', label: '创建时间', gen: () => genDate(2020, 2025) },
+  ],
+  article: [
+    { key: 'id', label: 'ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'title', label: '标题', gen: genArticleTitle },
+    { key: 'content', label: '内容', gen: genArticleContent },
+    { key: 'author', label: '作者', gen: genChineseName },
+    { key: 'category', label: '分类', gen: () => pick(['前端','后端','AI','云原生','数据库','运维','安全','移动端']) },
+    { key: 'views', label: '阅读量', gen: () => randInt(100, 99999) },
+    { key: 'likes', label: '点赞', gen: () => randInt(0, 9999) },
+    { key: 'publishedAt', label: '发布日期', gen: () => genDate(2023, 2025) },
+  ],
+  comment: [
+    { key: 'id', label: 'ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'content', label: '内容', gen: genComment },
+    { key: 'author', label: '评论者', gen: genChineseName },
+    { key: 'email', label: '邮箱', gen: genEmail },
+    { key: 'articleId', label: '文章ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'likes', label: '点赞', gen: () => randInt(0, 999) },
+    { key: 'createdAt', label: '评论时间', gen: () => genDate(2024, 2025) },
+  ],
+  product: [
+    { key: 'id', label: 'ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'name', label: '产品名', gen: genProductName },
+    { key: 'description', label: '描述', gen: genProductDesc },
+    { key: 'price', label: '价格', gen: () => randFloat(9.9, 9999, 2) },
+    { key: 'category', label: '分类', gen: () => pick(['电子产品','家居','办公','数码','配件','生活']) },
+    { key: 'stock', label: '库存', gen: () => randInt(0, 9999) },
+    { key: 'rating', label: '评分', gen: () => randFloat(1, 5, 1) },
+    { key: 'createdAt', label: '上架时间', gen: () => genDate(2023, 2025) },
+  ],
+  address: [
+    { key: 'id', label: 'ID', gen: () => genUUID().slice(0, 8) },
+    { key: 'name', label: '收件人', gen: genChineseName },
+    { key: 'phone', label: '电话', gen: genPhone },
+    { key: 'province', label: '省份', gen: () => pick(provinces) },
+    { key: 'city', label: '城市', gen: () => pick(cities) },
+    { key: 'district', label: '区/县', gen: () => pick(districts) },
+    { key: 'street', label: '街道', gen: () => pick(streets) + randInt(1, 999) + '号' },
+    { key: 'zipCode', label: '邮编', gen: () => String(randInt(100000, 999999)) },
+  ],
+};
+
+// ─── State ─────────────────────────────────────
+const state = {
+  currentType: 'user',
+  currentFormat: 'json',
+  currentData: null,
+  enabledFields: {},
+};
+
+function getFieldsForType(type) {
+  return fieldDefs[type] || fieldDefs.user;
+}
+
+// ─── DOM refs ──────────────────────────────────
+const typeBtns = document.querySelectorAll('#typeSelector .mode-btn');
+const typeSlider = document.getElementById('typeSlider');
+const formatBtns = document.querySelectorAll('#formatSelector .mode-btn');
+const formatSlider = document.getElementById('formatSlider');
+const countInput = document.getElementById('countInput');
+const fieldCheckboxes = document.getElementById('fieldCheckboxes');
+const generateBtn = document.getElementById('generateBtn');
+const previewBody = document.getElementById('previewBody');
+const placeholder = document.getElementById('placeholder');
+const statsInfo = document.getElementById('statsInfo');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const regenerateBtn = document.getElementById('regenerateBtn');
+const toastEl = document.getElementById('toast');
+
+// ─── Slider Logic ──────────────────────────────
+function moveSlider(btn, sliderEl) {
+  const container = btn.closest('.mode-selector');
+  const cRect = container.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  sliderEl.style.left = (bRect.left - cRect.left) + 'px';
+  sliderEl.style.width = bRect.width + 'px';
+}
+
+function initSlider(selector, sliderEl) {
+  const active = document.querySelector(selector + ' .mode-btn.active');
+  if (active) moveSlider(active, sliderEl);
+}
+
+// ─── Fields UI ─────────────────────────────────
+function renderFields(type) {
+  const fields = getFieldsForType(type);
+  const enabled = state.enabledFields[type];
+  const checkedKeys = enabled ? enabled : fields.map(f => f.key);
+
+  state.enabledFields[type] = checkedKeys;
+
+  fieldCheckboxes.innerHTML = fields.map(f => {
+    const checked = checkedKeys.includes(f.key);
+    return `
+      <label class="field-checkbox ${checked ? 'checked' : ''}" data-key="${f.key}">
+        <span class="check-icon">
+          <svg viewBox="0 0 12 12" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="2 6 5 9 10 2"/>
+          </svg>
+        </span>
+        ${escHtml(f.label)}
+      </label>
+    `;
+  }).join('');
+
+  fieldCheckboxes.querySelectorAll('.field-checkbox').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('checked');
+      const key = el.dataset.key;
+      const arr = state.enabledFields[type];
+      if (el.classList.contains('checked')) {
+        if (!arr.includes(key)) arr.push(key);
+      } else {
+        const idx = arr.indexOf(key);
+        if (idx > -1) arr.splice(idx, 1);
+      }
+    });
+  });
+}
+
+// ─── Data Generation ───────────────────────────
+function generateData() {
+  const type = state.currentType;
+  const count = parseInt(countInput.value) || 5;
+  const fields = getFieldsForType(type);
+  const enabledKeys = state.enabledFields[type] || fields.map(f => f.key);
+  const enabledFieldDefs = fields.filter(f => enabledKeys.includes(f.key));
+
+  const data = [];
+  for (let i = 0; i < count; i++) {
+    const item = {};
+    for (const fd of enabledFieldDefs) {
+      item[fd.key] = fd.gen();
+    }
+    data.push(item);
+  }
+  return data;
+}
+
+function getFormat() {
+  return state.currentFormat;
+}
+
+function formatJSON(data) {
+  return JSON.stringify(data, null, 2);
+}
+
+function formatCSV(data) {
+  if (!data || data.length === 0) return '';
+  const headers = Object.keys(data[0]);
+  const lines = [headers.join(',')];
+  for (const item of data) {
+    const row = headers.map(h => {
+      let val = item[h];
+      if (val === null || val === undefined) val = '';
+      val = String(val);
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+        val = '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    });
+    lines.push(row.join(','));
+  }
+  return lines.join('\n');
+}
+
+let currentRawData = null;
+
+function doGenerate() {
+  const data = generateData();
+  currentRawData = data;
+  state.currentData = data;
+  renderOutput(data);
+}
+
+function renderOutput(data) {
+  const format = getFormat();
+  let output;
+  if (format === 'json') {
+    output = formatJSON(data);
+  } else {
+    output = formatCSV(data);
+  }
+
+  placeholder.style.display = 'none';
+  previewBody.innerHTML = '';
+  previewBody.style.whiteSpace = 'pre-wrap';
+
+  if (format === 'json') {
+    const highlighted = syntaxHighlightJSON(output);
+    previewBody.innerHTML = highlighted;
+  } else {
+    previewBody.textContent = output;
+  }
+
+  const records = Array.isArray(data) ? data.length : 0;
+  const fields = records > 0 ? Object.keys(data[0]).length : 0;
+  statsInfo.textContent = `${records} 条记录 · ${fields} 个字段 · ${format.toUpperCase()}`;
+}
+
+function syntaxHighlightJSON(json) {
+  return json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"([^"]+)":/g, '<span class="token-label">"$1"</span>:')
+    .replace(/"([^"]+)"(?=\s*[,}\]])/g, '<span class="token-string">"$1"</span>')
+    .replace(/\b(\d+\.?\d*)\b/g, '<span class="token-number">$1</span>')
+    .replace(/\b(true|false)\b/g, '<span class="token-bool">$1</span>')
+    .replace(/\b(null)\b/g, '<span class="token-bool">$1</span>')
+    .replace(/([{}\[\]])/g, '<span class="token-punct">$1</span>');
+}
+
+// ─── Actions ───────────────────────────────────
+function getOutputText() {
+  const format = getFormat();
+  if (format === 'json') {
+    return formatJSON(currentRawData);
+  }
+  return formatCSV(currentRawData);
+}
+
+function getFilename() {
+  const type = state.currentType;
+  const format = getFormat();
+  const ext = format === 'json' ? 'json' : 'csv';
+  return `fake_${type}_${Date.now()}.${ext}`;
+}
+
+copyBtn.addEventListener('click', async () => {
+  if (!currentRawData || currentRawData.length === 0) {
+    showToast('请先生成数据');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(getOutputText());
+    showToast('已复制到剪贴板');
+  } catch {
+    showToast('复制失败');
+  }
+});
+
+downloadBtn.addEventListener('click', () => {
+  if (!currentRawData || currentRawData.length === 0) {
+    showToast('请先生成数据');
+    return;
+  }
+  const blob = new Blob([getOutputText()], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.download = getFilename();
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已下载: ' + link.download);
+});
+
+regenerateBtn.addEventListener('click', doGenerate);
+
+// ─── Type Change ───────────────────────────────
+typeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    typeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, typeSlider);
+    state.currentType = btn.dataset.type;
+    renderFields(state.currentType);
+    currentRawData = null;
+    state.currentData = null;
+    placeholder.style.display = 'flex';
+    previewBody.innerHTML = '';
+    previewBody.appendChild(placeholder);
+    statsInfo.textContent = '等待生成';
+  });
+});
+
+formatBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    formatBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, formatSlider);
+    state.currentFormat = btn.dataset.format;
+    if (currentRawData && currentRawData.length > 0) {
+      renderOutput(currentRawData);
+    }
+  });
+});
+
+// Number spinners
+document.querySelectorAll('.number-spinners button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    const step = parseInt(input.step) || 1;
+    const min = parseInt(input.min) || 0;
+    const max = parseInt(input.max) || 10000;
+    let val = parseInt(input.value) || 0;
+    val = btn.dataset.dir === 'up' ? Math.min(val + step, max) : Math.max(val - step, min);
+    input.value = val;
+  });
+});
+
+// Generate
+generateBtn.addEventListener('click', doGenerate);
+
+// Enter key on count input
+countInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') doGenerate();
+});
+
+// ─── Toast ─────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// ─── Helpers ───────────────────────────────────
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ─── Init ──────────────────────────────────────
+initSlider('#typeSelector .mode-btn.active', typeSlider);
+initSlider('#formatSelector .mode-btn.active', formatSlider);
+renderFields('user');
+</script>
+</body>
+</html>

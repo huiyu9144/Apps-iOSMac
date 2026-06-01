@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JiaRemoteWin")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e22acd6f0381376e68ab174f6d405fa4689b8855")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8392dcb40529ebaaba8a56e89322fc117392257c")]
 [assembly: System.Reflection.AssemblyProductAttribute("JiaRemoteWin")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JiaRemoteWin")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

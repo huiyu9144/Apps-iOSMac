@@ -190,6 +190,7 @@ enum JiaProtocol {
         static let frameChannelPrefix = "JR_FRAME"
         static let commandChannelPrefix = "JR_CMD"
         static let maxFrameSize = 256 * 1024 * 1024
+        static let compressionFlag: UInt32 = 0x80000000
     }
 
     static func encodeCommand(type: CommandType, payload: some Encodable) -> Data? {

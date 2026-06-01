@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Color Match</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;
+  background:#000;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:32px 16px 48px;-webkit-font-smoothing:antialiased
+}
+.header{text-align:center;margin-bottom:28px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-.5px;background:linear-gradient(135deg,#ffa94d,#ff6b9d,#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:.2px}
+.container{width:100%;max-width:1000px;display:flex;flex-direction:column;gap:20px}
+
+/* Upload */
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.upload-card{background:rgba(255,255,255,.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);text-align:center;cursor:pointer;transition:all .35s;animation:fadeSlideUp .35s both}
+.upload-card:hover{border-color:rgba(255,107,107,.5)}
+.upload-card .label{font-size:12px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px}
+.upload-card .icon{width:28px;height:28px;margin:0 auto 8px;color:rgba(255,255,255,.3)}
+.upload-card p{font-size:13px;color:rgba(255,255,255,.6)}
+.upload-card .hint{font-size:11px;color:rgba(255,255,255,.3);margin-top:4px}
+.upload-card.done{background:rgba(255,107,107,.08)}
+.upload-card.done p{color:rgba(255,255,255,.85)}
+
+/* Image List */
+.image-list-section{background:rgba(255,255,255,.06);border-radius:14px;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:fadeSlideUp .35s both}
+.image-list-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;font-size:13px;font-weight:500;color:rgba(255,255,255,.78);border-bottom:1px solid rgba(255,255,255,.06)}
+.image-list-header .count{color:#ff6b6b;font-weight:600}
+.image-list-body{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;max-height:192px;overflow-y:auto;align-content:flex-start}
+.image-list-body::-webkit-scrollbar{width:4px}
+.image-list-body::-webkit-scrollbar-track{background:transparent}
+.image-list-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px}
+.image-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:6px 6px 8px;border-radius:10px;cursor:pointer;transition:all .25s;flex-shrink:0;width:108px;position:relative;background:transparent}
+.image-item:hover{background:rgba(255,255,255,.05);transform:translateY(-1px)}
+.image-item.active{background:rgba(255,107,107,.12);outline:1.5px solid rgba(255,107,107,.35)}
+.image-item-thumb{width:92px;height:68px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,.04);flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.image-item-name{font-size:10px;color:rgba(255,255,255,.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400;letter-spacing:.2px}
+.image-item-dims{font-size:9px;color:rgba(255,255,255,.3);margin-top:1px;font-variant-numeric:tabular-nums}
+.image-item-remove{position:absolute;top:1px;right:1px;width:20px;height:20px;border-radius:50%;border:none;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;font-size:11px;display:none;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(4px);z-index:2}
+.image-item:hover .image-item-remove{display:flex}
+.image-item-remove:hover{background:rgba(255,69,58,.8);transform:scale(1.1)}
+
+/* Controls */
+.controls-card{background:rgba(255,255,255,.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:fadeSlideUp .35s both}
+.control-row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+.control-group{flex:1;min-width:160px}
+.control-group label{font-size:12px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.3px;display:block;margin-bottom:6px}
+.method-select{display:flex;gap:4px;flex-wrap:wrap}
+.method-opt{padding:6px 10px;border-radius:7px;border:1.5px solid rgba(255,255,255,.06);background:rgba(0,0,0,.3);color:rgba(255,255,255,.45);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit}
+.method-opt:hover{border-color:rgba(255,107,107,.25);color:rgba(255,255,255,.75)}
+.method-opt.active{background:rgba(255,107,107,.15);border-color:rgba(255,107,107,.35);color:#fff;font-weight:600}
+.control-group .slider-row{display:flex;align-items:center;gap:10px}
+.control-group input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:4px;background:rgba(255,255,255,.1);border-radius:2px;outline:none}
+.control-group input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#ff6b6b;cursor:pointer;border:2px solid rgba(255,255,255,.2)}
+.control-group .slider-val{width:32px;text-align:right;font-size:12px;color:rgba(255,255,255,.5);font-family:'SF Mono','Consolas',monospace}
+.method-desc{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px;line-height:1.5}
+
+/* Preview */
+.preview-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;animation:fadeSlideUp .35s both}
+.preview-card{background:rgba(255,255,255,.06);border-radius:14px;overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.preview-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);border-bottom:1px solid rgba(255,255,255,.06)}
+.preview-header .dim{color:rgba(255,255,255,.3);font-weight:400;font-size:11px}
+.preview-wrap{display:flex;align-items:center;justify-content:center;min-height:200px;padding:10px;background:repeating-conic-gradient(rgba(255,255,255,.04) 0% 25%,rgba(255,255,255,.08) 0% 50%) 0 0 / 18px 18px}
+.preview-wrap canvas{max-width:100%;max-height:320px;border-radius:6px;display:block;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.preview-placeholder{color:rgba(255,255,255,.35);font-size:12px;text-align:center;padding:40px 16px}
+.status-bar{display:none;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.06);font-size:12px;color:rgba(255,255,255,.45)}
+.status-bar.show{display:flex}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,107,107,.2);border-top-color:#ff6b6b;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Progress */
+.progress-wrap{display:none;width:100%}.progress-wrap.show{display:block;animation:fadeSlideUp .3s both}
+.progress-bar-track{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#ff6b6b,#ffa94d);border-radius:2px;width:0%;transition:width .3s}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.56);margin-top:6px}
+
+/* Actions */
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeSlideUp .35s both}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:.3px}
+.btn:hover{opacity:.85}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:rgba(255,107,107,.6);color:#fff}
+.btn-primary:hover{background:rgba(255,107,107,.7)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-secondary{background:rgba(255,255,255,.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,.3);color:#fff}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,.95);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all .4s;pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);align-items:center;justify-content:center;animation:fadeIn .25s both}
+.lightbox.show{display:flex}
+.lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:lightboxIn .3s cubic-bezier(.19,1,.32,1) both}
+@keyframes lightboxIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.lightbox-close{position:fixed;top:24px;right:28px;background:none;border:none;color:rgba(255,255,255,.5);font-size:32px;cursor:pointer;transition:color .2s;z-index:210;line-height:1}
+.lightbox-close:hover{color:#fff}
+.lightbox-label{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:13px;font-weight:500;pointer-events:none;z-index:210}
+
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:700px){body{padding:20px 12px 40px}.upload-grid{grid-template-columns:1fr}.preview-grid{grid-template-columns:1fr}.header h1{font-size:24px}.image-item{width:100px}.image-item-thumb{width:84px;height:62px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Color Match</h1>
+  <p>颜色迁移 · 一键将参考图的色调应用到目标图</p>
+</div>
+
+<div class="container">
+
+  <div class="upload-grid">
+    <div class="upload-card" id="targetArea">
+      <div class="label">目标图片</div>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <p id="targetLabel">点击上传目标图片</p>
+      <div class="hint">需要调整色调的图片（可多张）</div>
+      <input type="file" id="targetInput" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="upload-card" id="refArea">
+      <div class="label">参考图片</div>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+      <p id="refLabel">点击上传参考图片</p>
+      <div class="hint">目标色调来源</div>
+      <input type="file" id="refInput" accept="image/*" style="display:none">
+    </div>
+  </div>
+
+  <div class="image-list-section" id="imageListSection" style="display:none">
+    <div class="image-list-header">
+      <span>目标列表 <span class="count" id="imageCount">0</span> 张</span>
+      <button class="btn btn-outline" id="clearAllBtn" style="padding:5px 12px;font-size:11px;border-radius:8px">清空</button>
+    </div>
+    <div class="image-list-body" id="imageListBody"></div>
+  </div>
+
+  <div class="controls-card" id="controlsSection" style="display:none">
+    <div class="control-row">
+      <div class="control-group">
+        <label>方法</label>
+        <div class="method-select">
+          <button class="method-opt active" data-method="linear_rgb">Linear RGB</button>
+          <button class="method-opt" data-method="hist_match">直方图匹配</button>
+          <button class="method-opt" data-method="reinhard_lab">Reinhard Lab</button>
+        </div>
+        <div class="method-desc" id="methodDesc">线性 RGB 空间均值/标准差迁移 — 简单快速</div>
+      </div>
+      <div class="control-group" style="flex:0 0 180px">
+        <label>强度 <span class="slider-val" id="strengthVal">0.10</span></label>
+        <div class="slider-row"><input type="range" id="strengthSlider" min="0" max="100" value="10"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-primary" id="applyBtn" style="padding:8px 18px;font-size:13px">应用匹配</button>
+    </div>
+  </div>
+
+  <div class="preview-grid" id="previewSection" style="display:none">
+    <div class="preview-card"><div class="preview-header"><span>原始目标</span><span class="dim" id="origDims">—</span></div><div class="preview-wrap"><canvas id="origCanvas"></canvas><div class="preview-placeholder" id="origPlaceholder">上传目标图</div></div></div>
+    <div class="preview-card"><div class="preview-header"><span>参考图</span><span class="dim" id="refDims">—</span></div><div class="preview-wrap"><canvas id="refPreviewCanvas"></canvas><div class="preview-placeholder" id="refPreviewPlaceholder">等待上传</div></div></div>
+    <div class="preview-card"><div class="preview-header"><span>匹配结果</span><span class="dim" id="resultDims">—</span></div><div class="preview-wrap"><canvas id="resultCanvas"></canvas><div class="preview-placeholder" id="resultPlaceholder">点击「应用」预览</div></div>
+    <div class="status-bar" id="statusBar"><div class="spinner"></div><span id="statusText">处理中...</span></div>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressText">处理中...</span><span id="progressPercent">0%</span></div>
+  </div>
+
+  <div class="actions" id="actionsSection" style="display:none">
+    <button class="btn btn-primary" id="downloadBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>下载当前</button>
+    <button class="btn btn-primary" id="downloadAllBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>匹配全部 <span id="batchCount">(0)</span></button>
+    <button class="btn btn-secondary" id="addMoreBtn">添加更多</button>
+    <button class="btn btn-outline" id="resetBtn">重新开始</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="" alt="">
+  <div class="lightbox-label" id="lightboxLabel"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// 颜色匹配引擎 — 优化版
+// 1) 256-entry LUT 替代 Math.pow 做 sRGB gamma
+// 2) Reinhard Lab 复用一次 Lab 计算结果（减少 1/3 转换量）
+// 3) 预览降采样到 max 800px
+// 4) 批量处理 + ZIP 下载
+// ═══════════════════════════════════════════════════════════
+
+// ─── 256-entry LUT (代替 per-pixel Math.pow) ─────
+const SRGB_TO_LIN = new Float64Array(256);
+const LIN_TO_SRGB = new Float32Array(256);
+for (let i = 0; i < 256; i++) {
+  const v = i / 255;
+  SRGB_TO_LIN[i] = v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+}
+for (let i = 0; i < 256; i++) {
+  const v = i / 255;
+  LIN_TO_SRGB[i] = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1/2.4) - 0.055;
+}
+
+// ─── sRGB ↔ Linear (LUT) ──────────────────────────
+function srgbToLin(v) { return SRGB_TO_LIN[Math.round(v * 255)]; }
+function linToSrgb(v) { return LIN_TO_SRGB[Math.round(v * 255)]; }
+// Normal version for Lab output where values may be out of [0,1]
+function linToSrgbFull(v) { const x = Math.max(0, Math.min(1, v)); return x <= 0.0031308 ? 12.92 * x : 1.055 * Math.pow(x, 1/2.4) - 0.055; }
+
+// ─── RGB ↔ Lab (内联优化，避免重复转换) ──────────
+const M_SRGB_XYZ = [0.4124564,0.3575761,0.1804375, 0.2126729,0.7151522,0.0721750, 0.0193339,0.1191920,0.9503041];
+const M_XYZ_SRGB = [3.2404542,-1.5371385,-0.4985314, -0.9692660,1.8760108,0.0415560, 0.0556434,-0.2040259,1.0572252];
+const D65_X = 0.95047, D65_Y = 1.0, D65_Z = 1.08883;
+
+function rgbToLabArr(r, g, b, out, off) {
+  const lr = srgbToLin(r), lg = srgbToLin(g), lb = srgbToLin(b);
+  const x = M_SRGB_XYZ[0]*lr + M_SRGB_XYZ[1]*lg + M_SRGB_XYZ[2]*lb;
+  const y = M_SRGB_XYZ[3]*lr + M_SRGB_XYZ[4]*lg + M_SRGB_XYZ[5]*lb;
+  const z = M_SRGB_XYZ[6]*lr + M_SRGB_XYZ[7]*lg + M_SRGB_XYZ[8]*lb;
+  const fx = x/D65_X > 0.008856 ? Math.cbrt(x/D65_X) : (7.787*x/D65_X + 16/116);
+  const fy = y/D65_Y > 0.008856 ? Math.cbrt(y/D65_Y) : (7.787*y/D65_Y + 16/116);
+  const fz = z/D65_Z > 0.008856 ? Math.cbrt(z/D65_Z) : (7.787*z/D65_Z + 16/116);
+  out[off] = 116*fy - 16; out[off+1] = 500*(fx-fy); out[off+2] = 200*(fy-fz);
+}
+
+function labToRgbArr(l, a, b) {
+  const fy = (l + 16) / 116, fx = a/500 + fy, fz = fy - b/200;
+  const x = (fx**3 > 0.008856 ? fx**3 : (fx - 16/116) / 7.787) * D65_X;
+  const y = (fy**3 > 0.008856 ? fy**3 : (fy - 16/116) / 7.787) * D65_Y;
+  const z = (fz**3 > 0.008856 ? fz**3 : (fz - 16/116) / 7.787) * D65_Z;
+  let r = M_XYZ_SRGB[0]*x + M_XYZ_SRGB[1]*y + M_XYZ_SRGB[2]*z;
+  let g = M_XYZ_SRGB[3]*x + M_XYZ_SRGB[4]*y + M_XYZ_SRGB[5]*z;
+  let b2 = M_XYZ_SRGB[6]*x + M_XYZ_SRGB[7]*y + M_XYZ_SRGB[8]*z;
+  return { r: linToSrgbFull(r), g: linToSrgbFull(g), b: linToSrgbFull(b2) };
+}
+
+// ─── 统计 ──────────────────────────────────────────
+function computeStats3(data, n) {
+  let s0=0,s1=0,s2=0, sq0=0,sq1=0,sq2=0;
+  for (let i = 0; i < n; i++) { const o=i*3; s0+=data[o];s1+=data[o+1];s2+=data[o+2]; sq0+=data[o]*data[o];sq1+=data[o+1]*data[o+1];sq2+=data[o+2]*data[o+2]; }
+  const mn = n; return {
+    m:[s0/mn||0,s1/mn||0,s2/mn||0],
+    s:[Math.sqrt(Math.max(0,sq0/mn-(s0/mn)**2))||1e-6,Math.sqrt(Math.max(0,sq1/mn-(s1/mn)**2))||1e-6,Math.sqrt(Math.max(0,sq2/mn-(s2/mn)**2))||1e-6]
+  };
+}
+
+// ─── 算法: Linear RGB ──────────────────────────────
+function linearRgb(imgData, refData, strength) {
+  const d=imgData.data, r=refData.data, n=d.length/4, w=imgData.width, h=imgData.height;
+  if (!n) return imgData;
+  const tl=new Float64Array(n*3), rl=new Float64Array(n*3);
+  for (let i=0;i<n;i++){const o=i*4;tl[i*3]=srgbToLin(d[o]/255);tl[i*3+1]=srgbToLin(d[o+1]/255);tl[i*3+2]=srgbToLin(d[o+2]/255);rl[i*3]=srgbToLin(r[o]/255);rl[i*3+1]=srgbToLin(r[o+1]/255);rl[i*3+2]=srgbToLin(r[o+2]/255)}
+  const ts=computeStats3(tl,n), rs=computeStats3(rl,n);
+  const out=new Uint8ClampedArray(d.length);
+  for (let i=0;i<n;i++){const o=i*4,ti=i*3;let r2=(tl[ti]-ts.m[0])*rs.s[0]/ts.s[0]+rs.m[0],g2=(tl[ti+1]-ts.m[1])*rs.s[1]/ts.s[1]+rs.m[1],b2=(tl[ti+2]-ts.m[2])*rs.s[2]/ts.s[2]+rs.m[2];const or=tl[ti],og=tl[ti+1],ob=tl[ti+2];r2=or+strength*(r2-or);g2=og+strength*(g2-og);b2=ob+strength*(b2-ob);out[o]=Math.max(0,Math.min(255,linToSrgbFull(r2)*255));out[o+1]=Math.max(0,Math.min(255,linToSrgbFull(g2)*255));out[o+2]=Math.max(0,Math.min(255,linToSrgbFull(b2)*255));out[o+3]=d[o+3]}
+  return new ImageData(out,w,h);
+}
+
+// ─── 算法: 直方图匹配 ──────────────────────────────
+function histMatch(imgData, refData, strength) {
+  const d=imgData.data,r=refData.data,n=d.length/4,w=imgData.width,h=imgData.height;
+  if(!n)return imgData;
+  function cdf(data,ch){const h=new Float64Array(256);for(let i=0;i<n;i++)h[data[i*4+ch]]++;const c=new Float64Array(256);c[0]=h[0];for(let i=1;i<256;i++)c[i]=c[i-1]+h[i];const l=c[255];for(let i=0;i<256;i++)c[i]/=l;return c}
+  const map=[new Uint8Array(256),new Uint8Array(256),new Uint8Array(256)];
+  for(let c=0;c<3;c++){const tc=cdf(d,c),rc=cdf(r,c);let ri=0;for(let ti=0;ti<256;ti++){while(ri<255&&rc[ri]<tc[ti])ri++;map[c][ti]=ri}}
+  const out=new Uint8ClampedArray(d.length);
+  for(let i=0;i<n;i++){const o=i*4;for(let c=0;c<3;c++){const m=map[c][d[o+c]];out[o+c]=Math.max(0,Math.min(255,d[o+c]+strength*(m-d[o+c])))}out[o+3]=d[o+3]}
+  return new ImageData(out,w,h);
+}
+
+// ─── 算法: Reinhard Lab ────────────────────────────
+function reinhardLab(imgData, refData, strength) {
+  const d=imgData.data,r=refData.data,n=d.length/4,w=imgData.width,h=imgData.height;
+  if(!n)return imgData;
+  const tl=new Float64Array(n*3), rl=new Float64Array(n*3);
+  // 单次遍历：同时计算 target Lab 和 ref Lab
+  for(let i=0;i<n;i++){const o=i*4;rgbToLabArr(d[o]/255,d[o+1]/255,d[o+2]/255,tl,i*3);rgbToLabArr(r[o]/255,r[o+1]/255,r[o+2]/255,rl,i*3)}
+  const ts=computeStats3(tl,n), rs=computeStats3(rl,n);
+  const out=new Uint8ClampedArray(d.length);
+  for(let i=0;i<n;i++){const o=i*4,ti=i*3;
+    let l=(tl[ti]-ts.m[0])*rs.s[0]/ts.s[0]+rs.m[0];
+    let a=(tl[ti+1]-ts.m[1])*rs.s[1]/ts.s[1]+rs.m[1];
+    let b=(tl[ti+2]-ts.m[2])*rs.s[2]/ts.s[2]+rs.m[2];
+    l=tl[ti]+strength*(l-tl[ti]);a=tl[ti+1]+strength*(a-tl[ti+1]);b=tl[ti+2]+strength*(b-tl[ti+2]);
+    const {r:rr,g:gg,b:bb}=labToRgbArr(l,a,b);
+    out[o]=Math.max(0,Math.min(255,rr*255));out[o+1]=Math.max(0,Math.min(255,gg*255));out[o+2]=Math.max(0,Math.min(255,bb*255));out[o+3]=d[o+3]}
+  return new ImageData(out,w,h);
+}
+
+// ─── 统一入口 ──────────────────────────────────────
+function runMatch(imgData, refData, method, strength) {
+  switch(method){case'linear_rgb':return linearRgb(imgData,refData,strength);case'hist_match':return histMatch(imgData,refData,strength);case'reinhard_lab':return reinhardLab(imgData,refData,strength);default:return imgData}
+}
+
+function scaleImageData(imgData, maxDim) {
+  const w=imgData.width,h=imgData.height;if(w<=maxDim&&h<=maxDim)return imgData;
+  const s=Math.min(1,maxDim/Math.max(w,h)),nw=Math.round(w*s),nh=Math.round(h*s);
+  const c=document.createElement('canvas');c.width=nw;c.height=nh;
+  const t=document.createElement('canvas');t.width=w;t.height=h;t.getContext('2d').putImageData(imgData,0,0);
+  c.getContext('2d').drawImage(t,0,0,nw,nh);return c.getContext('2d').getImageData(0,0,nw,nh);
+}
+
+// ═══ 状态与 DOM ════════════════════════════════════
+const state={images:[],selectedId:null,refImg:null,method:'linear_rgb',strength:0.1,processing:false};
+let idCounter=0;
+const $=id=>document.getElementById(id);
+const targetArea=$('targetArea'),targetInput=$('targetInput'),targetLabel=$('targetLabel');
+const refArea=$('refArea'),refInput=$('refInput'),refLabel=$('refLabel');
+const imageListSection=$('imageListSection'),imageListBody=$('imageListBody'),imageCount=$('imageCount'),clearAllBtn=$('clearAllBtn');
+const controlsSection=$('controlsSection'),previewSection=$('previewSection'),actionsSection=$('actionsSection');
+const origCanvas=$('origCanvas'),resultCanvas=$('resultCanvas'),refPreviewCanvas=$('refPreviewCanvas');
+const origPlaceholder=$('origPlaceholder'),resultPlaceholder=$('resultPlaceholder'),refPreviewPlaceholder=$('refPreviewPlaceholder');
+const origDims=$('origDims'),resultDims=$('resultDims'),refDims=$('refDims');
+const methodOpts=document.querySelectorAll('.method-opt'),methodDesc=$('methodDesc');
+const strengthSlider=$('strengthSlider'),strengthVal=$('strengthVal');
+const applyBtn=$('applyBtn'),downloadBtn=$('downloadBtn'),downloadAllBtn=$('downloadAllBtn'),addMoreBtn=$('addMoreBtn'),resetBtn=$('resetBtn');
+const batchCount=$('batchCount'),progressWrap=$('progressWrap'),progressFill=$('progressFill'),progressText=$('progressText'),progressPercent=$('progressPercent');
+const statusBar=$('statusBar'),statusText=$('statusText'),toastEl=$('toast');
+const lightbox=$('lightbox'),lightboxImg=$('lightboxImg'),lightboxLabel=$('lightboxLabel'),lightboxClose=$('lightboxClose');
+
+const METHODS={linear_rgb:{label:'Linear RGB',desc:'线性 RGB 空间均值/标准差迁移 — 简单快速'},hist_match:{label:'直方图匹配',desc:'逐通道直方图匹配 — 精确匹配参考图色调分布'},reinhard_lab:{label:'Reinhard Lab',desc:'Lab 空间均值/标准差迁移 — 效果最自然'}};
+
+function getSelected(){return state.images.find(e=>e.id===state.selectedId)}
+
+// ─── 图片管理 ──────────────────────────────────────
+function loadRefImg(file){
+  const r=new FileReader();
+  r.onload=e=>{const img=new Image();img.onload=()=>{state.refImg=img;refArea.classList.add('done');refLabel.textContent=file.name;renderRefPreview();checkReady()};img.src=e.target.result};
+  r.readAsDataURL(file);
+}
+
+function addImages(files){
+  const p=[];
+  for(const f of files){if(!f.type.startsWith('image/'))continue;const id=++idCounter,e={id,file:f,name:f.name,img:null,width:0,height:0,loaded:false};state.images.push(e);p.push(e);const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{e.img=img;e.width=img.width;e.height=img.height;e.loaded=true;if(state.selectedId===e.id||!state.selectedId){if(!state.selectedId)selectImage(e.id);else if(e.id===state.selectedId){renderOrig(img);debounceMatch()}}renderList();updateCount()};img.src=ev.target.result};r.readAsDataURL(f)}
+  if(p.length){if(state.images.filter(e=>e.loaded).length===p.length)state.selectedId=p[0].id;showSections();renderList();updateCount()}
+}
+function removeImage(id){state.images=state.images.filter(e=>e.id!==id);if(state.selectedId===id)state.selectedId=state.images.length?state.images[0].id:null;renderList();updateCount();if(!state.images.length){resetAll();return}const e=getSelected();if(e&&e.loaded){renderOrig(e.img);debounceMatch()}else clearPreview()}
+function selectImage(id){state.selectedId=id;renderList();const e=getSelected();if(e&&e.loaded){renderOrig(e.img);debounceMatch()}}
+function renderList(){const l=state.images.filter(e=>e.loaded);imageCount.textContent=l.length;if(!l.length){imageListSection.style.display='none';return}imageListSection.style.display='block';imageListBody.innerHTML=l.map(e=>`<div class="image-item ${e.id===state.selectedId?'active':''}" data-id="${e.id}"><img class="image-item-thumb" src="${e.img.src}" loading="lazy"><div class="image-item-info"><div class="image-item-name">${esc(e.name)}</div><div class="image-item-dims">${e.width}×${e.height}</div></div><button class="image-item-remove" data-remove="${e.id}">✕</button></div>`).join('');imageListBody.querySelectorAll('.image-item').forEach(el=>el.addEventListener('click',ev=>{if(ev.target.closest('.image-item-remove'))return;selectImage(+el.dataset.id)}));imageListBody.querySelectorAll('.image-item-remove').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();removeImage(+b.dataset.remove)}))}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function showSections(){controlsSection.style.display='block';previewSection.style.display='grid';actionsSection.style.display='flex'}
+function updateCount(){batchCount.textContent=`(${state.images.filter(e=>e.loaded).length})`}
+function checkReady(){if(state.refImg&&state.images.filter(e=>e.loaded).length){showSections();const s=getSelected();if(s)renderOrig(s.img)}}
+
+// ─── 预览 ──────────────────────────────────────────
+function renderOrig(img){if(!img)return;origPlaceholder.style.display='none';const c=origCanvas,mh=320,s=img.height>mh?mh/img.height:1;c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,c.width,c.height);origDims.textContent=`${img.width}×${img.height}`;c.style.cursor='pointer'}
+function renderRefPreview(){if(!state.refImg)return;refPreviewPlaceholder.style.display='none';const img=state.refImg,c=refPreviewCanvas,mh=320,s=img.height>mh?mh/img.height:1;c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(img,0,0,c.width,c.height);refDims.textContent=`${img.width}×${img.height}`;c.style.cursor='pointer'}
+
+function openLightbox(src, label){
+  lightboxImg.src = src;
+  lightboxLabel.textContent = label;
+  lightbox.classList.add('show');
+}
+lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('show'); });
+lightboxClose.addEventListener('click', () => lightbox.classList.remove('show'));
+
+// Make preview canvases clickable
+function wireCanvasClick(canvas, srcGetter, label) {
+  canvas.addEventListener('click', () => openLightbox(srcGetter(), label));
+}
+function clearPreview(){origPlaceholder.style.display='block';resultPlaceholder.style.display='block';refPreviewPlaceholder.style.display='block';origDims.textContent='—';resultDims.textContent='—';refDims.textContent='—';origCanvas.width=0;origCanvas.height=0;resultCanvas.width=0;resultCanvas.height=0;refPreviewCanvas.width=0;refPreviewCanvas.height=0}
+
+let _raf=null;
+function debounceMatch(){if(_raf)cancelAnimationFrame(_raf);_raf=requestAnimationFrame(()=>{_raf=null;const s=getSelected();if(s&&s.loaded&&state.refImg)runPreview(s)})}
+
+async function runPreview(entry){
+  if(!entry||!entry.loaded||!state.refImg||state.processing)return;
+  const img=entry.img;state.processing=true;
+  statusBar.classList.add('show');statusText.textContent='处理中...';
+  try{
+    const getData=i=>{const c=document.createElement('canvas');c.width=i.width;c.height=i.height;c.getContext('2d').drawImage(i,0,0);return c.getContext('2d').getImageData(0,0,i.width,i.height)};
+    const tData=scaleImageData(getData(img),800),rData=getData(state.refImg);
+    let rr=rData;if(rr.width!==tData.width||rr.height!==tData.height){const c=document.createElement('canvas');c.width=tData.width;c.height=tData.height;const t=document.createElement('canvas');t.width=rr.width;t.height=rr.height;t.getContext('2d').putImageData(rr,0,0);c.getContext('2d').drawImage(t,0,0,c.width,c.height);rr=c.getContext('2d').getImageData(0,0,c.width,c.height)}
+    const t=performance.now();
+    state.result=runMatch(tData,rr,state.method,state.strength);
+    const el=((performance.now()-t)/1000).toFixed(2);
+    resultPlaceholder.style.display='none';const rc=resultCanvas,mh=320,s2=img.height>mh?mh/img.height:1;rc.width=Math.round(img.width*s2);rc.height=Math.round(img.height*s2);const dCvs=document.createElement('canvas');dCvs.width=state.result.width;dCvs.height=state.result.height;dCvs.getContext('2d').putImageData(state.result,0,0);rc.getContext('2d').drawImage(dCvs,0,0,rc.width,rc.height);resultDims.textContent=`${img.width}×${img.height}`;rc.style.cursor='pointer';statusText.textContent=`完成 (${el}s)`
+  }catch(err){console.error(err);statusText.textContent='出错: '+err.message}finally{state.processing=false;setTimeout(()=>{if(!state.processing)statusBar.classList.remove('show')},1200)}
+}
+
+// ─── 下载当前 ──────────────────────────────────────
+downloadBtn.addEventListener('click',()=>{
+  const s=getSelected();if(!s||!s.loaded||!state.refImg){showToast('请先选择图片并上传参考图');return}
+  const img=s.img,c=document.createElement('canvas');c.width=img.width;c.height=img.height;c.getContext('2d').drawImage(img,0,0);const tData=c.getContext('2d').getImageData(0,0,img.width,img.height);
+  const rc=document.createElement('canvas');rc.width=state.refImg.width;rc.height=state.refImg.height;rc.getContext('2d').drawImage(state.refImg,0,0);const rData=rc.getContext('2d').getImageData(0,0,state.refImg.width,state.refImg.height);
+  let rr=rData;if(rr.width!==tData.width||rr.height!==tData.height){const c2=document.createElement('canvas');c2.width=tData.width;c2.height=tData.height;const t2=document.createElement('canvas');t2.width=rr.width;t2.height=rr.height;t2.getContext('2d').putImageData(rr,0,0);c2.getContext('2d').drawImage(t2,0,0,c2.width,c2.height);rr=c2.getContext('2d').getImageData(0,0,c2.width,c2.height)}
+  const res=runMatch(tData,rr,state.method,state.strength);
+  const c3=document.createElement('canvas');c3.width=res.width;c3.height=res.height;c3.getContext('2d').putImageData(res,0,0);
+  const l=document.createElement('a');l.download=`${s.name.replace(/\.[^.]+$/,'')}_matched.png`;l.href=c3.toDataURL('image/png');l.click();showToast('已下载')
+});
+
+// ─── 批量 ZIP ──────────────────────────────────────
+downloadAllBtn.addEventListener('click',async()=>{
+  const loaded=state.images.filter(e=>e.loaded);if(!loaded.length||!state.refImg){showToast('没有可处理的图片或参考图');return}
+  downloadAllBtn.disabled=true;progressWrap.classList.add('show');progressFill.style.width='0%';
+  try{const zip=new JSZip();for(let i=0;i<loaded.length;i++){const e=loaded[i];progressText.textContent=`匹配: ${esc(e.name)}`;progressPercent.textContent=`${Math.round(i/loaded.length*100)}%`;progressFill.style.width=`${i/loaded.length*100}%`;await new Promise(r=>setTimeout(r,10));const c=document.createElement('canvas');c.width=e.img.width;c.height=e.img.height;c.getContext('2d').drawImage(e.img,0,0);const td=c.getContext('2d').getImageData(0,0,e.img.width,e.img.height);const rc2=document.createElement('canvas');rc2.width=state.refImg.width;rc2.height=state.refImg.height;rc2.getContext('2d').drawImage(state.refImg,0,0);const rd=rc2.getContext('2d').getImageData(0,0,state.refImg.width,state.refImg.height);let rr=rd;if(rr.width!==td.width||rr.height!==td.height){const c3=document.createElement('canvas');c3.width=td.width;c3.height=td.height;const t3=document.createElement('canvas');t3.width=rr.width;t3.height=rr.height;t3.getContext('2d').putImageData(rr,0,0);c3.getContext('2d').drawImage(t3,0,0,c3.width,c3.height);rr=c3.getContext('2d').getImageData(0,0,c3.width,c3.height)}const res=runMatch(td,rr,state.method,state.strength);const c4=document.createElement('canvas');c4.width=res.width;c4.height=res.height;c4.getContext('2d').putImageData(res,0,0);const blob=await new Promise(res2=>c4.toBlob(b=>res2(b),'image/png'));const stem=e.name.replace(/\.[^.]+$/,'');zip.file(`${stem}_matched.png`,blob)}progressText.textContent='打包 ZIP...';progressPercent.textContent='99%';progressFill.style.width='99%';const l=document.createElement('a');l.download=`color_matched_${loaded.length}pcs.zip`;l.href=URL.createObjectURL(await zip.generateAsync({type:'blob'}));l.click();URL.revokeObjectURL(l.href);showToast(`完成！共 ${loaded.length} 张`)}catch(err){showToast('出错: '+err.message)}finally{downloadAllBtn.disabled=false;progressWrap.classList.remove('show');progressFill.style.width='0%'}
+});
+
+// ─── Events ────────────────────────────────────────
+targetArea.addEventListener('click',()=>targetInput.click());
+targetInput.addEventListener('change',()=>{if(targetInput.files.length){addImages(targetInput.files);targetInput.value=''}});
+refArea.addEventListener('click',()=>refInput.click());
+refInput.addEventListener('change',()=>{if(refInput.files[0])loadRefImg(refInput.files[0])});
+addMoreBtn.addEventListener('click',()=>targetInput.click());
+clearAllBtn.addEventListener('click',resetAll);
+resetBtn.addEventListener('click',resetAll);
+
+methodOpts.forEach(b=>{b.addEventListener('click',()=>{methodOpts.forEach(x=>x.classList.remove('active'));b.classList.add('active');state.method=b.dataset.method;methodDesc.textContent=METHODS[state.method].desc;debounceMatch()})});
+strengthSlider.addEventListener('input',()=>{state.strength=strengthSlider.value/100;strengthVal.textContent=state.strength.toFixed(2);debounceMatch()});
+applyBtn.addEventListener('click',()=>{const s=getSelected();if(s&&s.loaded&&state.refImg)runPreview(s);else showToast('请上传目标图和参考图')});
+
+function resetAll(){state.images=[];state.selectedId=null;state.refImg=null;state.result=null;state.strength=0.1;strengthSlider.value=10;strengthVal.textContent='0.10';targetArea.classList.remove('done');refArea.classList.remove('done');targetLabel.textContent='点击上传目标图片';refLabel.textContent='点击上传参考图片';imageListSection.style.display='none';controlsSection.style.display='none';previewSection.style.display='none';actionsSection.style.display='none';progressWrap.classList.remove('show');statusBar.classList.remove('show');clearPreview();targetInput.value='';refInput.value='';updateCount()}
+function showToast(m){toastEl.textContent=m;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2400)}
+let toastTimer;
+methodDesc.textContent=METHODS.linear_rgb.desc;
+
+// Wire preview canvas clicks for lightbox
+wireCanvasClick(origCanvas, () => { const s=getSelected(); return s&&s.loaded?s.img.src:'' }, '原始目标');
+wireCanvasClick(refPreviewCanvas, () => state.refImg ? state.refImg.src : '', '参考图');
+wireCanvasClick(resultCanvas, () => state.result ? (()=>{const c=document.createElement('canvas');c.width=state.result.width;c.height=state.result.height;c.getContext('2d').putImageData(state.result,0,0);return c.toDataURL()})() : '', '匹配结果');
+</script>
+</body>
+</html>

@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SigCraft · 邮箱签名生成器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.control-group > label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.3px;
+}
+
+.control-group:last-child {
+  margin-bottom: 0;
+}
+
+.text-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  outline: none;
+  width: 100%;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: border-color 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.text-input:focus {
+  border-color: #8b8bf8;
+  box-shadow: 0 0 0 3px rgba(139, 139, 248, 0.2);
+}
+
+.text-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 500px) {
+  .form-row, .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mode-selector {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 3px;
+  overflow: hidden;
+}
+
+.mode-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(139, 139, 248, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 8px 8px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+}
+
+.mode-btn.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.3s;
+}
+
+.btn:hover::after {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: rgba(139, 139, 248, 0.6);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: rgba(139, 139, 248, 0.7);
+}
+
+.btn-success {
+  background: rgba(52, 199, 89, 0.55);
+  color: #fff;
+}
+
+.btn-success:hover {
+  background: rgba(52, 199, 89, 0.65);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.btn-danger {
+  background: rgba(255, 69, 58, 0.45);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: rgba(255, 69, 58, 0.55);
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.toggle-switch input:checked + .toggle-track {
+  background: #8b8bf8;
+}
+
+.toggle-switch input:checked + .toggle-track .toggle-thumb {
+  left: 18px;
+}
+
+/* Social row */
+.social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.social-row:last-child {
+  margin-bottom: 0;
+}
+.social-row .toggle-switch {
+  width: 36px;
+  height: 20px;
+}
+.social-row .toggle-thumb {
+  width: 16px;
+  height: 16px;
+}
+.social-row .toggle-switch input:checked + .toggle-track .toggle-thumb {
+  left: 18px;
+}
+.social-row .text-input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.social-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+}
+.social-row.enabled .social-icon {
+  color: #8b8bf8;
+}
+.custom-social-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+  animation: fadeSlideUp 0.25s ease both;
+}
+.custom-social-item .text-input {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.custom-social-item .custom-social-name {
+  flex: 0 0 90px;
+}
+.custom-social-item .custom-social-url {
+  flex: 1;
+}
+.custom-social-item .social-del-btn {
+  width: 24px; height: 24px; border-radius: 50%; border: none;
+  background: rgba(255,69,58,0.4); color: #fff; cursor: pointer;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.2s;
+}
+.custom-social-item .social-del-btn:hover {
+  background: rgba(255,69,58,0.7); transform: scale(1.1);
+}
+
+/* Upload area */
+.upload-area {
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(2px);
+}
+
+.upload-area:hover {
+  border-color: rgba(139, 139, 248, 0.5);
+  background: rgba(139, 139, 248, 0.06);
+}
+
+.upload-area.dragover {
+  border-color: #8b8bf8;
+  background: rgba(139, 139, 248, 0.1);
+  transform: scale(1.01);
+}
+
+.upload-icon {
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 6px;
+  color: #8b8bf8;
+}
+
+.upload-area p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+}
+
+.upload-preview-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.upload-preview-wrap img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.upload-preview-wrap .remove-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 69, 58, 0.5);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.upload-preview-wrap .remove-logo:hover {
+  background: rgba(255, 69, 58, 0.7);
+  transform: scale(1.1);
+}
+
+/* Preview panel */
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.preview-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.preview-header .hint {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.preview-body {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 24px 16px;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.preview-body .placeholder {
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 13px;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+}
+
+.preview-body table {
+  border-collapse: collapse;
+}
+
+.toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30, 30, 30, 0.95);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-slide-up {
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.saved-list {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+}
+
+.saved-list h4 {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.56);
+  margin-bottom: 8px;
+}
+
+.saved-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saved-item:hover {
+  background: rgba(139, 139, 248, 0.08);
+}
+
+.saved-item .name {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.saved-item .actions button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 6px;
+  transition: color 0.2s;
+}
+
+.saved-item .actions button:hover {
+  color: #8b8bf8;
+}
+
+.saved-item .actions button.del:hover {
+  color: #ff453a;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>SigCraft</h1>
+  <p>邮箱签名生成器 · 简约 / 现代 / 经典 多种模板</p>
+</div>
+
+<div class="container">
+  <div class="main-layout">
+    <div class="panel fade-slide-up">
+      <div class="control-group">
+        <label>个人信息</label>
+        <div class="form-row">
+          <input type="text" class="text-input" id="nameInput" placeholder="姓名" value="张三">
+          <input type="text" class="text-input" id="titleInput" placeholder="头衔" value="高级工程师">
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <input type="text" class="text-input" id="companyInput" placeholder="公司" value="示例科技有限公司">
+          <input type="email" class="text-input" id="emailInput" placeholder="邮箱" value="zhangsan@example.com">
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <input type="tel" class="text-input" id="phoneInput" placeholder="电话" value="+86 138-0000-0000">
+          <input type="url" class="text-input" id="websiteInput" placeholder="网站" value="https://example.com">
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>Logo / 头像</label>
+        <div class="upload-area" id="logoUploadArea">
+          <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>点击或拖拽上传 Logo</p>
+          <input type="file" id="logoInput" accept="image/*" style="display:none">
+        </div>
+        <div class="upload-preview-wrap" id="logoPreview" style="display:none">
+          <img id="logoImg" alt="Logo">
+          <button class="remove-logo" id="removeLogoBtn">✕</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>社交媒体</label>
+        <div class="social-row" id="linkedinRow">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          <label class="toggle-switch">
+            <input type="checkbox" class="social-toggle" data-key="linkedin" checked>
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+          <input type="url" class="text-input social-url" data-key="linkedin" placeholder="LinkedIn URL" value="https://linkedin.com/in/zhangsan">
+        </div>
+        <div class="social-row" id="twitterRow">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          <label class="toggle-switch">
+            <input type="checkbox" class="social-toggle" data-key="twitter" checked>
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+          <input type="url" class="text-input social-url" data-key="twitter" placeholder="Twitter / X URL" value="https://twitter.com/zhangsan">
+        </div>
+        <div class="social-row" id="githubRow">
+          <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          <label class="toggle-switch">
+            <input type="checkbox" class="social-toggle" data-key="github" checked>
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+          <input type="url" class="text-input social-url" data-key="github" placeholder="GitHub URL" value="https://github.com/zhangsan">
+        </div>
+        <div id="customSocialContainer"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-sm btn-outline" id="addCustomSocialBtn" style="flex:1;justify-content:center;font-size:11px;padding:6px 10px">+ 添加自定义社交</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>签名模板</label>
+        <div class="mode-selector" id="templateSelector">
+          <div class="mode-slider" id="templateSlider"></div>
+          <button class="mode-btn active" data-template="simple">简约</button>
+          <button class="mode-btn" data-template="modern">现代</button>
+          <button class="mode-btn" data-template="classic">经典</button>
+        </div>
+      </div>
+
+      <div class="actions-row" style="gap:6px;margin-top:4px">
+        <button class="btn btn-primary btn-sm" id="copyHtmlBtn" style="flex:1;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          复制 HTML
+        </button>
+        <button class="btn btn-success btn-sm" id="downloadHtmlBtn" style="flex:1;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          下载 .html
+        </button>
+      </div>
+      <div class="actions-row" style="gap:6px;margin-top:6px">
+        <button class="btn btn-secondary btn-sm" id="saveBtn" style="flex:1;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          保存到本地
+        </button>
+        <button class="btn btn-danger btn-sm" id="clearBtn" style="flex:1;justify-content:center">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          清空
+        </button>
+      </div>
+
+      <div class="saved-list" id="savedList">
+        <h4>已保存的签名</h4>
+        <div id="savedItems"></div>
+      </div>
+    </div>
+
+    <div class="panel preview-panel fade-slide-up">
+      <div class="preview-header">
+        <h3>签名预览</h3>
+        <span class="hint">实际尺寸渲染</span>
+      </div>
+      <div class="preview-body" id="previewBody">
+        <div class="placeholder">填写左侧信息后自动预览</div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.4);text-align:center">
+        签名将在支持 HTML 的邮件客户端中生效
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ─────────────────────────────────────
+const state = {
+  template: 'simple',
+  logoDataURL: null,
+  customSocials: [],  // [{ id, name, url, enabled }]
+};
+let customSocialIdCounter = 0;
+
+// ─── DOM refs ──────────────────────────────────
+const nameInput = document.getElementById('nameInput');
+const titleInput = document.getElementById('titleInput');
+const companyInput = document.getElementById('companyInput');
+const emailInput = document.getElementById('emailInput');
+const phoneInput = document.getElementById('phoneInput');
+const websiteInput = document.getElementById('websiteInput');
+const logoUploadArea = document.getElementById('logoUploadArea');
+const logoInput = document.getElementById('logoInput');
+const logoPreview = document.getElementById('logoPreview');
+const logoImg = document.getElementById('logoImg');
+const removeLogoBtn = document.getElementById('removeLogoBtn');
+const previewBody = document.getElementById('previewBody');
+const templateBtns = document.querySelectorAll('#templateSelector .mode-btn');
+const templateSlider = document.getElementById('templateSlider');
+const copyHtmlBtn = document.getElementById('copyHtmlBtn');
+const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+const saveBtn = document.getElementById('saveBtn');
+const clearBtn = document.getElementById('clearBtn');
+const savedItems = document.getElementById('savedItems');
+const toastEl = document.getElementById('toast');
+
+// ─── Social references ─────────────────────────
+const addCustomSocialBtn = document.getElementById('addCustomSocialBtn');
+const customSocialContainer = document.getElementById('customSocialContainer');
+
+function getSocialData() {
+  const toggles = document.querySelectorAll('.social-toggle');
+  const urls = document.querySelectorAll('.social-url');
+  const data = {};
+  toggles.forEach(t => { data[t.dataset.key] = { enabled: t.checked, url: '' }; });
+  urls.forEach(u => {
+    if (data[u.dataset.key]) data[u.dataset.key].url = u.value;
+  });
+  // Include custom socials
+  data.custom = state.customSocials.filter(s => s.enabled && s.url);
+  return data;
+}
+
+// ─── Social Toggle & URL events ────────────────
+document.querySelectorAll('.social-toggle').forEach(toggle => {
+  toggle.addEventListener('change', () => {
+    const row = toggle.closest('.social-row');
+    if (toggle.checked) {
+      row.classList.add('enabled');
+    } else {
+      row.classList.remove('enabled');
+    }
+    updatePreview();
+  });
+});
+
+document.querySelectorAll('.social-url').forEach(input => {
+  input.addEventListener('input', updatePreview);
+});
+
+// Init social enabled state
+document.querySelectorAll('.social-row').forEach(row => {
+  const toggle = row.querySelector('.social-toggle');
+  if (toggle && toggle.checked) row.classList.add('enabled');
+});
+
+// ─── Custom Social Management ──────────────────
+function renderCustomSocials() {
+  customSocialContainer.innerHTML = state.customSocials.map((s, i) => `
+    <div class="custom-social-item" data-idx="${i}">
+      <label class="toggle-switch" style="width:30px;height:18px">
+        <input type="checkbox" class="custom-social-toggle" ${s.enabled ? 'checked' : ''} data-idx="${i}">
+        <div class="toggle-track" style="border-radius:9px"><div class="toggle-thumb" style="width:14px;height:14px;top:2px;left:2px"></div></div>
+      </label>
+      <input type="text" class="text-input custom-social-name" value="${escHtml(s.name)}" placeholder="名称（如 Instagram）" data-idx="${i}">
+      <input type="url" class="text-input custom-social-url" value="${escHtml(s.url)}" placeholder="https://..." data-idx="${i}">
+      <button class="social-del-btn" data-idx="${i}" title="删除">✕</button>
+    </div>
+  `).join('');
+
+  customSocialContainer.querySelectorAll('.custom-social-toggle').forEach(tog => {
+    tog.addEventListener('change', () => {
+      const idx = parseInt(tog.dataset.idx);
+      if (state.customSocials[idx]) state.customSocials[idx].enabled = tog.checked;
+      updatePreview();
+    });
+  });
+  customSocialContainer.querySelectorAll('.custom-social-name').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const idx = parseInt(inp.dataset.idx);
+      if (state.customSocials[idx]) state.customSocials[idx].name = inp.value;
+      updatePreview();
+    });
+  });
+  customSocialContainer.querySelectorAll('.custom-social-url').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const idx = parseInt(inp.dataset.idx);
+      if (state.customSocials[idx]) state.customSocials[idx].url = inp.value;
+      updatePreview();
+    });
+  });
+  customSocialContainer.querySelectorAll('.social-del-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.idx);
+      state.customSocials.splice(idx, 1);
+      renderCustomSocials();
+      updatePreview();
+    });
+  });
+}
+
+addCustomSocialBtn.addEventListener('click', () => {
+  state.customSocials.push({
+    id: ++customSocialIdCounter,
+    name: '',
+    url: '',
+    enabled: true,
+  });
+  renderCustomSocials();
+  updatePreview();
+});
+
+// ─── Logo Upload ───────────────────────────────
+logoUploadArea.addEventListener('click', () => logoInput.click());
+
+logoInput.addEventListener('change', () => {
+  if (logoInput.files.length > 0) {
+    loadLogo(logoInput.files[0]);
+    logoInput.value = '';
+  }
+});
+
+logoUploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  logoUploadArea.classList.add('dragover');
+});
+
+logoUploadArea.addEventListener('dragleave', () => {
+  logoUploadArea.classList.remove('dragover');
+});
+
+logoUploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  logoUploadArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) {
+    loadLogo(e.dataTransfer.files[0]);
+  }
+});
+
+function loadLogo(file) {
+  if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    state.logoDataURL = e.target.result;
+    logoImg.src = state.logoDataURL;
+    logoPreview.style.display = 'flex';
+    logoUploadArea.style.display = 'none';
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+removeLogoBtn.addEventListener('click', () => {
+  state.logoDataURL = null;
+  logoPreview.style.display = 'none';
+  logoUploadArea.style.display = 'block';
+  updatePreview();
+});
+
+// ─── Template Selector ─────────────────────────
+function moveSlider(btn, sliderEl) {
+  const container = btn.closest('.mode-selector');
+  const cRect = container.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  sliderEl.style.left = (bRect.left - cRect.left) + 'px';
+  sliderEl.style.width = bRect.width + 'px';
+}
+
+templateBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    templateBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, templateSlider);
+    state.template = btn.dataset.template;
+    updatePreview();
+  });
+});
+
+requestAnimationFrame(() => {
+  const active = document.querySelector('#templateSelector .mode-btn.active');
+  if (active) moveSlider(active, templateSlider);
+});
+
+// ─── Form Inputs Update ────────────────────────
+[nameInput, titleInput, companyInput, emailInput, phoneInput, websiteInput].forEach(input => {
+  input.addEventListener('input', updatePreview);
+});
+
+// ─── Signature Generation ──────────────────────
+function getFormData() {
+  return {
+    name: nameInput.value || '您的姓名',
+    title: titleInput.value || '头衔',
+    company: companyInput.value || '',
+    email: emailInput.value || '',
+    phone: phoneInput.value || '',
+    website: websiteInput.value || '',
+    logo: state.logoDataURL || null,
+    social: getSocialData(),
+  };
+}
+
+function buildSignatureHTML(data, template) {
+  const { name, title, company, email, phone, website, logo, social } = data;
+  const socialLinks = [];
+  const socialDefs = {
+    linkedin: { name: 'LinkedIn', color: '#0A66C2' },
+    twitter: { name: 'X (Twitter)', color: '#000000' },
+    github: { name: 'GitHub', color: '#333333' },
+  };
+
+  for (const [key, s] of Object.entries(socialDefs)) {
+    if (social[key] && social[key].enabled && social[key].url) {
+      socialLinks.push({ name: s.name, url: social[key].url, color: s.color });
+    }
+  }
+  // Include custom social platforms
+  if (social.custom && social.custom.length > 0) {
+    social.custom.forEach(s => {
+      socialLinks.push({ name: s.name || 'Link', url: s.url, color: '#666666' });
+    });
+  }
+
+  const safeName = escHtml(name);
+  const safeTitle = escHtml(title);
+  const safeCompany = escHtml(company);
+  const safeEmail = escHtml(email);
+  const safePhone = escHtml(phone);
+  const safeWebsite = escHtml(website);
+
+  let socialHTML = '';
+  if (socialLinks.length > 0) {
+    socialHTML = socialLinks.map(s => {
+      return `<a href="${escHtml(s.url)}" target="_blank" style="text-decoration:none;${template === 'classic' ? 'color:' + s.color : 'color:#8b8bf8'};font-size:12px;margin-right:10px">${escHtml(s.name)}</a>`;
+    }).join('');
+  }
+
+  switch (template) {
+    case 'simple': {
+      let logoHTML = '';
+      if (logo) {
+        logoHTML = `<td style="padding-right:14px;vertical-align:middle"><img src="${logo}" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;display:block"></td>`;
+      }
+      return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif">
+        <tr>
+          ${logoHTML}
+          <td style="vertical-align:middle">
+            <div style="font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:2px">${safeName}</div>
+            <div style="font-size:13px;color:#666;margin-bottom:1px">${safeTitle}</div>
+            ${safeCompany ? '<div style="font-size:13px;color:#888;margin-bottom:6px">' + safeCompany + '</div>' : ''}
+            <table cellpadding="0" cellspacing="0" border="0">
+              ${safeEmail ? '<tr><td style="padding-right:4px"><span style="font-size:12px;color:#999">✉</span></td><td style="font-size:12px;color:#555"><a href="mailto:' + safeEmail + '" style="color:#555;text-decoration:none">' + safeEmail + '</a></td></tr>' : ''}
+              ${safePhone ? '<tr><td style="padding-right:4px"><span style="font-size:12px;color:#999">✆</span></td><td style="font-size:12px;color:#555">' + safePhone + '</td></tr>' : ''}
+              ${safeWebsite ? '<tr><td style="padding-right:4px"><span style="font-size:12px;color:#999">◉</span></td><td style="font-size:12px;color:#555"><a href="' + safeWebsite + '" style="color:#555;text-decoration:none">' + safeWebsite + '</a></td></tr>' : ''}
+            </table>
+            ${socialHTML ? '<div style="margin-top:8px;padding-top:8px;border-top:1px solid #eee">' + socialHTML + '</div>' : ''}
+          </td>
+        </tr>
+      </table>`;
+    }
+
+    case 'modern': {
+      const hasBottom = socialHTML || safeWebsite;
+      let logoHTML = '';
+      if (logo) {
+        logoHTML = `<div style="margin-bottom:10px"><img src="${logo}" alt="" style="width:48px;height:48px;border-radius:10px;object-fit:cover;display:block"></div>`;
+      }
+      return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif">
+        <tr>
+          <td style="padding:16px;background:linear-gradient(135deg,#f5f7fa,#e4e8f0);border-radius:12px">
+            ${logoHTML}
+            <div style="font-size:17px;font-weight:700;color:#1a1a1a">${safeName}</div>
+            <div style="font-size:13px;color:#8b8bf8;font-weight:600;margin:2px 0 6px">${safeTitle}</div>
+            ${safeCompany ? '<div style="font-size:13px;color:#888;margin-bottom:8px">' + safeCompany + '</div>' : ''}
+            <table cellpadding="0" cellspacing="0" border="0">
+              ${safeEmail ? '<tr><td style="padding-right:6px;font-size:11px;color:#8b8bf8">●</td><td style="font-size:12px;color:#444"><a href="mailto:' + safeEmail + '" style="color:#444;text-decoration:none">' + safeEmail + '</a></td></tr>' : ''}
+              ${safePhone ? '<tr><td style="padding-right:6px;font-size:11px;color:#8b8bf8">●</td><td style="font-size:12px;color:#444">' + safePhone + '</td></tr>' : ''}
+            </table>
+            ${hasBottom ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(139,139,248,0.15)">' : ''}
+            ${safeWebsite ? '<div style="font-size:12px;color:#8b8bf8;margin-bottom:6px"><a href="' + safeWebsite + '" style="color:#8b8bf8;text-decoration:none">' + safeWebsite + '</a></div>' : ''}
+            ${socialHTML ? '<div style="font-size:12px">' + socialHTML + '</div>' : ''}
+            ${hasBottom ? '</div>' : ''}
+          </td>
+        </tr>
+      </table>`;
+    }
+
+    case 'classic': {
+      let logoHTML = '';
+      if (logo) {
+        logoHTML = `<td style="padding-right:16px;vertical-align:top;border-right:2px solid #1a1a1a"><img src="${logo}" alt="" style="width:60px;height:60px;object-fit:cover;display:block"></td>`;
+      }
+      let separator = logo ? '' : '<div style="width:40px;height:2px;background:#1a1a1a;margin-bottom:8px"></div>';
+      return `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Georgia,'Times New Roman',serif">
+        <tr>
+          ${logoHTML}
+          <td style="vertical-align:top;${logo ? 'padding-left:16px' : ''}">
+            ${separator}
+            <div style="font-size:18px;font-weight:700;color:#1a1a1a;letter-spacing:-0.3px">${safeName}</div>
+            <div style="font-size:13px;color:#555;font-style:italic;margin:2px 0 4px">${safeTitle}</div>
+            ${safeCompany ? '<div style="font-size:13px;color:#777;margin-bottom:8px">' + safeCompany + '</div>' : ''}
+            <table cellpadding="0" cellspacing="0" border="0">
+              ${safeEmail ? '<tr><td style="padding-right:6px;font-size:12px;color:#1a1a1a">✉</td><td style="font-size:12px;color:#444"><a href="mailto:' + safeEmail + '" style="color:#444;text-decoration:none">' + safeEmail + '</a></td></tr>' : ''}
+              ${safePhone ? '<tr><td style="padding-right:6px;font-size:12px;color:#1a1a1a">☏</td><td style="font-size:12px;color:#444">' + safePhone + '</td></tr>' : ''}
+              ${safeWebsite ? '<tr><td style="padding-right:6px;font-size:12px;color:#1a1a1a">◈</td><td style="font-size:12px;color:#444"><a href="' + safeWebsite + '" style="color:#444;text-decoration:none">' + safeWebsite + '</a></td></tr>' : ''}
+            </table>
+            ${socialHTML ? '<div style="margin-top:10px;padding-top:8px;border-top:1px solid #ddd;font-size:12px">' + socialHTML + '</div>' : ''}
+          </td>
+        </tr>
+      </table>`;
+    }
+
+    default:
+      return '';
+  }
+}
+
+function buildFullHTML(sigHTML) {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0">
+${sigHTML}
+</body>
+</html>`;
+}
+
+function updatePreview() {
+  const data = getFormData();
+  const template = state.template;
+  const sigHTML = buildSignatureHTML(data, template);
+
+  previewBody.innerHTML = '';
+  if (sigHTML) {
+    previewBody.innerHTML = sigHTML;
+  } else {
+    previewBody.innerHTML = '<div class="placeholder">填写左侧信息后自动预览</div>';
+  }
+}
+
+// ─── Actions ───────────────────────────────────
+copyHtmlBtn.addEventListener('click', async () => {
+  const data = getFormData();
+  const sigHTML = buildSignatureHTML(data, state.template);
+  if (!sigHTML) { showToast('请先填写信息'); return; }
+  const full = buildFullHTML(sigHTML);
+  try {
+    await navigator.clipboard.writeText(full);
+    showToast('HTML 已复制到剪贴板');
+  } catch {
+    showToast('复制失败');
+  }
+});
+
+downloadHtmlBtn.addEventListener('click', () => {
+  const data = getFormData();
+  const sigHTML = buildSignatureHTML(data, state.template);
+  if (!sigHTML) { showToast('请先填写信息'); return; }
+  const full = buildFullHTML(sigHTML);
+  const blob = new Blob([full], { type: 'text/html;charset=utf-8' });
+  const link = document.createElement('a');
+  const name = (data.name || 'signature').replace(/\s+/g, '_');
+  link.download = `signature_${name}.html`;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已下载签名文件');
+});
+
+saveBtn.addEventListener('click', () => {
+  const data = getFormData();
+  if (!data.name || data.name === '您的姓名') { showToast('请先填写姓名'); return; }
+  const sigHTML = buildSignatureHTML(data, state.template);
+  const full = buildFullHTML(sigHTML);
+
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem('sigcraft_saved') || '[]');
+  } catch { saved = []; }
+
+  const entry = {
+    id: Date.now(),
+    name: data.name,
+    company: data.company,
+    template: state.template,
+    html: full,
+    createdAt: new Date().toISOString(),
+  };
+  saved.push(entry);
+  localStorage.setItem('sigcraft_saved', JSON.stringify(saved));
+  renderSavedList();
+  showToast('已保存到本地');
+});
+
+clearBtn.addEventListener('click', () => {
+  nameInput.value = '';
+  titleInput.value = '';
+  companyInput.value = '';
+  emailInput.value = '';
+  phoneInput.value = '';
+  websiteInput.value = '';
+  state.logoDataURL = null;
+  state.customSocials = [];
+  logoPreview.style.display = 'none';
+  logoUploadArea.style.display = 'block';
+  document.querySelectorAll('.social-url').forEach(i => i.value = '');
+  renderCustomSocials();
+  updatePreview();
+  showToast('已清空所有内容');
+});
+
+// ─── Saved Signatures ──────────────────────────
+function renderSavedList() {
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem('sigcraft_saved') || '[]');
+  } catch { saved = []; }
+
+  const container = savedItems;
+  if (saved.length === 0) {
+    container.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;padding:8px">暂无保存的签名</div>';
+    return;
+  }
+
+  container.innerHTML = saved.slice().reverse().map(s => {
+    const d = new Date(s.createdAt);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    return `<div class="saved-item" data-id="${s.id}">
+      <span class="name">${escHtml(s.name)}${s.company ? ' · ' + escHtml(s.company) : ''} <span style="color:rgba(255,255,255,0.3);font-size:10px">${dateStr}</span></span>
+      <span class="actions">
+        <button class="load-saved" data-id="${s.id}">加载</button>
+        <button class="del-saved" data-id="${s.id}">删除</button>
+      </span>
+    </div>`;
+  }).join('');
+
+  container.querySelectorAll('.load-saved').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      loadSaved(parseInt(btn.dataset.id));
+    });
+  });
+
+  container.querySelectorAll('.del-saved').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteSaved(parseInt(btn.dataset.id));
+    });
+  });
+
+  container.querySelectorAll('.saved-item').forEach(el => {
+    el.addEventListener('click', () => {
+      loadSaved(parseInt(el.dataset.id));
+    });
+  });
+}
+
+function loadSaved(id) {
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem('sigcraft_saved') || '[]');
+  } catch { return; }
+  const entry = saved.find(s => s.id === id);
+  if (!entry) { showToast('未找到该签名'); return; }
+  showToast('已加载: ' + entry.name);
+}
+
+function deleteSaved(id) {
+  let saved = [];
+  try {
+    saved = JSON.parse(localStorage.getItem('sigcraft_saved') || '[]');
+  } catch { return; }
+  saved = saved.filter(s => s.id !== id);
+  localStorage.setItem('sigcraft_saved', JSON.stringify(saved));
+  renderSavedList();
+  showToast('已删除');
+}
+
+// ─── Toast ─────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// ─── Helpers ───────────────────────────────────
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ─── Init ──────────────────────────────────────
+updatePreview();
+renderSavedList();
+renderCustomSocials();
+</script>
+</body>
+</html>

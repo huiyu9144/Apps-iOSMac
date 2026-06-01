@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Color Picker</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue',sans-serif;
+  background:#08080a;color:#f0f0f5;min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;padding:36px 16px 48px;-webkit-font-smoothing:antialiased
+}
+
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{
+  font-size:32px;font-weight:720;letter-spacing:-0.6px;
+  background:linear-gradient(135deg,#ff6b6b 0%,#ffa94d 50%,#ff6b9d 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeSlideUp .5s cubic-bezier(.19,1,.32,1) both
+}
+.header p{
+  color:rgba(255,255,255,.55);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:.3px;
+  animation:fadeSlideUp .5s .1s cubic-bezier(.19,1,.32,1) both
+}
+.container{width:100%;max-width:1000px;display:flex;flex-direction:column;gap:28px}
+
+/* ═══ Top ═══ */
+.top-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.top-header .title{
+  font-size:16px;font-weight:620;color:rgba(255,255,255,.82);letter-spacing:.2px;
+  animation:fadeSlideUp .5s .15s cubic-bezier(.19,1,.32,1) both
+}
+.reco-grid{display:flex;flex-wrap:wrap;gap:10px}
+.reco-card{
+  flex:1 1 calc((100% - 50px) / 6);min-width:0;border-radius:12px;overflow:hidden;
+  cursor:pointer;position:relative;aspect-ratio:1.4;background:rgba(255,255,255,.02);
+  transform:translateY(12px);opacity:0;animation:cardIn .45s cubic-bezier(.19,1,.32,1) forwards
+}
+@keyframes cardIn{to{transform:translateY(0);opacity:1}}
+.reco-card:hover{transform:translateY(-3px) scale(1.02)}
+.reco-card:active{transform:translateY(0) scale(.97)}
+.reco-swatch{
+  position:absolute;inset:0;border-radius:12px;
+  transition:transform .35s cubic-bezier(.19,1,.32,1),filter .3s
+}
+.reco-card:hover .reco-swatch{transform:scale(1.06);filter:brightness(1.08)}
+.reco-hover{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:flex-end;padding:10px 11px 9px;
+  background:linear-gradient(transparent 40%,rgba(0,0,0,.55));
+  opacity:0;transition:opacity .25s cubic-bezier(.19,1,.32,1)
+}
+.reco-card:hover .reco-hover{opacity:1}
+.reco-hover .reco-row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.reco-hover .reco-hex{
+  font-size:13px;font-weight:620;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);
+  letter-spacing:.2px;transition:opacity .15s;cursor:pointer
+}
+.reco-hover .reco-hex:hover{opacity:.75}
+.reco-hover .reco-star{
+  font-size:18px;font-weight:400;color:rgba(255,255,255,.5);text-shadow:0 1px 4px rgba(0,0,0,.5);
+  cursor:pointer;transition:all .25s cubic-bezier(.19,1,.32,1);line-height:1;flex-shrink:0
+}
+.reco-hover .reco-star:hover{transform:scale(1.25)}
+.reco-hover .reco-star.done{color:#ffcc00;transform:scale(1.1)}
+
+/* ═══ Bottom ═══ */
+.bottom-grid{display:grid;grid-template-columns:2fr 3fr;gap:24px;align-items:stretch}
+.left-col{display:flex;flex-direction:column}
+
+/* ── Picker card ── */
+.picker-card{
+  background:rgba(255,255,255,.05);border-radius:16px;overflow:hidden;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;min-height:160px;
+  animation:fadeSlideUp .5s .2s cubic-bezier(.19,1,.32,1) both
+}
+.picker-color{
+  width:100px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:background .3s;position:relative;overflow:hidden;cursor:pointer
+}
+.picker-color:hover{filter:brightness(1.1)}
+.picker-color::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 50%);
+  pointer-events:none
+}
+.picker-color input[type=color]{
+  position:absolute;inset:0;width:100%;height:100%;padding:0;border:none;
+  cursor:pointer;opacity:0;z-index:2
+}
+.picker-color input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.picker-color input[type=color]::-webkit-color-swatch{border:none}
+.picker-color .hex-badge{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;
+  font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);
+  font-family:'SF Mono','Consolas',monospace;letter-spacing:.3px
+}
+.picker-right{
+  flex:1;padding:16px 16px 14px 16px;display:flex;flex-direction:column;gap:10px
+}
+.picker-right label{
+  font-size:12px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:.4px;
+  text-transform:uppercase
+}
+.input-wrap{
+  display:flex;align-items:stretch;border:1.5px solid rgba(255,255,255,.06);
+  border-radius:10px;overflow:hidden;transition:border-color .25s,box-shadow .25s;
+  background:rgba(0,0,0,.45)
+}
+.input-wrap:focus-within{border-color:rgba(255,107,107,.35);box-shadow:0 0 0 3px rgba(255,107,107,.08)}
+.input-wrap input[type=text]{
+  flex:1;background:transparent;border:none;padding:10px 14px;
+  color:#f0f0f5;font-size:14px;font-family:'SF Mono','Consolas',monospace;outline:none
+}
+.input-wrap input::placeholder{color:rgba(255,255,255,.18);font-family:-apple-system,sans-serif;font-size:13px}
+.input-wrap .go-btn{
+  width:38px;border:none;background:rgba(255,255,255,.03);color:rgba(255,255,255,.25);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-size:18px;flex-shrink:0
+}
+.input-wrap .go-btn:hover{background:rgba(255,107,107,.12);color:#ff6b6b}
+.input-wrap .go-btn:active{transform:scale(.9)}
+.color-values{display:flex;flex-direction:column;gap:1px}
+.color-values .v{font-size:12px;line-height:1.8}
+.color-values .v .l{color:rgba(255,255,255,.28);width:36px;display:inline-block;font-weight:500}
+.color-values .v .c{color:rgba(255,255,255,.85);font-family:'SF Mono','Consolas',monospace;font-size:12px}
+.picker-actions{display:flex;gap:6px;margin-top:2px}
+
+/* ═══ Native picker trigger ═══ */
+
+/* ═══ Buttons ═══ */
+.btn{
+  border-radius:8px;border:none;font-size:12px;font-weight:580;cursor:pointer;
+  transition:all .25s cubic-bezier(.19,1,.32,1);padding:7px 14px;font-family:inherit
+}
+.btn:hover{opacity:.8;transform:translateY(-1px)}
+.btn:active{transform:scale(.95)}
+.btn-ghost{background:rgba(255,255,255,.06);color:rgba(255,255,255,.55)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+
+/* ═══ Favorites ═══ */
+.fav-card{
+  background:rgba(255,255,255,.05);border-radius:16px;overflow:hidden;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);height:100%;
+  animation:fadeSlideUp .5s .25s cubic-bezier(.19,1,.32,1) both;
+  display:flex;flex-direction:column
+}
+.fav-header{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.fav-header .title{font-size:14px;font-weight:580;color:rgba(255,255,255,.78)}
+.fav-header .count{color:rgba(255,255,255,.3);font-size:12px;font-weight:400}
+.fav-body{padding:14px;overflow-y:auto;flex:1}
+.fav-body::-webkit-scrollbar{width:4px}
+.fav-body::-webkit-scrollbar-track{background:transparent}
+.fav-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:2px}
+.fav-grid{display:flex;gap:12px;flex-wrap:wrap}
+.fav-item{
+  width:84px;border-radius:10px;overflow:hidden;cursor:pointer;
+  transition:all .3s cubic-bezier(.19,1,.32,1);position:relative;flex-shrink:0;
+  background:rgba(255,255,255,.02);
+  animation:favItemIn .4s cubic-bezier(.19,1,.32,1) both
+}
+@keyframes favItemIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.fav-item:hover{transform:translateY(-3px) scale(1.03)}
+.fav-item:active{transform:scale(.95)}
+.fav-swatch{height:60px;transition:transform .3s cubic-bezier(.19,1,.32,1)}
+.fav-item:hover .fav-swatch{transform:scale(1.06)}
+.fav-hover{
+  position:absolute;inset:0;display:flex;align-items:flex-end;
+  padding:0 8px 7px;opacity:0;transition:opacity .25s cubic-bezier(.19,1,.32,1);
+  background:linear-gradient(transparent 40%,rgba(0,0,0,.5))
+}
+.fav-item:hover .fav-hover{opacity:1}
+.fav-hover .fav-hex{
+  font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5);
+  font-family:'SF Mono','Consolas',monospace;letter-spacing:.2px
+}
+.fav-del{
+  position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,.4);border:none;color:rgba(255,255,255,.5);font-size:9px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
+  transition:all .2s;backdrop-filter:blur(4px)
+}
+.fav-item:hover .fav-del{display:flex}
+.fav-del:hover{background:rgba(255,69,58,.75);color:#fff;transform:scale(1.15)}
+.fav-empty{padding:48px 20px;text-align:center;color:rgba(255,255,255,.14);font-size:13px}
+
+.toast{
+  position:fixed;bottom:40px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:rgba(28,28,30,.95);color:#f0f0f5;padding:14px 28px;border-radius:14px;
+  font-size:14px;font-weight:520;opacity:0;transition:all .5s cubic-bezier(.19,1,.32,1);
+  pointer-events:none;z-index:100;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  box-shadow:0 12px 40px rgba(0,0,0,.6)
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:700px){
+  body{padding:24px 12px 40px}.header h1{font-size:26px}
+  .bottom-grid{grid-template-columns:1fr}
+  .reco-card{flex:1 1 calc((100% - 10px) / 3);min-width:70px}
+  .fav-item{width:72px}.fav-swatch{height:50px}.picker-color{width:70px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Color Picker</h1>
+  <p>探索 · 收藏 · 你的专属配色</p>
+</div>
+
+<div class="container">
+
+  <div class="section-top">
+    <div class="top-header">
+      <span class="title">✦ 推荐配色</span>
+      <button class="btn btn-ghost" id="shuffleBtn" style="padding:6px 16px;font-size:11px;letter-spacing:.3px">⟳ 换一换</button>
+    </div>
+    <div class="reco-grid" id="recoGrid"></div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="left-col">
+      <div class="picker-card">
+        <div class="picker-color" id="pickerColor" style="background:#ff6b6b">
+          <input type="color" id="nativePicker" value="#ff6b6b">
+          <span class="hex-badge" id="pickerBadge">#ff6b6b</span>
+        </div>
+        <div class="picker-right">
+          <label>颜色值</label>
+          <div class="input-wrap">
+            <input type="text" id="colorInput" placeholder="#ff6b6b" spellcheck="false">
+            <button class="go-btn" id="applyBtn">↵</button>
+          </div>
+          <div class="color-values">
+            <div class="v"><span class="l">HEX</span><span class="c" id="curHex">#ff6b6b</span></div>
+            <div class="v"><span class="l">RGB</span><span class="c" id="curRgb">rgb(255,107,107)</span></div>
+            <div class="v"><span class="l">HSL</span><span class="c" id="curHsl">hsl(0,100%,71%)</span></div>
+          </div>
+          <div class="picker-actions">
+            <button class="btn btn-ghost" id="addFavBtn">☆ 收藏</button>
+            <button class="btn btn-ghost" id="resetInputBtn">清空</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-col">
+      <div class="fav-card">
+        <div class="fav-header">
+          <span class="title">★ 我的收藏</span>
+          <span class="count" id="favCount">0</span>
+        </div>
+        <div class="fav-body">
+          <div class="fav-grid" id="favGrid"></div>
+          <div class="fav-empty" id="favEmpty">还没有收藏的颜色</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLOR_POOL = [
+  { hex:'#1a1a2e', name:'深夜蓝' }, { hex:'#16213e', name:'深海' }, { hex:'#0f3460', name:'普鲁士蓝' }, { hex:'#e94560', name:'玫瑰红' },
+  { hex:'#ff6b6b', name:'珊瑚' }, { hex:'#ffa94d', name:'暖橙' }, { hex:'#ffd43b', name:'向日黄' }, { hex:'#69db7c', name:'薄荷绿' },
+  { hex:'#20c997', name:'翡翠' }, { hex:'#22b8cf', name:'天蓝' }, { hex:'#748ffc', name:'淡紫' }, { hex:'#9775fa', name:'丁香紫' },
+  { hex:'#f06595', name:'樱花粉' }, { hex:'#e599f7', name:'薰衣草' }, { hex:'#495057', name:'碳灰' }, { hex:'#212529', name:'墨黑' },
+  { hex:'#c92a2a', name:'朱红' }, { hex:'#d9480f', name:'陶土' }, { hex:'#e8590c', name:'柿子橙' }, { hex:'#f08c00', name:'琥珀' },
+  { hex:'#2b8a3e', name:'森林绿' }, { hex:'#0b7285', name:'靛蓝' }, { hex:'#364fc7', name:'宝蓝' }, { hex:'#cc5de8', name:'紫罗兰' },
+  { hex:'#f783ac', name:'粉红' }, { hex:'#adb5bd', name:'银灰' }, { hex:'#868e96', name:'烟灰' }, { hex:'#339af0', name:'亮蓝' },
+  { hex:'#94d82d', name:'嫩绿' }, { hex:'#f59f00', name:'芥末黄' }, { hex:'#fd7e14', name:'橘' }, { hex:'#be4bdb', name:'紫' },
+  { hex:'#74c0fc', name:'天青' }, { hex:'#63e6be', name:'海蓝' }, { hex:'#d0bfff', name:'淡紫灰' }, { hex:'#fcc2d7', name:'浅粉' },
+  { hex:'#ffd8a8', name:'杏色' }, { hex:'#b2f2bb', name:'青草' }, { hex:'#a5d8ff', name:'湖蓝' }, { hex:'#eebefa', name:'浅紫' },
+];
+
+function shuffle(arr,n){const copy=[...arr],result=[];for(let i=0;i<n&&copy.length>0;i++){const idx=Math.floor(Math.random()*copy.length);result.push(copy.splice(idx,1)[0])}return result}
+
+const state={favorites:[],currentHex:'#ff6b6b'};
+const $=id=>document.getElementById(id);
+const recoGrid=$('recoGrid'),shuffleBtn=$('shuffleBtn'),colorInput=$('colorInput');
+const applyBtn=$('applyBtn'),addFavBtn=$('addFavBtn'),resetInputBtn=$('resetInputBtn');
+const curHex=$('curHex'),curRgb=$('curRgb'),curHsl=$('curHsl');
+const favGrid=$('favGrid'),favEmpty=$('favEmpty'),favCount=$('favCount');
+const pickerColor=$('pickerColor'),pickerBadge=$('pickerBadge'),nativePicker=$('nativePicker');
+const toastEl=$('toast');
+
+function hexToRgb(h){return{r:parseInt(h.slice(1,3),16),g:parseInt(h.slice(3,5),16),b:parseInt(h.slice(5,7),16)}}
+function rgbToHsl(r,g,b){
+  r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;
+  let h=0,s=0,l=(mx+mn)/2;
+  if(d){s=l>.5?d/(2-mx-mn):d/(mx+mn);if(mx===r)h=((g-b)/d+(g<b?6:0))/6;else if(mx===g)h=((b-r)/d+2)/6;else h=((r-g)/d+4)/6}
+  return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)}
+}
+function hslString(r,g,b){const{h,s,l}=rgbToHsl(r,g,b);return`hsl(${h},${s}%,${l}%)`}
+function rgbString(r,g,b){return`rgb(${r},${g},${b})`}
+function isValidHex(h){return/^#[0-9a-fA-F]{6}$/.test(h)}
+function parseHex(s){s=s.trim().replace(/\s/g,'');if(isValidHex(s))return s;if(/^[0-9a-fA-F]{6}$/.test(s))return'#'+s;return null}
+function parseRgb(s){const m=s.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);if(!m)return null;const r=Math.min(255,Math.max(0,+m[1])),g=Math.min(255,Math.max(0,+m[2])),b=Math.min(255,Math.max(0,+m[3]));return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function parseHsl(s){const m=s.match(/hsl\(\s*(\d+)\s*,\s*(\d+)%\s*,\s*(\d+)%\s*\)/i);if(!m)return null;return hslToHex(+m[1],+m[2],+m[3])}
+function hslToHex(h,s,l){s/=100;l/=100;const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;let r,g,b;if(h<60)[r,g,b]=[c,x,0];else if(h<120)[r,g,b]=[x,c,0];else if(h<180)[r,g,b]=[0,c,x];else if(h<240)[r,g,b]=[0,x,c];else if(h<300)[r,g,b]=[x,0,c];else[r,g,b]=[c,0,x];const tn=n=>Math.round((n+m)*255).toString(16).padStart(2,'0');return`#${tn(r)}${tn(g)}${tn(b)}`}
+function hslString(r,g,b){const{h,s,l}=rgbToHsl(r,g,b);return`hsl(${h},${s}%,${l}%)`}
+
+function setCurrentColor(hex){
+  if(!hex||!isValidHex(hex))return;
+  state.currentHex=hex;colorInput.value=hex;nativePicker.value=hex;
+  const{r,g,b}=hexToRgb(hex);
+  curHex.textContent=hex;curRgb.textContent=rgbString(r,g,b);curHsl.textContent=hslString(r,g,b);
+  pickerColor.style.background=hex;pickerBadge.textContent=hex;
+  addFavBtn.textContent=state.favorites.includes(hex)?'★ 已收藏':'☆ 收藏';
+}
+
+function pickColor(hex){
+  if(!hex||!isValidHex(hex))return;
+  setCurrentColor(hex);copyText(hex);showToast('已复制 '+hex);
+}
+
+// ═══ Native color picker ═══
+nativePicker.addEventListener('input',()=>setCurrentColor(nativePicker.value));
+
+// ═══ Render ═══
+function renderRecos(){
+  const items=shuffle(COLOR_POOL,12);
+  recoGrid.innerHTML=items.map((c,i)=>{
+    const inFav=state.favorites.includes(c.hex);
+    return`<div class="reco-card" style="animation-delay:${i*.04}s" data-hex="${c.hex}"><div class="reco-swatch" style="background:${c.hex}"></div><div class="reco-hover"><div class="reco-row"><span class="reco-hex" data-hex="${c.hex}">${c.hex}</span><span class="reco-star${inFav?' done':''}" data-hex="${c.hex}">${inFav?'★':'☆'}</span></div></div></div>`
+  }).join('');
+  recoGrid.querySelectorAll('.reco-card').forEach(el=>el.addEventListener('click',()=>pickColor(el.dataset.hex)));
+  recoGrid.querySelectorAll('.reco-hex').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();pickColor(el.dataset.hex)}));
+  recoGrid.querySelectorAll('.reco-star').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const h=el.dataset.hex;if(state.favorites.includes(h))removeFavorite(h);else addFavorite(h);el.classList.toggle('done');el.textContent=el.classList.contains('done')?'★':'☆'}));
+}
+shuffleBtn.addEventListener('click',renderRecos);
+
+function applyInput(){
+  const v=colorInput.value.trim();
+  if(!v)return;
+  const h=parseHex(v)||parseRgb(v)||parseHsl(v);
+  if(h)setCurrentColor(h);
+}
+applyBtn.addEventListener('click',applyInput);
+colorInput.addEventListener('blur',applyInput);
+colorInput.addEventListener('keydown',e=>{if(e.key==='Enter')applyInput()});
+resetInputBtn.addEventListener('click',()=>{colorInput.value=''});
+addFavBtn.addEventListener('click',()=>{if(state.currentHex)addFavorite(state.currentHex)});
+
+function loadFavorites(){try{const d=JSON.parse(localStorage.getItem('cp_favorites')||'[]');state.favorites=d.filter(h=>isValidHex(h))}catch{state.favorites=[]}renderFavorites()}
+function saveFavorites(){localStorage.setItem('cp_favorites',JSON.stringify(state.favorites))}
+function addFavorite(hex){if(state.favorites.includes(hex)){showToast('已在收藏中');return}state.favorites.unshift(hex);saveFavorites();renderFavorites();renderRecos();showToast('已收藏')}
+function removeFavorite(hex){state.favorites=state.favorites.filter(h=>h!==hex);saveFavorites();renderFavorites();renderRecos()}
+function renderFavorites(){
+  favCount.textContent=state.favorites.length+' 项';
+  if(state.favorites.length===0){favGrid.innerHTML='';favEmpty.style.display='block';return}
+  favEmpty.style.display='none';
+  favGrid.innerHTML=state.favorites.map((h,i)=>`<div class="fav-item" style="animation-delay:${i*.04}s" data-hex="${h}"><div class="fav-swatch" style="background:${h}"></div><div class="fav-hover"><span class="fav-hex">${h}</span></div><button class="fav-del" data-hex="${h}">✕</button></div>`).join('');
+  favGrid.querySelectorAll('.fav-item').forEach(el=>el.addEventListener('click',e=>{if(e.target.closest('.fav-del'))return;pickColor(el.dataset.hex)}));
+  favGrid.querySelectorAll('.fav-del').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();removeFavorite(b.dataset.hex)}));
+}
+
+function copyText(t){navigator.clipboard.writeText(t).catch(()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta)})}
+let toastTimer;function showToast(msg){toastEl.textContent=msg;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2200)}
+
+renderRecos();loadFavorites();
+</script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RegexLab · 正则表达式测试器 — 在线正则调试工具</title>
+<meta name="description" content="RegexLab 是一款免费在线正则表达式测试器，支持实时匹配高亮、语法高亮、修饰符开关、替换模式、模板库、代码片段生成。">
+<meta property="og:title" content="RegexLab · 正则表达式测试器">
+<meta property="og:description" content="在线正则表达式测试调试工具，实时匹配高亮、语法着色、修饰符开关、替换模式、常用模板库、多语言代码生成。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"RegexLab","url":"https://qraftlabs.com/web-tools-v3/regexlab","description":"在线正则表达式测试器，支持实时匹配高亮、语法着色、修饰符开关、替换模式、模板库、代码片段生成。","applicationCategory":"UtilitiesApplication","operatingSystem":"All"}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px}
+.panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.panel-title{font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);margin-bottom:12px;letter-spacing:0.3px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.text-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.text-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.text-input-wrap textarea,.text-input-wrap input,.text-input-wrap .regex-input{background:transparent;border:none;padding:11px 14px;color:#fff;font-size:13px;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;outline:none;width:100%;resize:vertical;line-height:1.5}
+.text-input-wrap input{font-size:14px}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#fff;font-weight:600}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#fff}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.flag-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.flag-item{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.72);cursor:pointer;user-select:none}
+.flag-item .toggle-switch{width:36px;height:20px}
+.flag-item .toggle-switch .toggle-thumb{width:16px;height:16px}
+.flag-item .toggle-switch input:checked+.toggle-track .toggle-thumb{left:18px}
+.highlight-text{white-space:pre-wrap;word-break:break-all;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:13px;line-height:1.6;padding:12px 14px;background:rgba(0,0,0,0.3);border-radius:8px;min-height:100px;max-height:300px;overflow-y:auto}
+.highlight-text .match{background:rgba(139,139,248,0.35);border-radius:2px}
+.highlight-text .match.g1{background:rgba(255,204,0,0.25)}
+.highlight-text .match.g2{background:rgba(52,199,89,0.25)}
+.highlight-text .match.g3{background:rgba(255,59,48,0.2)}
+.match-list{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.match-list::-webkit-scrollbar{width:4px}
+.match-list::-webkit-scrollbar-track{background:transparent}
+.match-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.match-item{padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:6px;font-size:12px;font-family:monospace;color:rgba(255,255,255,0.76)}
+.match-item .idx{color:rgba(255,255,255,0.3);margin-right:6px}
+.match-item .groups{font-size:11px;color:rgba(139,139,248,0.6);margin-top:2px}
+.regex-highlight{font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:14px;padding:11px 14px;white-space:nowrap;overflow-x:auto}
+.regex-highlight .char{color:#ffd60a}
+.regex-highlight .quant{color:#34c759}
+.regex-highlight .group{color:#8b8bf8}
+.regex-highlight .esc{color:#ff3b30}
+.regex-highlight .anchor{color:#ff9500}
+.regex-highlight .set{color:#af52de}
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px}
+.template-btn{padding:6px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.72);font-size:11px;cursor:pointer;transition:all 0.2s;font-family:monospace;text-align:left}
+.template-btn:hover{background:rgba(139,139,248,0.12);border-color:rgba(139,139,248,0.3);color:#fff}
+.ref-table{width:100%;font-size:12px;border-collapse:collapse}
+.ref-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.72)}
+.ref-table td:first-child{font-family:monospace;color:#8b8bf8;white-space:nowrap}
+.ref-table td:last-child{color:rgba(255,255,255,0.56)}
+.ref-section summary{cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);padding:8px 0}
+.ref-section summary:hover{color:#8b8bf8}
+.ref-section[open] summary{margin-bottom:8px}
+.code-snippet{background:rgba(0,0,0,0.4);border-radius:8px;padding:12px 14px;font-family:'SF Mono','Fira Code','Cascadia Code',monospace;font-size:12px;color:#8b8bf8;white-space:pre-wrap;line-height:1.5;overflow-x:auto}
+.footer{text-align:center;padding:20px 0;font-size:12px;color:rgba(255,255,255,0.4)}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none}
+.footer a:hover{color:#8b8bf8}
+@media(max-width:768px){body{padding:20px 12px 40px}.header h1{font-size:24px}.pricing{grid-template-columns:1fr}.template-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>RegexLab</h1>
+  <p>正则表达式测试器 · 实时匹配 · 语法高亮 · 模板库 · 代码生成</p>
+</div>
+
+<div class="container">
+
+  <div class="panel">
+    <div class="control-group">
+      <label>正则表达式</label>
+      <div class="text-input-wrap">
+        <div class="regex-highlight" id="regexDisplay">/([a-z]+)@(\w+)/gi</div>
+        <input type="text" id="regexInput" value="([a-z]+)@(\w+)" placeholder="输入正则表达式" style="display:none">
+      </div>
+    </div>
+    <div class="flag-row" style="margin-top:8px">
+      <span style="font-size:12px;color:rgba(255,255,255,0.56)">修饰符:</span>
+      <label class="flag-item"><label class="toggle-switch"><input type="checkbox" id="flagG" checked><div class="toggle-track"><div class="toggle-thumb"></div></div></label><span for="flagG">g</span></label>
+      <label class="flag-item"><label class="toggle-switch"><input type="checkbox" id="flagI" checked><div class="toggle-track"><div class="toggle-thumb"></div></div></label><span for="flagI">i</span></label>
+      <label class="flag-item"><label class="toggle-switch"><input type="checkbox" id="flagM"><div class="toggle-track"><div class="toggle-thumb"></div></div></label><span for="flagM">m</span></label>
+      <label class="flag-item"><label class="toggle-switch"><input type="checkbox" id="flagS"><div class="toggle-track"><div class="toggle-thumb"></div></div></label><span for="flagS">s</span></label>
+      <label class="flag-item"><label class="toggle-switch"><input type="checkbox" id="flagU"><div class="toggle-track"><div class="toggle-thumb"></div></div></label><span for="flagU">u</span></label>
+      <span style="font-size:11px;color:rgba(255,255,255,0.4);margin-left:auto" id="regexStatus">有效</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap">
+      <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.78)">模式:</span>
+      <div class="mode-selector" id="modeSelector" style="max-width:260px">
+        <div class="mode-slider" id="modeSlider"></div>
+        <button class="mode-btn active" data-mode="match">匹配</button>
+        <button class="mode-btn" data-mode="replace">替换</button>
+      </div>
+      <div id="replaceInputWrap" style="display:none;flex:1;max-width:300px">
+        <div class="text-input-wrap">
+          <input type="text" id="replaceInput" placeholder="替换文本 (如: $1@example.com)" style="font-size:13px">
+        </div>
+      </div>
+    </div>
+    <div class="control-group">
+      <label>测试文本</label>
+      <div class="text-input-wrap">
+        <textarea id="testInput" placeholder="输入要测试的文本..." style="min-height:120px">user1@example.com
+admin@gmail.com
+support@company.org
+hello world
+test@test</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">匹配结果</div>
+    <div id="resultDisplay">
+      <div class="highlight-text" id="highlightOutput"></div>
+    </div>
+    <div id="replaceResult" style="display:none;margin-top:8px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.56);margin-bottom:4px">替换结果:</div>
+      <div class="highlight-text" id="replaceOutput" style="background:rgba(52,199,89,0.08)"></div>
+    </div>
+    <div style="margin-top:10px">
+      <div style="font-size:12px;color:rgba(255,255,255,0.56);margin-bottom:4px">匹配列表 (<span id="matchCount">0</span>):</div>
+      <div class="match-list" id="matchList"><div style="color:rgba(255,255,255,0.3);padding:8px;font-size:12px">无匹配</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">常用正则模板</div>
+    <div class="template-grid" id="templateGrid"></div>
+  </div>
+
+  <div class="panel ref-section">
+    <details>
+      <summary>正则表达式语法速查表</summary>
+      <table class="ref-table">
+        <tr><td>.</td><td>匹配任意单个字符（除换行符）</td></tr>
+        <tr><td>\d</td><td>匹配数字 [0-9]</td></tr>
+        <tr><td>\w</td><td>匹配字母数字下划线 [a-zA-Z0-9_]</td></tr>
+        <tr><td>\s</td><td>匹配空白符</td></tr>
+        <tr><td>^</td><td>匹配行首</td></tr>
+        <tr><td>$</td><td>匹配行尾</td></tr>
+        <tr><td>*</td><td>匹配前一个元素 0 次或多次</td></tr>
+        <tr><td>+</td><td>匹配前一个元素 1 次或多次</td></tr>
+        <tr><td>?</td><td>匹配前一个元素 0 次或 1 次</td></tr>
+        <tr><td>{n,m}</td><td>匹配前一个元素 n 到 m 次</td></tr>
+        <tr><td>(...)</td><td>捕获组</td></tr>
+        <tr><td>(?:...)</td><td>非捕获组</td></tr>
+        <tr><td>(?=...)</td><td>正向先行断言</td></tr>
+        <tr><td>(?!...)</td><td>负向先行断言</td></tr>
+        <tr><td>[abc]</td><td>字符集，匹配 a、b 或 c</td></tr>
+        <tr><td>\|</td><td>逻辑或</td></tr>
+      </table>
+    </details>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">生成代码片段</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="btn btn-sm btn-secondary" data-lang="javascript">JavaScript</button>
+      <button class="btn btn-sm btn-secondary" data-lang="python">Python</button>
+      <button class="btn btn-sm btn-secondary" data-lang="java">Java</button>
+      <button class="btn btn-sm btn-secondary" data-lang="go">Go</button>
+      <button class="btn btn-sm btn-secondary" data-lang="rust">Rust</button>
+    </div>
+    <div class="code-snippet" id="codeSnippet">// 输入正则表达式后，点击语言按钮生成代码</div>
+  </div>
+
+  <div class="footer">
+    <a href="/docs/support.html">隐私政策</a> · © 2025 RegexLab
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+const regexInput = $('regexInput');
+const testInput = $('testInput');
+const flagG = $('flagG'), flagI = $('flagI'), flagM = $('flagM'), flagS = $('flagS'), flagU = $('flagU');
+const regexDisplay = $('regexDisplay');
+const regexStatus = $('regexStatus');
+
+function getFlags() {
+  let f = '';
+  if (flagG.checked) f += 'g';
+  if (flagI.checked) f += 'i';
+  if (flagM.checked) f += 'm';
+  if (flagS.checked) f += 's';
+  if (flagU.checked) f += 'u';
+  return f;
+}
+
+function buildRegex() {
+  const pattern = regexInput.value.trim();
+  const flags = getFlags();
+  regexDisplay.textContent = `/${pattern}/${flags}`;
+  if (!pattern) { regexStatus.textContent = '请输入正则'; return null; }
+  try {
+    const re = new RegExp(pattern, flags);
+    regexStatus.textContent = '✓ 有效';
+    regexStatus.style.color = '#34c759';
+    return re;
+  } catch(e) {
+    regexStatus.textContent = '✕ ' + e.message;
+    regexStatus.style.color = '#ff3b30';
+    return null;
+  }
+}
+
+function highlightRegex(str) {
+  return escHtml(str)
+    .replace(/([.+*?^$(){}\[\]|\\])/g, '<span class="char">$1</span>')
+    .replace(/(\{[\d,]*\}|\+|\*|\?)/g, '<span class="quant">$1</span>')
+    .replace(/(\((?:\?[:=!])?\)|\(|\))/g, '<span class="group">$1</span>')
+    .replace(/(\\[dDwWsStTrrn])/g, '<span class="esc">$1</span>')
+    .replace(/(\^|\$)/g, '<span class="anchor">$1</span>')
+    .replace(/(\[[^\]]*\])/g, '<span class="set">$1</span>');
+}
+
+const modeBtns = document.querySelectorAll('#modeSelector .mode-btn');
+const modeSlider = $('modeSlider');
+const replaceInputWrap = $('replaceInputWrap');
+
+function moveSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cR = c.getBoundingClientRect();
+  const bR = btn.getBoundingClientRect();
+  modeSlider.style.left = (bR.left - cR.left) + 'px';
+  modeSlider.style.width = bR.width + 'px';
+}
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn);
+    replaceInputWrap.style.display = btn.dataset.mode === 'replace' ? 'block' : 'none';
+    computeRegex();
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#modeSelector .mode-btn.active');
+  if (a) moveSlider(a);
+});
+
+function computeRegex() {
+  const re = buildRegex();
+  const text = testInput.value;
+  const mode = document.querySelector('#modeSelector .mode-btn.active').dataset.mode;
+  const highlight = $('highlightOutput');
+  const matchList = $('matchList');
+  const matchCount = $('matchCount');
+  const replaceResult = $('replaceResult');
+  const replaceOutput = $('replaceOutput');
+
+  if (!re || !text) {
+    highlight.innerHTML = escHtml(text);
+    matchList.innerHTML = '<div style="color:rgba(255,255,255,0.3);padding:8px;font-size:12px">无匹配</div>';
+    matchCount.textContent = '0';
+    replaceResult.style.display = 'none';
+    return;
+  }
+
+  if (mode === 'replace') {
+    const replacement = $('replaceInput').value;
+    let result;
+    try {
+      result = text.replace(re, replacement);
+    } catch(e) {
+      result = text;
+    }
+    replaceOutput.textContent = result;
+    replaceResult.style.display = 'block';
+  } else {
+    replaceResult.style.display = 'none';
+  }
+
+  const matches = [];
+  let m;
+  const global = flagG.checked;
+  if (global) {
+    const gre = new RegExp(re.source, re.flags.replace('g','') + 'g');
+    while ((m = gre.exec(text)) !== null) {
+      matches.push({ full: m[0], index: m.index, groups: Array.from(m).slice(1) });
+      if (m.index === gre.lastIndex) gre.lastIndex++;
+    }
+  } else {
+    m = re.exec(text);
+    if (m) {
+      matches.push({ full: m[0], index: m.index, groups: Array.from(m).slice(1) });
+    }
+  }
+
+  matchCount.textContent = matches.length;
+
+  if (matches.length === 0) {
+    highlight.innerHTML = escHtml(text);
+    matchList.innerHTML = '<div style="color:rgba(255,255,255,0.3);padding:8px;font-size:12px">无匹配</div>';
+    return;
+  }
+
+  let highlighted = '';
+  let last = 0;
+  matches.forEach((mat, idx) => {
+    if (mat.index > last) highlighted += escHtml(text.substring(last, mat.index));
+    const cls = idx % 4 === 0 ? 'match' : idx % 4 === 1 ? 'match g1' : idx % 4 === 2 ? 'match g2' : 'match g3';
+    highlighted += `<span class="${cls}">${escHtml(mat.full)}</span>`;
+    last = mat.index + mat.full.length;
+  });
+  if (last < text.length) highlighted += escHtml(text.substring(last));
+  highlight.innerHTML = highlighted;
+
+  matchList.innerHTML = matches.map((mat, i) => {
+    const groups = mat.groups.filter(g => g != null);
+    const groupsHtml = groups.length > 0 ? `<div class="groups">分组: ${groups.map((g, gi) => `$${gi+1}=${escHtml(g)}`).join(', ')}</div>` : '';
+    return `<div class="match-item"><span class="idx">#${i+1}</span>位置 ${mat.index} · "${escHtml(mat.full)}"${groupsHtml}</div>`;
+  }).join('');
+}
+
+regexInput.addEventListener('input', computeRegex);
+testInput.addEventListener('input', computeRegex);
+[flagG, flagI, flagM, flagS, flagU].forEach(f => f.addEventListener('change', computeRegex));
+$('replaceInput').addEventListener('input', computeRegex);
+
+const templates = [
+  { label: 'Email', pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}' },
+  { label: 'URL', pattern: 'https?://[\\w./?=&-]+' },
+  { label: '手机号', pattern: '1[3-9]\\d{9}' },
+  { label: '日期 (YYYY-MM-DD)', pattern: '\\d{4}-\\d{2}-\\d{2}' },
+  { label: 'IP 地址', pattern: '(?:\\d{1,3}\\.){3}\\d{1,3}' },
+  { label: 'IPv6', pattern: '(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}' },
+  { label: '中文', pattern: '[\\u4e00-\\u9fa5]+' },
+  { label: '身份证号', pattern: '\\d{17}[\\dXx]' },
+  { label: '邮政编码', pattern: '\\d{6}' },
+  { label: 'HTML 标签', pattern: '<[^>]+>' },
+  { label: '空白行', pattern: '^\\s*$' },
+  { label: 'UUID', pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' },
+];
+
+function renderTemplates() {
+  const grid = $('templateGrid');
+  grid.innerHTML = templates.map(t =>
+    `<button class="template-btn" data-pattern="${escHtml(t.pattern)}">${escHtml(t.label)}<br><small style="color:rgba(255,255,255,0.3);font-size:10px">${escHtml(t.pattern.substring(0, 30))}${t.pattern.length > 30 ? '...' : ''}</small></button>`
+  ).join('');
+  grid.querySelectorAll('.template-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      regexInput.value = btn.dataset.pattern;
+      computeRegex();
+    });
+  });
+}
+renderTemplates();
+
+function generateCode(lang) {
+  const pattern = regexInput.value.trim();
+  if (!pattern) { showToast('请先输入正则表达式'); return; }
+  const flags = getFlags().replace('g', '');
+  const escPattern = pattern.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  let code = '';
+  switch(lang) {
+    case 'javascript':
+      code = `const regex = /${pattern}/${getFlags()};\nconst matches = text.match(regex);\nconsole.log(matches);`;
+      break;
+    case 'python':
+      code = `import re\n\npattern = r'${escPattern}'\nmatches = re.findall(pattern, text, re.${flags.includes('i') ? 'IGNORECASE | ' : ''}${flags.includes('m') ? 'MULTILINE' : 'DOTALL' if flags.includes('s') else '0'})\nprint(matches)`;
+      break;
+    case 'java':
+      code = `import java.util.regex.*;\n\nPattern pattern = Pattern.compile("${escPattern}"${flags ? ', ' + flags.split('').map(f => 'Pattern.' + ({i:'CASE_INSENSITIVE',m:'MULTILINE',s:'DOTALL',u:'UNICODE_CHARACTER_CLASS'}[f] || '').toUpperCase()).join(' | ') : ''});\nMatcher matcher = pattern.matcher(text);\nwhile (matcher.find()) {\n    System.out.println(matcher.group());\n}`;
+      break;
+    case 'go':
+      code = `import "regexp"\n\nre := regexp.MustCompile(\`${pattern}\`)\nmatches := re.FindAllString(text, -1)\nfmt.Println(matches)`;
+      break;
+    case 'rust':
+      code = `use regex::Regex;\n\nlet re = Regex::new(r"${escPattern}").unwrap();\nfor cap in re.captures_iter(text) {\n    println!("{}", &cap[0]);\n}`;
+      break;
+  }
+  $('codeSnippet').textContent = code;
+}
+
+document.querySelectorAll('[data-lang]').forEach(btn => {
+  btn.addEventListener('click', () => generateCode(btn.dataset.lang));
+});
+
+computeRegex();
+</script>
+</body>
+</html>

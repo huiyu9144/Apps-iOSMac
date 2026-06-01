@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FormWizard - 表单/问卷构建器 | 在线工具</title>
+<meta name="description" content="免费在线表单构建器，通过拖拽添加文本、单选、多选、下拉等字段，实时预览表单效果，导出 HTML 代码和 JSON 配置。" />
+<meta property="og:title" content="FormWizard - 表单/问卷构建器" />
+<meta property="og:description" content="免费在线表单构建器，拖拽构建表单，实时预览，导出 HTML/JSON/React 代码。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"FormWizard 表单构建器",
+  "description":"通过拖拽方式快速创建表单和问卷，支持多种字段类型，实时预览，导出代码",
+  "applicationCategory":"DeveloperApplication",
+  "operatingSystem":"All",
+  "browserRequirements":"Requires JavaScript"
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000000;color:#ffffff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:20px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.row{display:grid;grid-template-columns:200px 1fr 280px;gap:16px}
+@media(max-width:960px){.row{grid-template-columns:1fr}}
+.control-group{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+input[type="text"],input[type="number"],input[type="email"],input[type="tel"],select,textarea{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;width:100%;transition:border-color 0.3s}
+input:focus,select:focus,textarea:focus{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;font-family:inherit;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-success{background:rgba(52,199,89,0.55);color:#fff}
+.btn-success:hover{background:rgba(52,199,89,0.65)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#ffffff}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.section-title{font-size:15px;font-weight:600;color:rgba(255,255,255,0.88);margin-bottom:10px;letter-spacing:0.2px}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-slide{animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+/* Toolbox */
+.toolbox{display:flex;flex-direction:column;gap:6px}
+.tool-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 12px;cursor:grab;font-size:13px;color:rgba(255,255,255,0.8);transition:all 0.2s;display:flex;align-items:center;gap:8px;user-select:none}
+.tool-item:hover{background:rgba(139,139,248,0.1);border-color:rgba(139,139,248,0.3);color:#fff}
+.tool-item:active{cursor:grabbing;transform:scale(0.97)}
+.tool-item .icon{width:18px;text-align:center;font-size:14px;flex-shrink:0}
+/* Canvas */
+.canvas-area{min-height:400px;background:rgba(255,255,255,0.02);border-radius:12px;border:1.5px dashed rgba(255,255,255,0.08);padding:16px;transition:border-color 0.3s}
+.canvas-area.drag-over{border-color:#8b8bf8;background:rgba(139,139,248,0.04)}
+.canvas-empty{text-align:center;color:rgba(255,255,255,0.3);padding:60px 20px;font-size:14px}
+/* Field card in canvas */
+.field-card{background:rgba(255,255,255,0.04);border-radius:10px;padding:14px 16px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.06);transition:all 0.2s;position:relative}
+.field-card:hover{border-color:rgba(139,139,248,0.3)}
+.field-card.selected{border-color:#8b8bf8;background:rgba(139,139,248,0.06)}
+.field-card .field-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.field-card .field-type{font-size:11px;color:rgba(139,139,248,0.7);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.field-card .field-actions{display:flex;gap:4px}
+.field-card .field-actions button{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:13px;transition:all 0.2s}
+.field-card .field-actions button:hover{background:rgba(255,255,255,0.08);color:#fff}
+.field-card .field-actions .delete-btn:hover{background:rgba(255,69,58,0.2);color:#ff453a}
+.field-card .field-label{font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);margin-bottom:4px}
+.field-card .field-required{color:#ff453a;font-size:12px;margin-left:4px}
+.field-card .field-preview-input{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 12px;color:rgba(255,255,255,0.5);font-size:13px;pointer-events:none}
+.field-card .field-options-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.field-card .field-options-preview label{font-size:13px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:4px;cursor:pointer}
+/* Properties panel */
+.prop-group{margin-bottom:12px}
+.prop-group label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.7);display:block;margin-bottom:4px}
+.prop-group input[type="text"],.prop-group select{font-size:13px;padding:8px 10px}
+.prop-group .toggle-switch{position:relative;width:42px;height:24px;display:inline-block}
+.prop-group .toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.prop-group .toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s}
+.prop-group .toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.prop-group .toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.prop-group .toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.option-row{display:flex;gap:4px;margin-bottom:4px;align-items:center}
+.option-row input{flex:1;font-size:12px;padding:6px 8px}
+.option-row button{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:12px}
+.option-row button:hover{background:rgba(255,69,58,0.2);color:#ff453a}
+.add-option-btn{background:none;border:1px dashed rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;color:rgba(255,255,255,0.5);cursor:pointer;font-size:11px;width:100%;margin-top:2px}
+.add-option-btn:hover{border-color:#8b8bf8;color:#8b8bf8}
+.code-area{background:rgba(0,0,0,0.5);border-radius:10px;padding:14px;font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12px;color:rgba(255,255,255,0.8);max-height:240px;overflow:auto;white-space:pre-wrap;word-break:break-all;border:1px solid rgba(255,255,255,0.06)}
+.code-area::-webkit-scrollbar{width:4px}
+.code-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>FormWizard</h1>
+  <p>表单 / 问卷构建器 · 拖拽构建 · 实时预览 · 导出代码</p>
+</div>
+
+<div class="container">
+  <div class="frost-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <span class="section-title" style="margin-bottom:0">当前表单</span>
+        <span style="font-size:13px;color:rgba(255,255,255,0.5);margin-left:8px" id="fieldCount">0 个字段</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-secondary" id="exportHtmlBtn">导出 HTML</button>
+        <button class="btn btn-sm btn-secondary" id="exportJsonBtn">导出 JSON</button>
+        <button class="btn btn-sm btn-success" id="exportReactBtn">导出 React (Pro)</button>
+        <button class="btn btn-sm btn-outline" id="clearFormBtn">清空</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="frost-panel">
+      <div class="section-title">字段工具箱</div>
+      <div class="toolbox" id="toolbox">
+        <div class="tool-item" data-type="text"><span class="icon">T</span> 单行文本</div>
+        <div class="tool-item" data-type="textarea"><span class="icon">¶</span> 多行文本</div>
+        <div class="tool-item" data-type="radio"><span class="icon">◉</span> 单选</div>
+        <div class="tool-item" data-type="checkbox"><span class="icon">☐</span> 多选</div>
+        <div class="tool-item" data-type="select"><span class="icon">▼</span> 下拉选择</div>
+        <div class="tool-item" data-type="email"><span class="icon">@</span> 邮箱</div>
+        <div class="tool-item" data-type="tel"><span class="icon">✆</span> 电话</div>
+        <div class="tool-item" data-type="file"><span class="icon">↑</span> 文件上传</div>
+      </div>
+    </div>
+
+    <div class="frost-panel" style="padding:14px">
+      <div class="canvas-area" id="canvasArea">
+        <div class="canvas-empty" id="canvasEmpty">从左侧点击或拖拽字段到此处</div>
+        <div id="canvasFields"></div>
+      </div>
+    </div>
+
+    <div class="frost-panel" id="propertiesPanel">
+      <div class="section-title">字段属性</div>
+      <div id="propContent">
+        <div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px 10px;font-size:13px">选择字段以编辑属性</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FIELD_TYPES = {
+  text:       { label:'单行文本', icon:'T' },
+  textarea:   { label:'多行文本', icon:'¶' },
+  radio:      { label:'单选', icon:'◉' },
+  checkbox:   { label:'多选', icon:'☐' },
+  select:     { label:'下拉选择', icon:'▼' },
+  email:      { label:'邮箱', icon:'@' },
+  tel:        { label:'电话', icon:'✆' },
+  file:       { label:'文件上传', icon:'↑' },
+};
+const STORAGE_KEY = 'formwizard_forms';
+const SAVE_KEY = 'formwizard_current';
+
+let toastTimer = null;
+const $ = id => document.getElementById(id);
+
+function showToast(msg) {
+  const el = $('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+let state = {
+  fields: [],
+  selectedId: null,
+  idCounter: 0,
+};
+
+function generateId() { return 'f_' + (++state.idCounter) + '_' + Date.now().toString(36); }
+
+/* Load / Save */
+function saveCurrent() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state.fields)); } catch(e) {}
+}
+function loadSaved() {
+  try {
+    const data = localStorage.getItem(SAVE_KEY);
+    if (data) { state.fields = JSON.parse(data); state.idCounter = state.fields.length; }
+  } catch(e) {}
+}
+
+/* Toolbox click to add */
+document.querySelectorAll('.tool-item').forEach(el => {
+  el.addEventListener('click', () => addField(el.dataset.type));
+  el.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', el.dataset.type);
+    el.style.opacity = '0.5';
+  });
+  el.addEventListener('dragend', (e) => { el.style.opacity = '1'; });
+});
+
+function addField(type) {
+  const field = createField(type);
+  state.fields.push(field);
+  state.selectedId = field.id;
+  renderCanvas();
+  renderProperties();
+  saveCurrent();
+  showToast(`已添加 ${FIELD_TYPES[type].label}`);
+}
+
+function createField(type) {
+  const base = {
+    id: generateId(),
+    type,
+    label: FIELD_TYPES[type].label + (state.fields.length+1),
+    placeholder: '',
+    required: false,
+    options: [],
+  };
+  if (['radio','checkbox','select'].includes(type)) {
+    base.options = ['选项 1', '选项 2', '选项 3'];
+  }
+  if (type === 'file') {
+    base.accept = 'image/*,.pdf';
+  }
+  return base;
+}
+
+/* Canvas */
+function renderCanvas() {
+  const container = $('canvasFields');
+  const empty = $('canvasEmpty');
+  if (state.fields.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    $('fieldCount').textContent = '0 个字段';
+    return;
+  }
+  empty.style.display = 'none';
+  $('fieldCount').textContent = `${state.fields.length} 个字段`;
+
+  container.innerHTML = state.fields.map((f, idx) => {
+    const selected = f.id === state.selectedId ? 'selected' : '';
+    let preview = '';
+    const req = f.required ? '<span class="field-required">*</span>' : '';
+
+    switch (f.type) {
+      case 'text':
+      case 'email':
+      case 'tel':
+        preview = `<div class="field-preview-input">${escHtml(f.placeholder || '输入框预览')}</div>`;
+        break;
+      case 'textarea':
+        preview = `<div class="field-preview-input" style="min-height:48px">${escHtml(f.placeholder || '多行输入框预览')}</div>`;
+        break;
+      case 'radio':
+        preview = `<div class="field-options-preview">${f.options.map(o => `<label><input type="radio" disabled> ${escHtml(o)}</label>`).join('')}</div>`;
+        break;
+      case 'checkbox':
+        preview = `<div class="field-options-preview">${f.options.map(o => `<label><input type="checkbox" disabled> ${escHtml(o)}</label>`).join('')}</div>`;
+        break;
+      case 'select':
+        preview = `<div class="field-preview-input">${escHtml(f.options[0]||'选择...')} ▼</div>`;
+        break;
+      case 'file':
+        preview = `<div class="field-preview-input">点击或拖拽上传文件</div>`;
+        break;
+    }
+
+    return `<div class="field-card ${selected}" data-id="${f.id}" draggable="true">
+      <div class="field-header">
+        <span class="field-type">${FIELD_TYPES[f.type].label}</span>
+        <div class="field-actions">
+          <button class="delete-btn" data-id="${f.id}" title="删除">✕</button>
+        </div>
+      </div>
+      <div class="field-label">${escHtml(f.label)}${req}</div>
+      ${preview}
+    </div>`;
+  }).join('');
+
+  // Click to select
+  container.querySelectorAll('.field-card').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.delete-btn')) return;
+      state.selectedId = el.dataset.id;
+      renderCanvas();
+      renderProperties();
+    });
+    // Drag sorting
+    el.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', 'move:' + el.dataset.id);
+      el.style.opacity = '0.4';
+    });
+    el.addEventListener('dragend', (e) => { el.style.opacity = '1'; });
+  });
+
+  // Delete buttons
+  container.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      state.fields = state.fields.filter(f => f.id !== id);
+      if (state.selectedId === id) state.selectedId = state.fields.length > 0 ? state.fields[0].id : null;
+      renderCanvas();
+      renderProperties();
+      saveCurrent();
+    });
+  });
+}
+
+/* Drag & drop on canvas */
+const canvasArea = $('canvasArea');
+canvasArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  canvasArea.classList.add('drag-over');
+});
+canvasArea.addEventListener('dragleave', () => {
+  canvasArea.classList.remove('drag-over');
+});
+canvasArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  canvasArea.classList.remove('drag-over');
+  const data = e.dataTransfer.getData('text/plain');
+  if (data.startsWith('move:')) {
+    // Reorder
+    const id = data.slice(5);
+    const idx = state.fields.findIndex(f => f.id === id);
+    if (idx === -1) return;
+    const [field] = state.fields.splice(idx, 1);
+    // Insert at drop position (estimate)
+    const dropY = e.clientY;
+    const cards = canvasArea.querySelectorAll('.field-card');
+    let insertIdx = state.fields.length;
+    for (let i = 0; i < cards.length; i++) {
+      const rect = cards[i].getBoundingClientRect();
+      if (dropY < rect.top + rect.height / 2) {
+        insertIdx = i;
+        break;
+      }
+    }
+    state.fields.splice(insertIdx, 0, field);
+    renderCanvas();
+    renderProperties();
+    saveCurrent();
+  } else if (FIELD_TYPES[data]) {
+    addField(data);
+  }
+});
+
+/* Properties panel */
+function renderProperties() {
+  const container = $('propContent');
+  if (!state.selectedId) {
+    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:30px 10px;font-size:13px">选择字段以编辑属性</div>';
+    return;
+  }
+  const field = state.fields.find(f => f.id === state.selectedId);
+  if (!field) return;
+
+  let optionsHtml = '';
+  if (['radio','checkbox','select'].includes(field.type)) {
+    optionsHtml = `<div class="prop-group">
+      <label>选项</label>
+      ${field.options.map((o, i) => `<div class="option-row">
+        <input type="text" class="opt-input" data-idx="${i}" value="${escHtml(o)}">
+        <button class="opt-remove" data-idx="${i}">✕</button>
+      </div>`).join('')}
+      <button class="add-option-btn" id="addOptionBtn">+ 添加选项</button>
+    </div>`;
+  }
+
+  container.innerHTML = `<div class="fade-slide">
+    <div class="prop-group">
+      <label>字段标签</label>
+      <input type="text" id="propLabel" value="${escHtml(field.label)}">
+    </div>
+    <div class="prop-group">
+      <label>占位符</label>
+      <input type="text" id="propPlaceholder" value="${escHtml(field.placeholder)}">
+    </div>
+    <div class="prop-group" style="display:flex;align-items:center;gap:10px">
+      <label class="toggle-switch">
+        <input type="checkbox" id="propRequired" ${field.required?'checked':''}>
+        <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      </label>
+      <span style="font-size:13px;color:rgba(255,255,255,0.7)">必填</span>
+    </div>
+    ${optionsHtml}
+  </div>`;
+
+  // Bind events
+  const propLabel = $('propLabel');
+  const propPlaceholder = $('propPlaceholder');
+  const propRequired = $('propRequired');
+  if (propLabel) propLabel.addEventListener('input', () => { field.label = propLabel.value; renderCanvas(); saveCurrent(); });
+  if (propPlaceholder) propPlaceholder.addEventListener('input', () => { field.placeholder = propPlaceholder.value; renderCanvas(); saveCurrent(); });
+  if (propRequired) propRequired.addEventListener('change', () => { field.required = propRequired.checked; renderCanvas(); saveCurrent(); });
+
+  container.querySelectorAll('.opt-input').forEach(el => {
+    el.addEventListener('input', () => {
+      field.options[+el.dataset.idx] = el.value;
+      renderCanvas();
+    });
+  });
+  container.querySelectorAll('.opt-remove').forEach(el => {
+    el.addEventListener('click', () => {
+      field.options.splice(+el.dataset.idx, 1);
+      renderProperties();
+      renderCanvas();
+    });
+  });
+  const addOptBtn = $('addOptionBtn');
+  if (addOptBtn) addOptBtn.addEventListener('click', () => {
+    field.options.push('新选项 ' + (field.options.length+1));
+    renderProperties();
+    renderCanvas();
+  });
+}
+
+/* Export */
+function generateFormHtml() {
+  const fieldsHtml = state.fields.map(f => {
+    let inputHtml = '';
+    const req = f.required ? ' required' : '';
+    const label = `<label style="font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);display:block;margin-bottom:4px">${escHtml(f.label)}${f.required?' <span style="color:#ff453a">*</span>':''}</label>`;
+
+    switch (f.type) {
+      case 'text':
+        inputHtml = `<input type="text" placeholder="${escHtml(f.placeholder)}"${req} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit">`;
+        break;
+      case 'email':
+        inputHtml = `<input type="email" placeholder="${escHtml(f.placeholder)}"${req} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit">`;
+        break;
+      case 'tel':
+        inputHtml = `<input type="tel" placeholder="${escHtml(f.placeholder)}"${req} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit">`;
+        break;
+      case 'textarea':
+        inputHtml = `<textarea placeholder="${escHtml(f.placeholder)}"${req} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit;min-height:80px"></textarea>`;
+        break;
+      case 'radio':
+        inputHtml = `<div style="display:flex;flex-direction:column;gap:6px">${f.options.map(o => `<label style="font-size:14px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px"><input type="radio" name="${escHtml(f.id)}" value="${escHtml(o)}"${req}> ${escHtml(o)}</label>`).join('')}</div>`;
+        break;
+      case 'checkbox':
+        inputHtml = `<div style="display:flex;flex-direction:column;gap:6px">${f.options.map(o => `<label style="font-size:14px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px"><input type="checkbox" value="${escHtml(o)}"> ${escHtml(o)}</label>`).join('')}</div>`;
+        break;
+      case 'select':
+        const opts = f.options.map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
+        inputHtml = `<select${req} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit">${opts}</select>`;
+        break;
+      case 'file':
+        inputHtml = `<input type="file"${f.accept?` accept="${escHtml(f.accept)}"`:''}${req} style="width:100%;padding:10px;color:rgba(255,255,255,0.7);font-size:14px">`;
+        break;
+    }
+
+    return `<div style="margin-bottom:16px">
+      ${label}
+      ${inputHtml}
+    </div>`;
+  }).join('\n      ');
+
+  return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:#000;color:#fff;padding:24px;max-width:640px;margin:0 auto}
+h1{font-size:22px;font-weight:600;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{font-size:14px;font-weight:500;color:rgba(255,255,255,0.9);display:block;margin-bottom:4px}
+.form-group .required{color:#ff453a}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.3);color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border-color 0.3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#8b8bf8}
+.form-group .radio-group,.form-group .checkbox-group{display:flex;flex-direction:column;gap:6px}
+.form-group .radio-group label,.form-group .checkbox-group label{font-size:14px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;font-weight:400}
+.btn-submit{background:rgba(139,139,248,0.6);color:#fff;border:none;border-radius:10px;padding:12px 32px;font-size:15px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
+.btn-submit:hover{background:rgba(139,139,248,0.7)}
+</style>
+</head>
+<body>
+<h1>表单</h1>
+<form onsubmit="event.preventDefault();alert('表单已提交（演示）')">
+      ${fieldsHtml}
+  <button type="submit" class="btn-submit">提交</button>
+</form>
+</body>
+</html>`;
+}
+
+$('exportHtmlBtn').addEventListener('click', () => {
+  if (state.fields.length === 0) { showToast('请先添加字段'); return; }
+  const html = generateFormHtml();
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.download = 'form.html';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('已导出 form.html');
+});
+
+$('exportJsonBtn').addEventListener('click', () => {
+  if (state.fields.length === 0) { showToast('请先添加字段'); return; }
+  const json = JSON.stringify(state.fields, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.download = 'form-config.json';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('已导出 form-config.json');
+});
+
+$('exportReactBtn').addEventListener('click', () => {
+  if (state.fields.length === 0) { showToast('请先添加字段'); return; }
+  const fieldsCode = state.fields.map(f => {
+    const req = f.required ? ' required' : '';
+    switch (f.type) {
+      case 'text': return `      <input type="text" placeholder="${escHtml(f.placeholder)}"${req} />`;
+      case 'email': return `      <input type="email" placeholder="${escHtml(f.placeholder)}"${req} />`;
+      case 'tel': return `      <input type="tel" placeholder="${escHtml(f.placeholder)}"${req} />`;
+      case 'textarea': return `      <textarea placeholder="${escHtml(f.placeholder)}"${req} />`;
+      case 'radio': return `      <div>${f.options.map(o => `<label><input type="radio" name="${f.id}" value="${escHtml(o)}"${req} /> ${escHtml(o)}</label>`).join('\n        ')}</div>`;
+      case 'checkbox': return `      <div>${f.options.map(o => `<label><input type="checkbox" value="${escHtml(o)}" /> ${escHtml(o)}</label>`).join('\n        ')}</div>`;
+      case 'select': return `      <select${req}>\n${f.options.map(o => `        <option value="${escHtml(o)}">${escHtml(o)}</option>`).join('\n')}\n      </select>`;
+      case 'file': return `      <input type="file"${f.accept?` accept="${f.accept}"`:''}${req} />`;
+      default: return '';
+    }
+  }).join('\n');
+
+  const code = `import React, { useState } from 'react';
+
+const FormBuilder = () => {
+  const [formData, setFormData] = useState({});
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form data:', formData);
+    alert('表单已提交（演示）');
+  };
+
+  const handleChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{
+      maxWidth: 640,
+      margin: '0 auto',
+      padding: 24,
+      fontFamily: '-apple-system, sans-serif',
+      background: '#000',
+      color: '#fff',
+    }}>
+${fieldsCode}
+      <button type="submit" style={{
+        background: 'rgba(139,139,248,0.6)',
+        color: '#fff',
+        border: 'none',
+        borderRadius: 10,
+        padding: '12px 32px',
+        fontSize: 15,
+        fontWeight: 600,
+        cursor: 'pointer',
+        width: '100%',
+        marginTop: 16,
+      }}>提交</button>
+    </form>
+  );
+};
+
+export default FormBuilder;`;
+
+  if (navigator.clipboard) navigator.clipboard.writeText(code).then(() => showToast('React 代码已复制'));
+  else showToast('复制失败');
+});
+
+$('clearFormBtn').addEventListener('click', () => {
+  state.fields = [];
+  state.selectedId = null;
+  renderCanvas();
+  renderProperties();
+  saveCurrent();
+  showToast('表单已清空');
+});
+
+function escHtml(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* Init */
+loadSaved();
+renderCanvas();
+if (state.fields.length > 0) {
+  state.selectedId = state.fields[0].id;
+  renderProperties();
+}
+</script>
+</body>
+</html>

@@ -1,3 +1,8 @@
+C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.exe
+C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.deps.json
+C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.runtimeconfig.json
+C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.dll
+C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.pdb
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\DebugLogWindow.baml
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\MainWindow.baml
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\SettingsWindow.baml
@@ -13,11 +18,6 @@ C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Rele
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\JiaRemoteWin.AssemblyInfo.cs
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\JiaRemoteWin.csproj.CoreCompileInputs.cache
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\JiaRemoteWin.sourcelink.json
-C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.exe
-C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.deps.json
-C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.runtimeconfig.json
-C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.dll
-C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\bin\Release\net9.0-windows\JiaRemoteWin.pdb
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\JiaRemoteWin.dll
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\refint\JiaRemoteWin.dll
 C:\Users\Administrator\Desktop\111111\jia-ios\JiaRemoteWin\JiaRemoteWin\obj\Release\net9.0-windows\JiaRemoteWin.pdb

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PDFForge</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000; color: #ffffff; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 48px; -webkit-font-smoothing: antialiased;
+}
+.header { text-align: center; margin-bottom: 32px; padding: 0 8px; }
+.header h1 {
+  font-size: 30px; font-weight: 700; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p { color: rgba(255,255,255,0.72); font-size: 14px; margin-top: 6px; font-weight: 400; letter-spacing: 0.2px; }
+.container { width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 20px; }
+
+.upload-area {
+  border: 1.5px dashed rgba(255,255,255,0.15); border-radius: 14px;
+  padding: 28px 20px; text-align: center; cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  background: rgba(255,255,255,0.04); backdrop-filter: blur(2px);
+}
+.upload-area:hover { border-color: rgba(139,139,248,0.5); background: rgba(139,139,248,0.06); }
+.upload-area.dragover { border-color: #8b8bf8; background: rgba(139,139,248,0.1); transform: scale(1.01); }
+.upload-icon { width: 34px; height: 34px; margin: 0 auto 8px; color: #8b8bf8; }
+.upload-area p { color: rgba(255,255,255,0.88); font-size: 14px; font-weight: 400; }
+.upload-area .hint { font-size: 12px; color: rgba(255,255,255,0.56); margin-top: 4px; }
+
+.pdf-list-section {
+  background: rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+.pdf-list-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.78);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.pdf-list-header .count { color: #8b8bf8; font-weight: 600; }
+.pdf-list-body {
+  padding: 12px 14px; max-height: 240px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pdf-list-body::-webkit-scrollbar { width: 4px; }
+.pdf-list-body::-webkit-scrollbar-track { background: transparent; }
+.pdf-list-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.pdf-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
+  background: transparent; position: relative;
+}
+.pdf-item:hover { background: rgba(255,255,255,0.05); transform: translateX(2px); }
+.pdf-item.active { background: rgba(139,139,248,0.12); outline: 1.5px solid rgba(139,139,248,0.35); }
+.pdf-icon { width: 28px; height: 32px; flex-shrink:0; color: #8b8bf8; }
+.pdf-item-name { font-size: 13px; color: rgba(255,255,255,0.88); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex:1; }
+.pdf-item-pages { font-size: 11px; color: rgba(255,255,255,0.52); flex-shrink:0; font-variant-numeric: tabular-nums; }
+.pdf-item-remove {
+  width: 22px; height: 22px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.52);
+  cursor: pointer; font-size: 10px; display: flex; align-items: center;
+  justify-content: center; transition: all 0.2s; opacity: 0;
+}
+.pdf-item:hover .pdf-item-remove { opacity: 1; }
+.pdf-item-remove:hover { background: rgba(255,69,58,0.8); color: #fff; transform: scale(1.1); }
+
+.controls-panel {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  background: rgba(255,255,255,0.06); border-radius: 14px;
+  padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+.control-group { display: flex; flex-direction: column; gap: 6px; }
+.control-group label {
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.78); letter-spacing: 0.3px;
+}
+.control-group input, .control-group textarea {
+  background: rgba(0,0,0,0.5); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 11px 14px; color: #fff; font-size: 14px;
+  font-family: inherit; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+}
+.control-group input:focus, .control-group textarea:focus {
+  border-color: #8b8bf8; box-shadow: 0 0 0 3px rgba(139,139,248,0.2);
+}
+
+.mode-selector {
+  position: relative; display: flex;
+  background: rgba(0,0,0,0.4); border-radius: 10px; padding: 3px; overflow: hidden;
+}
+.mode-slider {
+  position: absolute; top: 3px; left: 3px; height: calc(100% - 6px); border-radius: 7px;
+  background: rgba(139,139,248,0.25); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25,0.46,0.45,0.94), width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  z-index: 0; pointer-events: none;
+}
+.mode-btn {
+  flex: 1; padding: 8px 8px; border-radius: 7px; border: none;
+  background: transparent; color: rgba(255,255,255,0.78); font-size: 12px;
+  font-weight: 500; cursor: pointer; text-align: center; font-family: inherit;
+  position: relative; z-index: 1; transition: color 0.25s ease; user-select: none;
+}
+.mode-btn.active { color: #ffffff; font-weight: 600; }
+.mode-desc { font-size: 11px; color: rgba(255,255,255,0.52); margin-top: 4px; line-height: 1.4; }
+
+.actions {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+.btn {
+  padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px;
+  font-weight: 600; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap; font-family: inherit; letter-spacing: 0.3px;
+  position: relative; overflow: hidden;
+}
+.btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.3s; }
+.btn:hover::after { background: rgba(255,255,255,0.06); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: rgba(139,139,248,0.6); color: #fff; }
+.btn-primary:hover { background: rgba(139,139,248,0.7); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+.btn-success { background: rgba(52,199,89,0.55); color: #fff; }
+.btn-success:hover { background: rgba(52,199,89,0.65); }
+.btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.btn-sm { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
+.btn-danger { background: rgba(255,69,58,0.55); color: #fff; }
+.btn-danger:hover { background: rgba(255,69,58,0.65); }
+
+.progress-wrap { display: none; width: 100%; }
+.progress-wrap.show { display: block; animation: fadeSlideUp 0.3s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+.progress-bar-track { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, #8b8bf8, #c084fc); border-radius: 2px; width: 0%; transition: width 0.3s; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.56); margin-top: 6px; }
+
+.toast {
+  position: fixed; bottom: 36px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30,30,30,0.95); color: #fff; padding: 12px 24px;
+  border-radius: 12px; font-size: 14px; font-weight: 500; opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  pointer-events: none; z-index: 100;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.operation-panel {
+  background: rgba(255,255,255,0.02); border-radius: 10px; padding: 16px;
+  min-height: 120px; display: flex; flex-direction: column; gap: 12px;
+  justify-content: center;
+}
+.operation-panel .placeholder {
+  color: rgba(255,255,255,0.48); font-size: 13px; text-align: center;
+}
+
+.page-range-input { display: flex; align-items: center; gap: 8px; }
+.page-range-input input { width: 80px; }
+.page-range-input span { color: rgba(255,255,255,0.56); font-size: 13px; }
+
+.order-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(139,139,248,0.2); color: #8b8bf8;
+  font-size: 11px; font-weight: 600; flex-shrink: 0;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 700px) {
+  body { padding: 20px 12px 40px; }
+  .controls-panel { grid-template-columns: 1fr; }
+  .header h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PDFForge</h1>
+  <p>PDF 合并 / 拆分 / 压缩 · 纯浏览器端处理</p>
+</div>
+
+<div class="container">
+  <div class="upload-area" id="uploadArea">
+    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>拖拽 PDF 到此处，或点击上传</p>
+    <p class="hint">支持批量上传多个 PDF 文件</p>
+    <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple style="display:none">
+  </div>
+
+  <div class="pdf-list-section" id="pdfListSection" style="display:none">
+    <div class="pdf-list-header">
+      <span>PDF 文件 <span class="count" id="pdfCount">0</span> 个</span>
+      <button class="btn btn-outline" id="clearAllBtn" style="padding:5px 12px;font-size:11px;border-radius:8px">清空</button>
+    </div>
+    <div class="pdf-list-body" id="pdfListBody"></div>
+  </div>
+
+  <div class="controls-panel" id="controlsPanel" style="display:none">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="control-group">
+        <label>操作模式</label>
+        <div class="mode-selector" id="modeSelector">
+          <div class="mode-slider" id="modeSlider"></div>
+          <button class="mode-btn active" data-op="merge">合并</button>
+          <button class="mode-btn" data-op="split">拆分</button>
+          <button class="mode-btn" data-op="compress">压缩</button>
+        </div>
+        <div class="mode-desc" id="modeDesc">将多个 PDF 按顺序合并为一个文件</div>
+      </div>
+    </div>
+    <div>
+      <div class="operation-panel" id="operationPanel">
+        <div class="placeholder" id="opPlaceholder">上传 PDF 后开始操作</div>
+        <div id="opContent" style="display:none;flex-direction:column;gap:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actionsSection" style="display:none">
+    <button class="btn btn-primary" id="executeBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span id="executeBtnText">执行操作</span>
+    </button>
+    <button class="btn btn-secondary" id="addMoreBtn">添加更多 PDF</button>
+    <button class="btn btn-outline" id="resetBtn">重新开始</button>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressText">处理中...</span><span id="progressPercent">0%</span></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const state = { pdfs: [], selectedId: null, currentOp: 'merge' };
+let idCounter = 0;
+
+const $ = (id) => document.getElementById(id);
+const uploadArea = $('uploadArea');
+const fileInput = $('fileInput');
+const pdfListSection = $('pdfListSection');
+const pdfListBody = $('pdfListBody');
+const pdfCount = $('pdfCount');
+const clearAllBtn = $('clearAllBtn');
+const controlsPanel = $('controlsPanel');
+const modeBtns = document.querySelectorAll('#modeSelector .mode-btn');
+const modeSlider = $('modeSlider');
+const modeDesc = $('modeDesc');
+const opPanel = $('operationPanel');
+const opPlaceholder = $('opPlaceholder');
+const opContent = $('opContent');
+const executeBtn = $('executeBtn');
+const executeBtnText = $('executeBtnText');
+const addMoreBtn = $('addMoreBtn');
+const resetBtn = $('resetBtn');
+const progressWrap = $('progressWrap');
+const progressFill = $('progressFill');
+const progressText = $('progressText');
+const progressPercent = $('progressPercent');
+const toastEl = $('toast');
+
+const opDescriptions = {
+  merge: '将多个 PDF 按顺序合并为一个文件',
+  split: '选择一个 PDF，提取指定页码范围生成新文件',
+  compress: '选择一个 PDF，移除指定页面以减小文件体积',
+};
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+async function loadPdfMeta(file) {
+  const id = ++idCounter;
+  const entry = { id, file, name: file.name, size: file.size, arrayBuffer: null, pageCount: 0, loaded: false };
+  try {
+    const ab = await file.arrayBuffer();
+    entry.arrayBuffer = ab;
+    const pdf = await pdfjsLib.getDocument({ data: ab.slice(0) }).promise;
+    entry.pageCount = pdf.numPages;
+    entry.loaded = true;
+  } catch (e) {
+    entry.pageCount = 0;
+    entry.loaded = true;
+  }
+  return entry;
+}
+
+async function addPdfs(files) {
+  for (const file of files) {
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) continue;
+    const entry = await loadPdfMeta(file);
+    state.pdfs.push(entry);
+  }
+  if (state.pdfs.length > 0) {
+    if (state.pdfs.filter(e => e.loaded).length === 1) state.selectedId = state.pdfs[0].id;
+    sectionsVisible();
+    renderPdfList();
+    updateOpPanel();
+  }
+}
+
+function removePdf(id) {
+  state.pdfs = state.pdfs.filter(e => e.id !== id);
+  if (state.selectedId === id) state.selectedId = state.pdfs.length > 0 ? state.pdfs[0].id : null;
+  renderPdfList();
+  if (state.pdfs.length === 0) resetAll();
+  else updateOpPanel();
+}
+
+function selectPdf(id) {
+  state.selectedId = id;
+  renderPdfList();
+  updateOpPanel();
+}
+
+function getSelected() { return state.pdfs.find(e => e.id === state.selectedId); }
+
+function renderPdfList() {
+  const loaded = state.pdfs.filter(e => e.loaded);
+  pdfCount.textContent = loaded.length;
+  if (loaded.length === 0) { pdfListSection.style.display = 'none'; return; }
+  pdfListSection.style.display = 'block';
+
+  const isMerge = state.currentOp === 'merge';
+
+  pdfListBody.innerHTML = loaded.map((entry, idx) => {
+    const active = entry.id === state.selectedId ? 'active' : '';
+    return `<div class="pdf-item ${active}" data-id="${entry.id}">
+      ${isMerge ? `<span class="order-badge">${idx + 1}</span>` : ''}
+      <svg class="pdf-icon" viewBox="0 0 24 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v20a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="8" y1="21" x2="12" y2="21"/>
+      </svg>
+      <span class="pdf-item-name">${escHtml(entry.name)}</span>
+      <span class="pdf-item-pages">${entry.pageCount} 页</span>
+      <button class="pdf-item-remove" data-remove="${entry.id}" title="移除">✕</button>
+    </div>`;
+  }).join('');
+
+  pdfListBody.querySelectorAll('.pdf-item').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.pdf-item-remove')) return;
+      selectPdf(parseInt(el.dataset.id));
+    });
+  });
+  pdfListBody.querySelectorAll('.pdf-item-remove').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); removePdf(parseInt(btn.dataset.remove)); });
+  });
+}
+
+function updateOpPanel() {
+  const loaded = state.pdfs.filter(e => e.loaded);
+  if (loaded.length === 0) {
+    opPlaceholder.style.display = 'block';
+    opContent.style.display = 'none';
+    opContent.innerHTML = '';
+    return;
+  }
+  opPlaceholder.style.display = 'none';
+  opContent.style.display = 'flex';
+
+  const sel = getSelected();
+  switch (state.currentOp) {
+    case 'merge':
+      if (loaded.length < 2) {
+        opContent.innerHTML = '<div class="placeholder">请上传至少 2 个 PDF 文件进行合并</div>';
+        executeBtn.disabled = true;
+      } else {
+        opContent.innerHTML = `<div style="font-size:13px;color:rgba(255,255,255,0.78);">
+          已选择 <strong style="color:#8b8bf8;">${loaded.length}</strong> 个 PDF，共 <strong style="color:#8b8bf8;">${loaded.reduce((s, e) => s + e.pageCount, 0)}</strong> 页<br>
+          将按上方顺序合并为一个 PDF 文件
+        </div>`;
+        executeBtn.disabled = false;
+      }
+      executeBtnText.textContent = '合并并下载';
+      break;
+
+    case 'split':
+      if (!sel) {
+        opContent.innerHTML = '<div class="placeholder">请从列表中选择一个 PDF</div>';
+        executeBtn.disabled = true;
+      } else {
+        opContent.innerHTML = `
+          <div style="font-size:13px;color:rgba(255,255,255,0.78);">
+            已选择: <strong style="color:#8b8bf8;">${escHtml(sel.name)}</strong>（共 ${sel.pageCount} 页）
+          </div>
+          <div class="page-range-input">
+            <span style="font-size:13px;color:rgba(255,255,255,0.78);">提取页码范围:</span>
+            <input type="number" id="splitFrom" value="1" min="1" max="${sel.pageCount}" style="width:70px;">
+            <span style="color:rgba(255,255,255,0.56);">至</span>
+            <input type="number" id="splitTo" value="${sel.pageCount}" min="1" max="${sel.pageCount}" style="width:70px;">
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.48);">例如: "1-3" 表示提取第 1 到第 3 页</div>
+        `;
+        executeBtn.disabled = false;
+      }
+      executeBtnText.textContent = '提取页面';
+      break;
+
+    case 'compress':
+      if (!sel) {
+        opContent.innerHTML = '<div class="placeholder">请从列表中选择一个 PDF</div>';
+        executeBtn.disabled = true;
+      } else {
+        opContent.innerHTML = `
+          <div style="font-size:13px;color:rgba(255,255,255,0.78);">
+            已选择: <strong style="color:#8b8bf8;">${escHtml(sel.name)}</strong>（共 ${sel.pageCount} 页）
+          </div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.78);">
+            移除指定页面（逗号分隔，如: 1,3,5）:
+          </div>
+          <input type="text" id="removePages" value="" placeholder="例如: 1,3,5 或 2-4" style="background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;color:#fff;font-size:14px;font-family:inherit;outline:none;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.48);">支持单个页码、逗号分隔和连字符范围，如: 1,3,5-7</div>
+        `;
+        executeBtn.disabled = false;
+      }
+      executeBtnText.textContent = '压缩并下载';
+      break;
+  }
+}
+
+function parsePageRanges(input, maxPage) {
+  const parts = input.split(',').map(s => s.trim()).filter(Boolean);
+  const pages = new Set();
+  for (const part of parts) {
+    if (/^\d+$/.test(part)) {
+      const p = parseInt(part);
+      if (p >= 1 && p <= maxPage) pages.add(p);
+    } else if (/^(\d+)-(\d+)$/.test(part)) {
+      const [, a, b] = part.match(/^(\d+)-(\d+)$/);
+      const from = Math.max(1, parseInt(a));
+      const to = Math.min(maxPage, parseInt(b));
+      for (let i = from; i <= to; i++) pages.add(i);
+    }
+  }
+  return [...pages].sort((a, b) => a - b);
+}
+
+async function executeMerge() {
+  const loaded = state.pdfs.filter(e => e.loaded);
+  if (loaded.length < 2) { showToast('请上传至少 2 个 PDF 文件'); return; }
+
+  executeBtn.disabled = true;
+  progressWrap.classList.add('show');
+  progressFill.style.width = '0%';
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const mergedPdf = await PDFDocument.create();
+
+    for (let i = 0; i < loaded.length; i++) {
+      progressText.textContent = `合并: ${escHtml(loaded[i].name)}`;
+      progressPercent.textContent = `${Math.round((i / loaded.length) * 100)}%`;
+      progressFill.style.width = `${(i / loaded.length) * 100}%`;
+
+      const srcDoc = await PDFDocument.load(loaded[i].arrayBuffer, { ignoreEncryption: true });
+      const indices = srcDoc.getPageIndices();
+      const pages = await mergedPdf.copyPages(srcDoc, indices);
+      pages.forEach(p => mergedPdf.addPage(p));
+    }
+
+    progressText.textContent = '正在生成 PDF...';
+    progressPercent.textContent = '99%';
+    progressFill.style.width = '99%';
+
+    const pdfBytes = await mergedPdf.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.download = `merged_${loaded.length}files.pdf`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast(`合并完成！共 ${loaded.reduce((s, e) => s + e.pageCount, 0)} 页`);
+  } catch (err) {
+    showToast('合并出错: ' + err.message);
+  } finally {
+    executeBtn.disabled = false;
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+  }
+}
+
+async function executeSplit() {
+  const sel = getSelected();
+  if (!sel) { showToast('请选择一个 PDF'); return; }
+
+  const from = parseInt($('splitFrom').value) || 1;
+  const to = parseInt($('splitTo').value) || sel.pageCount;
+  if (from < 1 || to > sel.pageCount || from > to) {
+    showToast(`页码范围无效（1-${sel.pageCount}）`); return;
+  }
+
+  executeBtn.disabled = true;
+  progressWrap.classList.add('show');
+  progressFill.style.width = '50%';
+  progressText.textContent = '提取页面...';
+  progressPercent.textContent = '50%';
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const srcDoc = await PDFDocument.load(sel.arrayBuffer, { ignoreEncryption: true });
+    const destPdf = await PDFDocument.create();
+    const indices = [];
+    for (let i = from - 1; i < to; i++) indices.push(i);
+    const pages = await destPdf.copyPages(srcDoc, indices);
+    pages.forEach(p => destPdf.addPage(p));
+
+    progressFill.style.width = '90%';
+    progressPercent.textContent = '90%';
+
+    const pdfBytes = await destPdf.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    const stem = sel.name.replace(/\.pdf$/i, '');
+    link.download = `${stem}_p${from}-${to}.pdf`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast(`已提取第 ${from}-${to} 页，共 ${to - from + 1} 页`);
+  } catch (err) {
+    showToast('拆分出错: ' + err.message);
+  } finally {
+    executeBtn.disabled = false;
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+  }
+}
+
+async function executeCompress() {
+  const sel = getSelected();
+  if (!sel) { showToast('请选择一个 PDF'); return; }
+
+  const input = $('removePages').value.trim();
+  if (!input) { showToast('请输入要移除的页码'); return; }
+
+  const toRemove = parsePageRanges(input, sel.pageCount);
+  if (toRemove.length === 0) { showToast('无效的页码'); return; }
+  if (toRemove.length >= sel.pageCount) { showToast('不能移除所有页面'); return; }
+
+  executeBtn.disabled = true;
+  progressWrap.classList.add('show');
+  progressFill.style.width = '30%';
+  progressText.textContent = '处理中...';
+  progressPercent.textContent = '30%';
+
+  try {
+    const { PDFDocument } = PDFLib;
+    const srcDoc = await PDFDocument.load(sel.arrayBuffer, { ignoreEncryption: true });
+    const destPdf = await PDFDocument.create();
+
+    const removeSet = new Set(toRemove.map(p => p - 1));
+    const allIndices = srcDoc.getPageIndices();
+    const keepIndices = allIndices.filter(i => !removeSet.has(i));
+
+    const pages = await destPdf.copyPages(srcDoc, keepIndices);
+    pages.forEach(p => destPdf.addPage(p));
+
+    progressFill.style.width = '80%';
+    progressPercent.textContent = '80%';
+
+    const pdfBytes = await destPdf.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    const stem = sel.name.replace(/\.pdf$/i, '');
+    link.download = `${stem}_compressed.pdf`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    URL.revokeObjectURL(link.href);
+    const removed = toRemove.length;
+    const kept = sel.pageCount - removed;
+    showToast(`压缩完成！移除 ${removed} 页，保留 ${kept} 页`);
+  } catch (err) {
+    showToast('压缩出错: ' + err.message);
+  } finally {
+    executeBtn.disabled = false;
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+  }
+}
+
+function sectionsVisible() {
+  controlsPanel.style.display = 'grid';
+  document.getElementById('actionsSection').style.display = 'flex';
+}
+
+function resetAll() {
+  state.pdfs = []; state.selectedId = null;
+  pdfListSection.style.display = 'none';
+  controlsPanel.style.display = 'none';
+  document.getElementById('actionsSection').style.display = 'none';
+  progressWrap.classList.remove('show');
+  updateOpPanel();
+  fileInput.value = '';
+}
+
+uploadArea.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => { if (fileInput.files.length > 0) { addPdfs(fileInput.files); fileInput.value = ''; } });
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) addPdfs(e.dataTransfer.files); else showToast('请拖入 PDF 文件'); });
+addMoreBtn.addEventListener('click', () => fileInput.click());
+clearAllBtn.addEventListener('click', resetAll);
+resetBtn.addEventListener('click', resetAll);
+
+function moveSlider(btn, slider) {
+  const container = btn.closest('.mode-selector');
+  const cRect = container.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  slider.style.left = (bRect.left - cRect.left) + 'px';
+  slider.style.width = bRect.width + 'px';
+}
+
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, modeSlider);
+    state.currentOp = btn.dataset.op;
+    modeDesc.textContent = opDescriptions[state.currentOp];
+    renderPdfList();
+    updateOpPanel();
+  });
+});
+
+requestAnimationFrame(() => {
+  const a = document.querySelector('#modeSelector .mode-btn.active');
+  if (a) moveSlider(a, modeSlider);
+});
+
+executeBtn.addEventListener('click', () => {
+  switch (state.currentOp) {
+    case 'merge': executeMerge(); break;
+    case 'split': executeSplit(); break;
+    case 'compress': executeCompress(); break;
+  }
+});
+
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+modeDesc.textContent = opDescriptions.merge;
+</script>
+</body>
+</html>

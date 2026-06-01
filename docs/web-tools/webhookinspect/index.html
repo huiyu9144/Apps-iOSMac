@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>WebhookInspect · Webhook 调试器</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000; color: #fff; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+}
+.header { text-align: center; margin-bottom: 32px; padding: 0 8px; }
+.header h1 {
+  font-size: 30px; font-weight: 700; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p { color: rgba(255,255,255,0.72); font-size: 14px; margin-top: 6px; letter-spacing: 0.2px; }
+.container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 16px; }
+
+.frost-panel { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  display: inline-flex; align-items: center; gap: 6px; font-family: inherit; letter-spacing: 0.3px;
+  position: relative; overflow: hidden;
+}
+.btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.3s; }
+.btn:hover::after { background: rgba(255,255,255,0.06); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: rgba(139,139,248,0.6); color: #fff; }
+.btn-primary:hover { background: rgba(139,139,248,0.7); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+.btn-success { background: rgba(52,199,89,0.55); color: #fff; }
+.btn-success:hover { background: rgba(52,199,89,0.65); }
+.btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
+.btn-sm { padding: 6px 14px; font-size: 11px; border-radius: 8px; }
+
+/* Input */
+.input-wrap {
+  position: relative; display: flex; align-items: stretch; border-radius: 10px; overflow: hidden;
+  border: 1.5px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-wrap:focus-within { border-color: #8b8bf8; box-shadow: 0 0 0 3px rgba(139,139,248,0.2); }
+.input-wrap input, .input-wrap textarea {
+  background: transparent; border: none; padding: 10px 12px; color: #fff; font-size: 13px;
+  outline: none; width: 100%; font-family: inherit;
+}
+.input-wrap textarea { resize: vertical; min-height: 60px; }
+
+/* Method badges */
+.method-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase; flex-shrink: 0;
+}
+.method-get { background: rgba(52,199,89,0.2); color: #34c759; }
+.method-post { background: rgba(139,139,248,0.2); color: #8b8bf8; }
+.method-put { background: rgba(255,204,0,0.2); color: #ffcc00; }
+.method-delete { background: rgba(255,59,48,0.2); color: #ff3b30; }
+
+/* Log list */
+.log-list {
+  max-height: 480px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;
+}
+.log-list::-webkit-scrollbar { width: 4px; }
+.log-list::-webkit-scrollbar-track { background: transparent; }
+.log-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+.log-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px;
+  cursor: pointer; transition: all 0.2s; border: 1px solid transparent;
+  background: rgba(255,255,255,0.02);
+}
+.log-item:hover { background: rgba(139,139,248,0.05); border-color: rgba(139,139,248,0.15); }
+.log-item.active { background: rgba(139,139,248,0.1); border-color: rgba(139,139,248,0.3); }
+.log-time { font-size: 10px; color: rgba(255,255,255,0.4); flex-shrink: 0; font-variant-numeric: tabular-nums; width: 60px; }
+.log-path { font-size: 11px; color: rgba(255,255,255,0.7); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.log-status {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
+}
+.status-2xx { background: rgba(52,199,89,0.15); color: #34c759; }
+.status-4xx { background: rgba(255,204,0,0.15); color: #ffcc00; }
+.status-5xx { background: rgba(255,59,48,0.15); color: #ff3b30; }
+
+/* Detail panels */
+.detail-section { margin-bottom: 12px; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 4px; font-weight: 500; letter-spacing: 0.3px; }
+.detail-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.detail-table td { padding: 4px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+.detail-table td:first-child { color: #8b8bf8; font-weight: 500; white-space: nowrap; width: 30%; }
+.detail-table td:last-child { color: rgba(255,255,255,0.8); word-break: break-all; }
+.json-body {
+  font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-size: 11px; line-height: 1.5; color: rgba(255,255,255,0.85);
+  background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px;
+  max-height: 240px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+}
+.json-body::-webkit-scrollbar { width: 4px; }
+.json-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* Modal overlay for custom response settings */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: #1c1c1e; border-radius: 16px; padding: 24px; width: 90%; max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* Stats badge */
+.stat-badge {
+  display: flex; align-items: center; gap: 6px; font-size: 12px; color: rgba(255,255,255,0.6);
+}
+.stat-badge span { font-weight: 600; color: #8b8bf8; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: rgba(30,30,30,0.95); color: #fff; padding: 12px 24px; border-radius: 12px;
+  font-size: 14px; font-weight: 500; opacity: 0; pointer-events: none; z-index: 100;
+  backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-in { animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both; }
+
+@media (max-width: 768px) {
+  body { padding: 20px 12px 40px; }
+  .header h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>WebhookInspect</h1>
+  <p>Webhook 调试器</p>
+</div>
+
+<div class="container">
+  <!-- Top status bar -->
+  <div class="frost-panel anim-in">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <div class="flex-1 flex items-center gap-2 min-w-0">
+        <span class="text-[12px] text-[rgba(255,255,255,0.5)] shrink-0">Webhook URL</span>
+        <div class="input-wrap flex-1 min-w-0"><input id="webhookUrl" readonly value="—" style="font-size:12px;"></div>
+        <button class="btn btn-sm btn-secondary" id="copyUrlBtn">复制</button>
+        <button class="btn btn-sm btn-outline" id="regenerateBtn">重新生成</button>
+      </div>
+      <div class="flex gap-4 shrink-0">
+        <div class="stat-badge">总请求 <span id="totalCount">0</span></div>
+        <div class="stat-badge">今日 <span id="todayCount">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="flex flex-col lg:flex-row gap-4">
+    <!-- Left: Log list -->
+    <div class="w-full lg:w-[380px] flex flex-col gap-3">
+      <div class="frost-panel anim-in" style="flex:1;">
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-[13px] font-medium text-[rgba(255,255,255,0.78)]">请求日志</span>
+          <span class="text-[11px] text-[rgba(255,255,255,0.4)]" id="logCount">0 条</span>
+        </div>
+        <div class="log-list" id="logList">
+          <div style="text-align:center;padding:30px 0;color:rgba(255,255,255,0.3);font-size:13px;">暂无请求记录</div>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-sm btn-primary" id="simulateBtn">模拟发送请求</button>
+        <button class="btn btn-sm btn-outline" id="clearLogsBtn">清空历史</button>
+        <button class="btn btn-sm btn-secondary" id="exportJsonBtn">导出日志 JSON</button>
+        <button class="btn btn-sm btn-outline" id="customRespBtn">自定义响应</button>
+      </div>
+    </div>
+
+    <!-- Right: Detail panel -->
+    <div class="flex-1 flex flex-col gap-3">
+      <div class="frost-panel anim-in" style="flex:1;min-height:300px;">
+        <div class="text-[13px] font-medium text-[rgba(255,255,255,0.78)] mb-3">请求详情</div>
+        <div id="detailContent">
+          <div style="text-align:center;padding:40px 0;color:rgba(255,255,255,0.3);font-size:13px;">点击左侧日志条目查看详情</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom response modal -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-box anim-in">
+    <div class="text-[15px] font-semibold mb-4">自定义响应设置</div>
+    <div class="flex flex-col gap-3">
+      <div>
+        <label class="text-[11px] text-[rgba(255,255,255,0.5)] block mb-1">状态码</label>
+        <div class="input-wrap"><input id="customStatus" value="200" type="number" min="100" max="599"></div>
+      </div>
+      <div>
+        <label class="text-[11px] text-[rgba(255,255,255,0.5)] block mb-1">响应体 (JSON)</label>
+        <div class="input-wrap"><textarea id="customBody" rows="4">{"status":"ok","message":"Webhook received"}</textarea></div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end mt-4">
+      <button class="btn btn-sm btn-outline" id="modalCancelBtn">取消</button>
+      <button class="btn btn-sm btn-primary" id="modalSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const METHODS = ['GET', 'POST', 'PUT', 'DELETE'];
+const SAMPLE_PATHS = ['/api/webhook', '/callback/payment', '/events/user', '/hooks/order', '/notifications'];
+
+const $ = id => document.getElementById(id);
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+// State
+let state = {
+  webhookId: null,
+  logs: [],
+  selectedId: null,
+  customStatus: 200,
+  customBody: '{"status":"ok","message":"Webhook received"}',
+};
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('webhookinspect_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(state, parsed);
+      if (!state.logs) state.logs = [];
+    }
+  } catch(e) {}
+}
+loadState();
+
+function saveState() {
+  try { localStorage.setItem('webhookinspect_state', JSON.stringify(state)); } catch(e) {}
+}
+
+function generateId() {
+  return 'wh_' + crypto.randomUUID().slice(0, 8) + Math.random().toString(36).substring(2,6);
+}
+
+// Ensure webhook ID
+if (!state.webhookId) {
+  state.webhookId = generateId();
+  saveState();
+}
+
+function getWebhookUrl() {
+  return `https://hook.inspect/${state.webhookId}`;
+}
+
+function renderUrl() {
+  $('webhookUrl').value = getWebhookUrl();
+}
+
+function updateStats() {
+  $('totalCount').textContent = state.logs.length;
+  const today = new Date().toISOString().split('T')[0];
+  const todayLogs = state.logs.filter(l => l.timestamp.startsWith(today));
+  $('todayCount').textContent = todayLogs.length;
+  $('logCount').textContent = state.logs.length + ' 条';
+}
+
+// Render log list
+function renderLogs() {
+  const list = $('logList');
+  if (state.logs.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:30px 0;color:rgba(255,255,255,0.3);font-size:13px;">暂无请求记录</div>';
+    updateStats();
+    return;
+  }
+  list.innerHTML = state.logs.map(log => {
+    const active = log.id === state.selectedId ? 'active' : '';
+    const methodCls = 'method-badge method-' + log.method.toLowerCase();
+    let statusCls = 'log-status ';
+    if (log.statusCode < 300) statusCls += 'status-2xx';
+    else if (log.statusCode < 500) statusCls += 'status-4xx';
+    else statusCls += 'status-5xx';
+    const time = log.timestamp.slice(11, 19);
+    return `<div class="log-item ${active}" data-id="${log.id}">
+      <span class="log-time">${time}</span>
+      <span class="${methodCls}">${log.method}</span>
+      <span class="log-path">${escHtml(log.path)}</span>
+      <span class="${statusCls}">${log.statusCode}</span>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.log-item').forEach(el => {
+    el.addEventListener('click', () => {
+      state.selectedId = el.dataset.id;
+      renderLogs();
+      renderDetail();
+    });
+  });
+  updateStats();
+}
+
+// Render detail
+function renderDetail() {
+  const container = $('detailContent');
+  const log = state.logs.find(l => l.id === state.selectedId);
+  if (!log) {
+    container.innerHTML = '<div style="text-align:center;padding:40px 0;color:rgba(255,255,255,0.3);font-size:13px;">点击左侧日志条目查看详情</div>';
+    return;
+  }
+
+  const methodCls = 'method-badge method-' + log.method.toLowerCase();
+
+  let headersHtml = Object.entries(log.headers).map(([k, v]) =>
+    `<tr><td>${escHtml(k)}</td><td>${escHtml(v)}</td></tr>`
+  ).join('');
+
+  let bodyHtml = '';
+  try {
+    const parsed = JSON.parse(log.body);
+    bodyHtml = JSON.stringify(parsed, null, 2);
+  } catch(e) {
+    bodyHtml = log.body || '(空)';
+  }
+
+  container.innerHTML = `
+    <div class="detail-section">
+      <div class="detail-label">请求行</div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.8);margin-bottom:8px;">
+        <span class="${methodCls}">${log.method}</span>
+        <span style="color:rgba(255,255,255,0.4)">${escHtml(log.path)}</span>
+        <span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3)">${log.timestamp}</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">请求头 (${Object.keys(log.headers).length})</div>
+      <table class="detail-table">
+        ${headersHtml || '<tr><td colspan="2" style="color:rgba(255,255,255,0.3)">无</td></tr>'}
+      </table>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">请求体</div>
+      <div class="json-body">${escHtml(bodyHtml)}</div>
+    </div>
+  `;
+}
+
+function escHtml(s) {
+  if (typeof s !== 'string') s = String(s);
+  const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
+}
+
+// Generate a mock request
+function generateMockRequest() {
+  const method = METHODS[Math.floor(Math.random() * METHODS.length)];
+  const path = SAMPLE_PATHS[Math.floor(Math.random() * SAMPLE_PATHS.length)];
+  const now = new Date();
+  const timestamp = now.toISOString().replace('T', ' ').slice(0, 19);
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': 'WebhookInspect-Simulator/1.0',
+    'X-Request-Id': crypto.randomUUID ? crypto.randomUUID().slice(0,8) : Math.random().toString(36).slice(2,10),
+    'X-Signature': 'sha256=' + Math.random().toString(36).substring(2, 18),
+  };
+
+  const bodies = [
+    JSON.stringify({ event: 'user.created', data: { id: 123, name: 'John' }, timestamp: Date.now() }),
+    JSON.stringify({ event: 'payment.succeeded', data: { order_id: 'ORD-' + Math.floor(Math.random()*10000), amount: 99.99 }, timestamp: Date.now() }),
+    JSON.stringify({ event: 'order.shipped', data: { order_id: 'ORD-' + Math.floor(Math.random()*10000), carrier: 'UPS', tracking: '1Z' + Math.floor(Math.random()*10000000000) }, timestamp: Date.now() }),
+    JSON.stringify({ event: 'user.deleted', data: { id: 456, reason: 'user_requested' }, timestamp: Date.now() }),
+  ];
+  const body = bodies[Math.floor(Math.random() * bodies.length)];
+
+  let statusCode = state.customStatus || 200;
+
+  return { method, path, timestamp, headers, body, statusCode };
+}
+
+function addLog(logData) {
+  const id = 'log_' + Date.now() + '_' + Math.random().toString(36).substring(2,6);
+  const entry = { id, ...logData };
+  state.logs.unshift(entry);
+  state.selectedId = entry.id;
+  renderLogs();
+  renderDetail();
+  saveState();
+}
+
+// Simulate request
+$('simulateBtn').addEventListener('click', () => {
+  const mock = generateMockRequest();
+  addLog(mock);
+  showToast('已模拟 ' + mock.method + ' ' + mock.path + ' → ' + mock.statusCode);
+});
+
+// Batch simulate (for testing)
+function batchSimulate(count) {
+  for (let i = 0; i < count; i++) {
+    const mock = generateMockRequest();
+    const id = 'log_' + Date.now() + '_' + i + '_' + Math.random().toString(36).substring(2,6);
+    state.logs.unshift({ id, ...mock });
+  }
+  if (state.logs.length > 0) state.selectedId = state.logs[0].id;
+  renderLogs();
+  renderDetail();
+  saveState();
+}
+
+// Copy URL
+$('copyUrlBtn').addEventListener('click', () => {
+  const url = getWebhookUrl();
+  navigator.clipboard.writeText(url).then(() => showToast('已复制 Webhook URL')).catch(() => showToast('复制失败'));
+});
+
+// Regenerate
+$('regenerateBtn').addEventListener('click', () => {
+  state.webhookId = generateId();
+  saveState();
+  renderUrl();
+  showToast('已重新生成 Webhook URL');
+});
+
+// Clear logs
+$('clearLogsBtn').addEventListener('click', () => {
+  if (state.logs.length === 0) { showToast('日志已为空'); return; }
+  state.logs = [];
+  state.selectedId = null;
+  renderLogs();
+  renderDetail();
+  saveState();
+  showToast('已清空所有日志');
+});
+
+// Export JSON
+$('exportJsonBtn').addEventListener('click', () => {
+  if (state.logs.length === 0) { showToast('没有日志可导出'); return; }
+  const data = JSON.stringify({ webhookUrl: getWebhookUrl(), logs: state.logs, exportedAt: new Date().toISOString() }, null, 2);
+  const blob = new Blob([data], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'webhook_logs_' + Date.now() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('日志已导出');
+});
+
+// Custom response modal
+$('customRespBtn').addEventListener('click', () => {
+  $('customStatus').value = state.customStatus;
+  $('customBody').value = state.customBody;
+  $('customModal').classList.add('show');
+});
+
+$('modalCancelBtn').addEventListener('click', () => {
+  $('customModal').classList.remove('show');
+});
+
+$('modalSaveBtn').addEventListener('click', () => {
+  const status = parseInt($('customStatus').value) || 200;
+  const body = $('customBody').value || '{}';
+  state.customStatus = status;
+  state.customBody = body;
+  saveState();
+  $('customModal').classList.remove('show');
+  showToast('已保存自定义响应设置');
+});
+
+// Init
+renderUrl();
+renderLogs();
+renderDetail();
+
+// Auto-generate some sample logs on first visit (if empty)
+if (state.logs.length === 0) {
+  batchSimulate(5);
+}
+</script>
+</body>
+</html>

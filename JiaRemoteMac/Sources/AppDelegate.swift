@@ -1,4 +1,4 @@
-﻿import Cocoa
+import Cocoa
 import SwiftUI
 import Combine
 import Network
@@ -27,6 +27,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         JiaLog("🚀 JiaRemote Mac 被控端启动")
         JiaLog("📝 日志系统已初始化")
+        JiaLog("🔧 macOS \(ProcessInfo.processInfo.operatingSystemVersionString)")
+        JiaLog("💻 主机: \(Host.current().localizedName ?? "Unknown")")
 
         setupStatusBar()
         setupCaptureDelegate()
@@ -215,6 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startCaptureWithRetry() {
         Task {
+            JiaLog("[JiaRemote] 🔍 检查屏幕录制权限...")
             if !CGPreflightScreenCaptureAccess() {
                 JiaLog("[JiaRemote] ⚠️ 屏幕录制权限未授权，无法启动采集。请在 系统设置→隐私与安全性→屏幕录制 中允许 JiaRemote，然后重启应用。")
                 JiaLog("[JiaRemote] 提示：如果是 Xcode 调试运行，需要在授权后完全退出应用（Cmd+Q）再重新 Run（Xcode 每次编译会改变二进制签名）")
@@ -223,17 +226,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
             for attempt in 1...5 {
                 do {
+                    JiaLog("[JiaRemote] 🔄 尝试启动采集 (attempt \(attempt)/5)...")
                     if config.captureMode == "window", config.selectedWindowID != 0 {
-                        try captureEngine.start(target: .window(windowID: config.selectedWindowID))
+                        try await captureEngine.start(target: .window(windowID: config.selectedWindowID))
                     } else {
                         let displays = try await CaptureEngine.fetchDisplays()
                         let targetID = config.selectedDisplayID != 0 ? config.selectedDisplayID : displays.first?.displayID ?? 0
-                        try captureEngine.start(target: .display(displayID: targetID))
+                        JiaLog("[JiaRemote] 📺 目标显示器ID: \(targetID), 可用显示器: \(displays.count)")
+                        try await captureEngine.start(target: .display(displayID: targetID))
                     }
                     JiaLog("[JiaRemote] ✅ Capture started successfully")
                     return
                 } catch {
-                    JiaLog("[JiaRemote] Capture attempt \(attempt)/5 failed: \(error)")
+                    JiaLog("[JiaRemote] ❌ Capture attempt \(attempt)/5 failed: \(error)")
                     if attempt < 5 {
                         try? await Task.sleep(nanoseconds: 2_000_000_000)
                     }
@@ -465,6 +470,11 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                sectionHeader("🔌 服务控制")
+                serviceControlRow
+
+                Divider().background(Color.white.opacity(0.1))
+
                 sectionHeader("📺 画面捕获")
                 captureModeRow
                 displayOrWindowRow
@@ -473,8 +483,8 @@ struct SettingsView: View {
                 Divider().background(Color.white.opacity(0.1))
 
                 sectionHeader("🔐 权限状态")
-                permissionRow("屏幕录制", granted: config.screenRecordingGranted)
-                permissionRow("辅助功能", granted: config.accessibilityGranted)
+                permissionRow(name: "屏幕录制", granted: config.screenRecordingGranted, settingsPane: "Privacy_ScreenCapture")
+                permissionRow(name: "辅助功能", granted: config.accessibilityGranted, settingsPane: "Privacy_Accessibility")
 
                 Divider().background(Color.white.opacity(0.1))
 
@@ -499,10 +509,22 @@ struct SettingsView: View {
             .padding(20)
         }
         .background(Color(red: 0.11, green: 0.11, blue: 0.12))
-        .onAppear { config.refreshPermissions() }
+        .onAppear {
+            config.refreshPermissions()
+            updateServiceStatus()
+        }
         .onReceive(Timer.publish(every: 3, on: .main, in: .common).autoconnect()) { _ in
             config.refreshPermissions()
+            updateServiceStatus()
         }
+    }
+
+    @State private var serviceRunning: Bool = false
+    @State private var serviceStatusText: String = "未启动"
+
+    private func updateServiceStatus() {
+        serviceRunning = appDelegate?.isServiceRunning ?? false
+        serviceStatusText = serviceRunning ? "运行中" : "未启动"
     }
 
     func sectionHeader(_ title: String) -> some View {
@@ -578,7 +600,7 @@ struct SettingsView: View {
         .cornerRadius(10)
     }
 
-    func permissionRow(_ name: String, granted: Bool) -> some View {
+    func permissionRow(name: String, granted: Bool, settingsPane: String) -> some View {
         HStack {
             Text(name).font(.system(size: 14)).foregroundColor(.white)
             Spacer()
@@ -588,6 +610,18 @@ struct SettingsView: View {
             Text(granted ? "已授权" : "未授权")
                 .font(.system(size: 12))
                 .foregroundColor(granted ? .green : .red)
+            if !granted {
+                Button("去设置") {
+                    NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?\(settingsPane)")!)
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.blue)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.blue.opacity(0.15))
+                .cornerRadius(4)
+            }
         }
         .padding(12)
         .background(Color.white.opacity(0.06))
@@ -665,9 +699,42 @@ struct SettingsView: View {
                 Text("启动时自动运行服务").font(.system(size: 14)).foregroundColor(.white)
             }
             Spacer()
-            Toggle("", isOn: $config.autoStartService)
-                .toggleStyle(.switch)
-                .onChange(of: config.autoStartService) { _ in config.save() }
+            Toggle("", isOn: Binding(
+                get: { config.autoStartService },
+                set: { newValue in
+                    config.autoStartService = newValue
+                    config.save()
+                }
+            ))
+            .toggleStyle(.switch)
+        }
+        .padding(12)
+        .background(Color.white.opacity(0.06))
+        .cornerRadius(10)
+    }
+
+    var serviceControlRow: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(serviceStatusText).font(.system(size: 14)).foregroundColor(.white)
+                Text(serviceRunning ? "已监听端口 \(appDelegate?.tcpServer.listeningPort ?? 0)" : "点击下方按钮启动").font(.system(size: 11)).foregroundColor(.white.opacity(0.4))
+            }
+            Spacer()
+            Button(serviceRunning ? "⏹ 停止服务" : "▶ 启动服务") {
+                if serviceRunning {
+                    appDelegate?.stopAllServices()
+                } else {
+                    appDelegate?.checkPermissionsAndStart()
+                }
+                updateServiceStatus()
+            }
+            .buttonStyle(.plain)
+            .font(.system(size: 12, weight: .medium))
+            .foregroundColor(serviceRunning ? .red : .green)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(serviceRunning ? Color.red.opacity(0.15) : Color.green.opacity(0.15))
+            .cornerRadius(6)
         }
         .padding(12)
         .background(Color.white.opacity(0.06))

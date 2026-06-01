@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support - Apps-iOSMac</title>
+    <title>Support Center - Apps-iOSMac</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 40px; background: #f5f5f5; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -16,6 +16,11 @@
         .contact-box { background: #f8f9fa; padding: 24px; border-radius: 12px; margin-top: 20px; }
         .contact-box a { color: #667eea; text-decoration: none; }
         .contact-box a:hover { text-decoration: underline; }
+        .contact-box h3 { margin-top: 0; }
+        .product-list { list-style: none; padding: 0; }
+        .product-list li { padding: 12px; border-bottom: 1px solid #eee; }
+        .product-list li a { color: #667eea; text-decoration: none; font-weight: 500; }
+        .product-list li a:hover { text-decoration: underline; }
         .faq-item { margin-bottom: 20px; }
         .faq-item h4 { color: #333; margin-bottom: 8px; }
         .faq-item p { color: #666; }
@@ -26,47 +31,59 @@
     <div class="container">
         <a href="index.html" class="back-link"> Back to Products</a>
         
-        <h1> Technical Support</h1>
+        <h1> Support Center</h1>
         
-        <p>Welcome! We are here to help you get the best experience with our products.</p>
+        <p>Welcome to the Apps-iOSMac Support Center. We are here to help you get the best experience with our products. If you have any questions, issues, or feedback, please use one of the contact methods below.</p>
         
-        <h2>Frequently Asked Questions (FAQ)</h2>
+        <div class="contact-box">
+            <h3> Contact Us</h3>
+            <p> Email: <a href="mailto:support@apps-iosmac.com">support@apps-iosmac.com</a></p>
+            <p> GitHub Issues: <a href="https://github.com/huiyu9144/Apps-iOSMac/issues" target="_blank">https://github.com/huiyu9144/Apps-iOSMac/issues</a></p>
+            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">We typically respond within 24-48 hours.</p>
+        </div>
+
+        <h2>Product Support Pages</h2>
+        <p>Select a product to visit its dedicated support page with FAQs and troubleshooting:</p>
+        <ul class="product-list">
+            <li><a href="clean-shot/support.html">CleanShot</a> - Screen capture tool</li>
+            <li><a href="paste-lite/support.html">PasteLite</a> - Clipboard manager</li>
+            <li><a href="find-dup/support.html">FindDup</a> - Duplicate file finder</li>
+            <li><a href="dash-timer/support.html">DashTimer</a> - Menu bar timer</li>
+            <li><a href="quick-ocr/support.html">QuickOCR</a> - OCR text recognition</li>
+            <li><a href="menu-meter/support.html">MenuMeter</a> - System monitor</li>
+            <li><a href="format-quick/support.html">FormatQuick</a> - Text format converter</li>
+            <li><a href="hue-snap/support.html">HueSnap</a> - Color picker</li>
+            <li><a href="net-meter/support.html">NetMeter</a> - Network monitor</li>
+            <li><a href="pic-shrink/support.html">PicShrink</a> - Image compression</li>
+            <li><a href="jia-remote-mac/support.html">JiaRemoteMac</a> - Remote desktop (macOS host)</li>
+            <li><a href="jia-remote-win/support.html">JiaRemoteWin</a> - Remote desktop (Windows client)</li>
+            <li><a href="net-bar/support.html">NetBar</a> - Network traffic monitor</li>
+        </ul>
+        
+        <h2>Frequently Asked Questions (General)</h2>
         
         <div class="faq-item">
             <h4>Q: The app won't launch. What should I do?</h4>
-            <p>A: Please check that your macOS version meets the requirements (macOS 12.0 or later). If the issue persists, please contact us.</p>
+            <p>A: Please check that your macOS version meets the requirements (macOS 12.0 or later, some apps require 14.0+). If the issue persists, please contact us via email or GitHub Issues.</p>
         </div>
         
         <div class="faq-item">
-            <h4>Q: How do I uninstall the app?</h4>
-            <p>A: Open the Applications folder and drag the app to the Trash.</p>
+            <h4>Q: How do I uninstall an app?</h4>
+            <p>A: Open the Applications folder and drag the app to the Trash. You may also want to check ~/Library/Preferences/ for any leftover configuration files.</p>
         </div>
         
         <div class="faq-item">
             <h4>Q: Is my data uploaded to the cloud?</h4>
-            <p>A: No. All apps run locally and do not upload any data to cloud servers.</p>
+            <p>A: No. All apps run locally on your device. None of our apps upload your data to any cloud servers. Data is processed and stored entirely on your machine.</p>
         </div>
         
         <div class="faq-item">
-            <h4>Q: Do you support English?</h4>
-            <p>A: Yes, all apps support English interface.</p>
-        </div>
-        
-        <h2>Contact Us</h2>
-        
-        <div class="contact-box">
-            <h3> Email Support</h3>
-            <p>Send an email to: <a href="mailto:support@apps-iosmac.com">support@apps-iosmac.com</a></p>
-            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">We typically respond within 24-48 hours.</p>
-        </div>
-        
-        <div class="contact-box">
-            <h3> GitHub Issues</h3>
-            <p>Submit an issue on GitHub: <a href="https://github.com/huiyu9144/Apps-iOSMac/issues" target="_blank">https://github.com/huiyu9144/Apps-iOSMac/issues</a></p>
+            <h4>Q: How do I submit a bug report or feature request?</h4>
+            <p>A: The best way is to submit an issue on our <a href="https://github.com/huiyu9144/Apps-iOSMac/issues">GitHub Issues page</a>. You can also email us directly.</p>
         </div>
         
         <h2>Feedback & Suggestions</h2>
-        <p>We value your feedback! Please feel free to reach out with any questions or suggestions.</p>
+        <p>We value your feedback! Please feel free to reach out with any questions, suggestions, or concerns. Your input helps us make better products.</p>
         
         <footer>
             <p>&copy; 2026 Apps-iOSMac. All rights reserved.</p>

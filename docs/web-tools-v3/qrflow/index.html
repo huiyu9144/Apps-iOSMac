@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>QRFlow · 二维码生成器 — 在线免费批量生成 QR 码</title>
+<meta name="description" content="QRFlow 是一款免费在线二维码生成器，支持自定义颜色、尺寸、嵌入 Logo、批量生成 CSV 导入，下载 PNG/SVG/ZIP。">
+<meta property="og:title" content="QRFlow · 二维码生成器">
+<meta property="og:description" content="在线免费二维码生成器，支持自定义颜色尺寸、嵌入 Logo、批量生成与导出 PNG/SVG/ZIP。">
+<meta property="og:type" content="website">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"QRFlow","url":"https://qraftlabs.com/web-tools-v3/qrflow","description":"在线免费二维码生成器，支持自定义颜色、嵌入 Logo、批量生成 CSV 导入，下载 PNG/SVG/ZIP。","applicationCategory":"UtilitiesApplication","operatingSystem":"All"}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:960px;display:flex;flex-direction:column;gap:20px}
+.panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.panel-title{font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);margin-bottom:12px;letter-spacing:0.3px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.upload-area{border:1.5px dashed rgba(255,255,255,0.15);border-radius:14px;padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);background:rgba(255,255,255,0.04);backdrop-filter:blur(2px)}
+.upload-area:hover{border-color:rgba(139,139,248,0.5);background:rgba(139,139,248,0.06)}
+.upload-area.dragover{border-color:#8b8bf8;background:rgba(139,139,248,0.1);transform:scale(1.01)}
+.upload-icon{width:34px;height:34px;margin:0 auto 8px;color:#8b8bf8}
+.upload-area p{color:rgba(255,255,255,0.88);font-size:14px;font-weight:400}
+.upload-area .hint{font-size:12px;color:rgba(255,255,255,0.56);margin-top:4px}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+.text-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.text-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.text-input-wrap textarea,.text-input-wrap input[type="text"]{background:transparent;border:none;padding:11px 14px;color:#fff;font-size:14px;outline:none;width:100%;font-family:inherit;letter-spacing:0.3px;resize:vertical}
+.text-input-wrap textarea{min-height:80px;line-height:1.5}
+.number-input-wrap{position:relative;display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.5);transition:border-color 0.3s cubic-bezier(0.25,0.46,0.45,0.94),box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.number-input-wrap:focus-within{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.number-input-wrap input[type="number"]{background:transparent;border:none;padding:11px 14px;color:#fff;font-size:15px;font-weight:500;outline:none;width:100%;-moz-appearance:textfield;font-family:inherit;letter-spacing:0.3px}
+.number-input-wrap input[type="number"]::-webkit-inner-spin-button,.number-input-wrap input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.number-spinners{display:flex;flex-direction:column;border-left:1px solid rgba(255,255,255,0.06);flex-shrink:0;background:rgba(255,255,255,0.03)}
+.number-spinners button{display:flex;align-items:center;justify-content:center;width:30px;flex:1;border:none;background:transparent;color:rgba(255,255,255,0.52);cursor:pointer;font-size:8px;padding:0;transition:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);position:relative}
+.number-spinners button:first-child{border-bottom:1px solid rgba(255,255,255,0.04)}
+.number-spinners button:hover{background:rgba(139,139,248,0.15);color:#8b8bf8}
+.number-spinners button:active{background:rgba(139,139,248,0.25);transform:scale(0.92)}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#fff;font-weight:600}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-success{background:rgba(52,199,89,0.55);color:#fff}
+.btn-success:hover{background:rgba(52,199,89,0.65)}
+.btn-success:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#fff}
+.btn-sm{padding:8px 16px;font-size:12px;border-radius:10px}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.progress-wrap{display:none;width:100%}
+.progress-wrap.show{display:block;animation:fadeSlideUp 0.3s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.progress-bar-track{width:100%;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#8b8bf8,#c084fc);border-radius:2px;width:0%;transition:width 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,0.56);margin-top:6px}
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#fff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.layout-col2{display:grid;grid-template-columns:380px 1fr;gap:20px}
+.color-presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.color-presets button{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.2s;padding:0}
+.color-presets button:hover{transform:scale(1.15)}
+.color-presets button.active{border-color:#fff;box-shadow:0 0 0 2px #8b8bf8}
+.color-input-row{display:flex;align-items:center;gap:10px}
+.color-input-row input[type="color"]{width:36px;height:36px;border:none;border-radius:8px;cursor:pointer;background:transparent;padding:0}
+.qr-preview-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;padding:20px}
+.qr-preview-wrap #qrcode{background:#fff;padding:12px;border-radius:12px;display:inline-block}
+.qr-preview-wrap #qrcode img,.qr-preview-wrap #qrcode canvas{display:block}
+.qr-preview-placeholder{color:rgba(255,255,255,0.48);font-size:13px;text-align:center;padding:60px 20px}
+.footer{text-align:center;padding:20px 0;font-size:12px;color:rgba(255,255,255,0.4)}
+.footer a{color:rgba(255,255,255,0.5);text-decoration:none}
+.footer a:hover{color:#8b8bf8}
+.tag-wrap{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.file-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-top:8px}
+.file-list::-webkit-scrollbar{width:4px}
+.file-list::-webkit-scrollbar-track{background:transparent}
+.file-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+.file-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.76)}
+.file-item .remove{cursor:pointer;color:rgba(255,255,255,0.35);background:none;border:none;font-size:14px;padding:2px}
+.file-item .remove:hover{color:#ff4444}
+@media(max-width:768px){.layout-col2{grid-template-columns:1fr}body{padding:20px 12px 40px}.header h1{font-size:24px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>QRFlow</h1>
+  <p>在线二维码生成器 · 自定义颜色 · 嵌入 Logo · 批量导出</p>
+</div>
+
+<div class="container">
+
+  <div class="layout-col2">
+    <div class="panel" style="display:flex;flex-direction:column;gap:16px">
+      <div class="control-group">
+        <label>输入文本 / URL</label>
+        <div class="text-input-wrap">
+          <textarea id="qrText" placeholder="输入文本或 URL，例如 https://example.com">https://github.com</textarea>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>尺寸</label>
+        <div class="mode-selector" id="sizeSelector">
+          <div class="mode-slider" id="sizeSlider"></div>
+          <button class="mode-btn active" data-size="200">200</button>
+          <button class="mode-btn" data-size="300">300</button>
+          <button class="mode-btn" data-size="400">400</button>
+          <button class="mode-btn" data-size="500">500</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>前景色</label>
+        <div class="color-input-row">
+          <input type="color" id="fgColor" value="#000000">
+          <div class="color-presets" id="fgPresets"></div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>背景色</label>
+        <div class="color-input-row">
+          <input type="color" id="bgColor" value="#ffffff">
+          <div class="color-presets" id="bgPresets"></div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label>嵌入 Logo（选填）</label>
+        <div class="upload-area" id="logoUpload" style="padding:16px">
+          <svg class="upload-icon" style="width:24px;height:24px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p style="font-size:12px">点击上传 Logo 图片</p>
+          <input type="file" id="logoInput" accept="image/*" style="display:none">
+        </div>
+        <div id="logoPreview" style="display:none;margin-top:6px;display:none;align-items:center;gap:8px">
+          <img id="logoImg" style="width:36px;height:36px;border-radius:6px;object-fit:cover">
+          <button class="btn btn-sm btn-outline" id="removeLogo" style="padding:4px 10px;font-size:11px">移除</button>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <label style="display:flex;align-items:center;gap:8px">
+          <span>批量生成模式</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="batchMode">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          </label>
+        </label>
+        <div id="batchArea" style="display:none">
+          <div class="text-input-wrap">
+            <textarea id="batchInput" placeholder="每行一个文本或 URL，或粘贴 CSV 格式&#10;名称,内容&#10;例如:&#10;GitHub,https://github.com&#10;Twitter,https://twitter.com" style="min-height:120px"></textarea>
+          </div>
+          <div class="upload-area" id="csvUpload" style="padding:12px;margin-top:8px">
+            <p style="font-size:12px">或上传 CSV 文件</p>
+            <input type="file" id="csvInput" accept=".csv,.txt" style="display:none">
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="justify-content:flex-start">
+        <button class="btn btn-primary" id="downloadPngBtn">下载 PNG</button>
+        <button class="btn btn-secondary" id="downloadSvgBtn">下载 SVG</button>
+        <button class="btn btn-success" id="downloadZipBtn">下载全部 ZIP</button>
+      </div>
+    </div>
+
+    <div class="panel" style="display:flex;flex-direction:column">
+      <div class="panel-title">实时预览</div>
+      <div class="qr-preview-wrap" id="previewWrap">
+        <div id="qrcode"></div>
+        <div class="qr-preview-placeholder" id="qrPlaceholder" style="display:none">输入内容后自动生成二维码</div>
+      </div>
+      <div id="batchResult" style="display:none;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;margin-top:12px">
+        <div style="font-size:12px;color:rgba(255,255,255,0.56);margin-bottom:6px">已生成 <span id="batchCount">0</span> 个二维码</div>
+        <div class="file-list" id="batchList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-label"><span id="progressText">处理中...</span><span id="progressPercent">0%</span></div>
+  </div>
+
+  <div class="footer">
+    <a href="/docs/support.html">隐私政策</a> · © 2025 QRFlow
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const fgColor = $('fgColor'), bgColor = $('bgColor');
+const qrText = $('qrText');
+let qrCodeInstance = null;
+let logoDataURL = null;
+let currentSize = 200;
+const toastEl = $('toast');
+let toastTimer = null;
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+const fgColors = ['#000000','#8b8bf8','#ff3b30','#34c759','#007aff','#ff9500','#af52de','#ff2d55','#5856d6','#000000'];
+const bgColors = ['#ffffff','#1c1c1e','#f2f2f7','#8b8bf8','#ffd60a','#d2d2d7','#e5e5ea','#ffffff'];
+
+function renderPresets(containerId, colors, targetInput) {
+  const c = $(containerId);
+  c.innerHTML = colors.map((cl, i) =>
+    `<button style="background:${cl}" data-color="${cl}" class="${i===0?'active':''}"></button>`
+  ).join('');
+  c.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      c.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      targetInput.value = b.dataset.color;
+      generateQR();
+    });
+  });
+}
+renderPresets('fgPresets', fgColors, fgColor);
+renderPresets('bgPresets', bgColors, bgColor);
+
+fgColor.addEventListener('input', generateQR);
+bgColor.addEventListener('input', generateQR);
+qrText.addEventListener('input', generateQR);
+
+const sizeBtns = document.querySelectorAll('#sizeSelector .mode-btn');
+const sizeSlider = $('sizeSlider');
+
+function moveSizeSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cR = c.getBoundingClientRect();
+  const bR = btn.getBoundingClientRect();
+  sizeSlider.style.left = (bR.left - cR.left) + 'px';
+  sizeSlider.style.width = bR.width + 'px';
+}
+sizeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    sizeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSizeSlider(btn);
+    currentSize = parseInt(btn.dataset.size);
+    generateQR();
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#sizeSelector .mode-btn.active');
+  if (a) moveSizeSlider(a);
+});
+
+const logoUpload = $('logoUpload');
+const logoInput = $('logoInput');
+const logoPreview = $('logoPreview');
+const logoImg = $('logoImg');
+
+logoUpload.addEventListener('click', () => logoInput.click());
+logoInput.addEventListener('change', () => {
+  if (logoInput.files.length > 0) {
+    const r = new FileReader();
+    r.onload = e => {
+      logoDataURL = e.target.result;
+      logoImg.src = logoDataURL;
+      logoPreview.style.display = 'flex';
+      generateQR();
+    };
+    r.readAsDataURL(logoInput.files[0]);
+  }
+});
+$('removeLogo').addEventListener('click', () => {
+  logoDataURL = null;
+  logoPreview.style.display = 'none';
+  logoInput.value = '';
+  generateQR();
+});
+
+const batchMode = $('batchMode');
+const batchArea = $('batchArea');
+const batchResult = $('batchResult');
+batchMode.addEventListener('change', () => {
+  batchArea.style.display = batchMode.checked ? 'block' : 'none';
+  if (!batchMode.checked) batchResult.style.display = 'none';
+  generateQR();
+});
+
+const csvUpload = $('csvUpload');
+const csvInput = $('csvInput');
+csvUpload.addEventListener('click', () => csvInput.click());
+csvInput.addEventListener('change', () => {
+  if (csvInput.files.length > 0) {
+    const r = new FileReader();
+    r.onload = e => {
+      $('batchInput').value = e.target.result;
+      generateQR();
+    };
+    r.readAsText(csvInput.files[0]);
+  }
+});
+
+function getBatchItems() {
+  const text = $('batchInput').value.trim();
+  if (!text) return [];
+  const lines = text.split('\n').filter(l => l.trim());
+  return lines.map((line, i) => {
+    const parts = line.split(',');
+    if (parts.length >= 2) {
+      const name = parts[0].trim();
+      const content = parts.slice(1).join(',').trim();
+      return { name: name || `QR_${i+1}`, content };
+    }
+    return { name: `QR_${i+1}`, content: line.trim() };
+  }).filter(item => item.content);
+}
+
+function generateQR() {
+  const qrContainer = $('qrcode');
+  const placeholder = $('qrPlaceholder');
+  const text = qrText.value.trim();
+
+  if (!text || batchMode.checked) {
+    qrContainer.innerHTML = '';
+    placeholder.style.display = text ? 'none' : 'block';
+    if (batchMode.checked && text) {
+      generateBatch();
+    }
+    return;
+  }
+  placeholder.style.display = 'none';
+  qrContainer.innerHTML = '';
+
+  try {
+    qrCodeInstance = new QRCode(qrContainer, {
+      text,
+      width: currentSize,
+      height: currentSize,
+      colorDark: fgColor.value,
+      colorLight: bgColor.value,
+      correctLevel: logoDataURL ? QRCode.CorrectLevel.H : QRCode.CorrectLevel.M,
+    });
+
+    if (logoDataURL) {
+      const img = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
+      if (img) {
+        const onLoad = () => {
+          const c = document.createElement('canvas');
+          c.width = currentSize;
+          c.height = currentSize;
+          const ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0, currentSize, currentSize);
+          const logoSize = Math.round(currentSize * 0.22);
+          const logoX = Math.round((currentSize - logoSize) / 2);
+          const logoY = Math.round((currentSize - logoSize) / 2);
+          ctx.fillStyle = bgColor.value;
+          ctx.beginPath();
+          const r = 4;
+          ctx.moveTo(logoX + r, logoY);
+          ctx.lineTo(logoX + logoSize - r, logoY);
+          ctx.quadraticCurveTo(logoX + logoSize, logoY, logoX + logoSize, logoY + r);
+          ctx.lineTo(logoX + logoSize, logoY + logoSize - r);
+          ctx.quadraticCurveTo(logoX + logoSize, logoY + logoSize, logoX + logoSize - r, logoY + logoSize);
+          ctx.lineTo(logoX + r, logoY + logoSize);
+          ctx.quadraticCurveTo(logoX, logoY + logoSize, logoX, logoY + logoSize - r);
+          ctx.lineTo(logoX, logoY + r);
+          ctx.quadraticCurveTo(logoX, logoY, logoX + r, logoY);
+          ctx.closePath();
+          ctx.fill();
+          const l = new Image();
+          l.onload = () => {
+            ctx.drawImage(l, logoX + 2, logoY + 2, logoSize - 4, logoSize - 4);
+            qrContainer.innerHTML = '';
+            qrContainer.appendChild(c);
+          };
+          l.src = logoDataURL;
+        };
+        if (img.complete) onLoad();
+        else img.onload = onLoad;
+      }
+    }
+  } catch(e) {
+    showToast('生成失败: ' + e.message);
+  }
+}
+
+function generateBatch() {
+  const items = getBatchItems();
+  const list = $('batchList');
+  const count = $('batchCount');
+  if (items.length === 0) {
+    batchResult.style.display = 'none';
+    return;
+  }
+  batchResult.style.display = 'block';
+  count.textContent = items.length;
+  list.innerHTML = items.map((item, i) =>
+    `<div class="file-item"><span>${escHtml(item.name)} (${escHtml(item.content.substring(0, 40))})</span></div>`
+  ).join('');
+}
+
+let svgBlobUrl = null;
+
+function getQRDataURL(size) {
+  return new Promise(resolve => {
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    QRCode.toCanvas ? null : null;
+    try {
+      const qr = new QRCode(c, {
+        text: qrText.value.trim(),
+        width: size,
+        height: size,
+        colorDark: fgColor.value,
+        colorLight: bgColor.value,
+        correctLevel: logoDataURL ? QRCode.CorrectLevel.H : QRCode.CorrectLevel.M,
+      });
+      setTimeout(() => {
+        if (logoDataURL) {
+          const logoSize = Math.round(size * 0.22);
+          const logoX = Math.round((size - logoSize) / 2);
+          const logoY = Math.round((size - logoSize) / 2);
+          ctx.fillStyle = bgColor.value;
+          ctx.fillRect(logoX, logoY, logoSize, logoSize);
+          const l = new Image();
+          l.onload = () => {
+            ctx.drawImage(l, logoX + 2, logoY + 2, logoSize - 4, logoSize - 4);
+            resolve(c.toDataURL('image/png'));
+          };
+          l.src = logoDataURL;
+        } else {
+          resolve(c.toDataURL('image/png'));
+        }
+      }, 100);
+    } catch(e) {
+      resolve(null);
+    }
+  });
+}
+
+function dataURLToBlob(dataURL) {
+  const parts = dataURL.split(',');
+  const mime = parts[0].match(/:(.*?);/)[1];
+  const bin = atob(parts[1]);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+$('downloadPngBtn').addEventListener('click', () => {
+  const text = qrText.value.trim();
+  if (!text) { showToast('请输入内容'); return; }
+  const qrEl = $('qrcode').querySelector('img') || $('qrcode').querySelector('canvas');
+  if (!qrEl) { showToast('请先生成二维码'); return; }
+  const link = document.createElement('a');
+  link.download = `qrcode_${Date.now()}.png`;
+  if (qrEl.tagName === 'IMG') link.href = qrEl.src;
+  else link.href = qrEl.toDataURL('image/png');
+  link.click();
+  showToast('已下载 PNG');
+});
+
+$('downloadZipBtn').addEventListener('click', async () => {
+  const text = qrText.value.trim();
+  if (!text && !batchMode.checked) { showToast('请输入内容'); return; }
+  const items = batchMode.checked ? getBatchItems() : [{ name: 'qrcode', content: text }];
+  if (items.length === 0) { showToast('无内容可生成'); return; }
+
+  const pw = $('progressWrap');
+  const pf = $('progressFill');
+  const pt = $('progressText');
+  const pp = $('progressPercent');
+  pw.classList.add('show');
+  pf.style.width = '0%';
+
+  try {
+    const zip = new JSZip();
+    for (let i = 0; i < items.length; i++) {
+      pt.textContent = `生成: ${escHtml(items[i].name)}`;
+      pp.textContent = `${Math.round((i / items.length) * 100)}%`;
+      pf.style.width = `${(i / items.length) * 100}%`;
+
+      const c = document.createElement('canvas');
+      c.width = currentSize;
+      c.height = currentSize;
+      const ctx = c.getContext('2d');
+      const qr = new QRCode(c, {
+        text: items[i].content,
+        width: currentSize,
+        height: currentSize,
+        colorDark: fgColor.value,
+        colorLight: bgColor.value,
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+      await new Promise(r => setTimeout(r, 50));
+      const blob = await new Promise(res => c.toBlob(b => res(b), 'image/png'));
+      zip.file(`${items[i].name.replace(/[^a-zA-Z0-9_-]/g, '_')}.png`, blob);
+    }
+    pt.textContent = '打包中...';
+    pp.textContent = '99%';
+    pf.style.width = '99%';
+    const link = document.createElement('a');
+    link.download = `qrcodes_${Date.now()}.zip`;
+    link.href = URL.createObjectURL(await zip.generateAsync({ type: 'blob' }));
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast(`已完成！共 ${items.length} 个二维码`);
+  } catch(e) {
+    showToast('打包失败: ' + e.message);
+  } finally {
+    pw.classList.remove('show');
+    pf.style.width = '0%';
+  }
+});
+
+generateQR();
+</script>
+</body>
+</html>

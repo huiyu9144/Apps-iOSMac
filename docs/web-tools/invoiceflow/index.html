@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>InvoiceFlow</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000; color: #ffffff; min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 48px; -webkit-font-smoothing: antialiased;
+}
+.header { text-align: center; margin-bottom: 32px; padding: 0 8px; }
+.header h1 {
+  font-size: 30px; font-weight: 700; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header p { color: rgba(255,255,255,0.72); font-size: 14px; margin-top: 6px; font-weight: 400; letter-spacing: 0.2px; }
+.container { width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 20px; }
+
+.upload-area {
+  border: 1.5px dashed rgba(255,255,255,0.15); border-radius: 14px;
+  padding: 28px 20px; text-align: center; cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+  background: rgba(255,255,255,0.04); backdrop-filter: blur(2px);
+}
+.upload-area:hover { border-color: rgba(139,139,248,0.5); background: rgba(139,139,248,0.06); }
+.upload-area.dragover { border-color: #8b8bf8; background: rgba(139,139,248,0.1); transform: scale(1.01); }
+.upload-icon { width: 34px; height: 34px; margin: 0 auto 8px; color: #8b8bf8; }
+.upload-area p { color: rgba(255,255,255,0.88); font-size: 14px; font-weight: 400; }
+.upload-area .hint { font-size: 12px; color: rgba(255,255,255,0.56); margin-top: 4px; }
+
+.controls {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  background: rgba(255,255,255,0.06); border-radius: 14px;
+  padding: 20px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+
+.control-group { display: flex; flex-direction: column; gap: 6px; }
+.control-group label {
+  font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.78); letter-spacing: 0.3px;
+}
+.control-group input, .control-group textarea {
+  background: rgba(0,0,0,0.5); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 10px; padding: 11px 14px; color: #fff; font-size: 14px;
+  font-family: inherit; outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+}
+.control-group input:focus, .control-group textarea:focus {
+  border-color: #8b8bf8; box-shadow: 0 0 0 3px rgba(139,139,248,0.2);
+}
+.control-group textarea { resize: vertical; min-height: 70px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.invoice-preview {
+  background: #ffffff; color: #222; border-radius: 10px; padding: 28px 24px;
+  min-height: 380px; box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  font-family: 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  width: 100%; position: relative;
+}
+.invoice-preview .ip-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 2px solid #8b8bf8; padding-bottom: 14px; }
+.invoice-preview .ip-title { font-size: 22px; font-weight: 700; color: #8b8bf8; letter-spacing: -0.3px; }
+.invoice-preview .ip-number { font-size: 13px; color: #888; }
+.invoice-preview .ip-row { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 13px; }
+.invoice-preview .ip-bill { display: flex; justify-content: space-between; margin-bottom: 16px; }
+.invoice-preview .ip-bill div { font-size: 13px; line-height: 1.6; }
+.invoice-preview .ip-bill strong { font-size: 14px; }
+.invoice-preview .ip-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.invoice-preview .ip-table th { text-align: left; font-size: 12px; color: #888; padding: 6px 4px; border-bottom: 1px solid #eee; }
+.invoice-preview .ip-table td { font-size: 13px; padding: 6px 4px; border-bottom: 1px solid #f0f0f0; }
+.invoice-preview .ip-table td:last-child, .invoice-preview .ip-table th:last-child { text-align: right; }
+.invoice-preview .ip-total { text-align: right; font-size: 16px; font-weight: 700; margin-top: 8px; padding-top: 8px; border-top: 2px solid #8b8bf8; }
+.invoice-preview .ip-total span { color: #8b8bf8; }
+.invoice-preview .ip-footer { font-size: 11px; color: #aaa; text-align: center; margin-top: 20px; }
+
+.items-section {
+  background: rgba(255,255,255,0.06); border-radius: 14px; overflow: hidden;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+.items-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.78);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.items-body { padding: 12px 14px; overflow-y: auto; max-height: 320px; }
+.items-body::-webkit-scrollbar { width: 4px; }
+.items-body::-webkit-scrollbar-track { background: transparent; }
+.items-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.item-row {
+  display: grid; grid-template-columns: 1fr 80px 100px 80px 28px; gap: 8px;
+  align-items: center; margin-bottom: 8px; animation: fadeSlideUp 0.25s ease both;
+}
+.item-row input {
+  background: rgba(0,0,0,0.5); border: 1.5px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 8px 10px; color: #fff; font-size: 13px;
+  font-family: inherit; outline: none; transition: border-color 0.3s;
+}
+.item-row input:focus { border-color: #8b8bf8; box-shadow: 0 0 0 3px rgba(139,139,248,0.2); }
+.item-row input[type="number"] { -moz-appearance: textfield; }
+.item-row input[type="number"]::-webkit-inner-spin-button,
+.item-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.item-row .item-remove {
+  width: 26px; height: 26px; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.52);
+  cursor: pointer; font-size: 12px; display: flex; align-items: center;
+  justify-content: center; transition: all 0.2s;
+}
+.item-row .item-remove:hover { background: rgba(255,69,58,0.8); color: #fff; transform: scale(1.1); }
+
+.items-footer { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+.summary-bar { display: flex; gap: 24px; font-size: 13px; color: rgba(255,255,255,0.78); }
+.summary-bar strong { color: #8b8bf8; font-weight: 600; }
+
+.actions {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both;
+}
+.btn {
+  padding: 12px 24px; border-radius: 12px; border: none; font-size: 14px;
+  font-weight: 600; cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+  display: inline-flex; align-items: center; gap: 8px;
+  white-space: nowrap; font-family: inherit; letter-spacing: 0.3px;
+  position: relative; overflow: hidden;
+}
+.btn::after { content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0); transition: background 0.3s; }
+.btn:hover::after { background: rgba(255,255,255,0.06); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: rgba(139,139,248,0.6); color: #fff; }
+.btn-primary:hover { background: rgba(139,139,248,0.7); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+.btn-success { background: rgba(52,199,89,0.55); color: #fff; }
+.btn-success:hover { background: rgba(52,199,89,0.65); }
+.btn-outline { background: transparent; border: 1.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.65); }
+.btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #ffffff; }
+.btn-sm { padding: 8px 16px; font-size: 12px; border-radius: 8px; }
+
+.toast {
+  position: fixed; bottom: 36px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30,30,30,0.95); color: #fff; padding: 12px 24px;
+  border-radius: 12px; font-size: 14px; font-weight: 500; opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  pointer-events: none; z-index: 100;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 800px) {
+  .controls { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .item-row { grid-template-columns: 1fr 70px 80px 70px 28px; gap: 4px; }
+  .header h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>InvoiceFlow</h1>
+  <p>极简发票生成器 · 填写信息 &amp; 行项目，实时预览并导出 PDF</p>
+</div>
+
+<div class="container">
+  <div class="controls" style="grid-template-columns: 1fr 1fr;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="form-grid">
+        <div class="control-group">
+          <label>公司名称</label>
+          <input type="text" id="companyName" value="示例科技有限公司" placeholder="公司名称">
+        </div>
+        <div class="control-group">
+          <label>客户名称</label>
+          <input type="text" id="customerName" value="张三企业" placeholder="客户名称">
+        </div>
+        <div class="control-group" style="grid-column:1/-1;">
+          <label>公司地址</label>
+          <input type="text" id="companyAddress" value="北京市朝阳区科技路88号" placeholder="公司地址">
+        </div>
+        <div class="control-group">
+          <label>发票编号</label>
+          <input type="text" id="invoiceNumber" value="INV-2026-001" placeholder="发票编号">
+        </div>
+        <div class="control-group">
+          <label>日期</label>
+          <input type="date" id="invoiceDate">
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="invoice-preview" id="invoicePreview"></div>
+    </div>
+  </div>
+
+  <div class="items-section">
+    <div class="items-header">
+      <span>行项目 <span class="count" id="itemCount" style="color:#8b8bf8;font-weight:600;">0</span> 项</span>
+      <div>
+        <span style="font-size:12px;color:rgba(255,255,255,0.56);margin-right:12px;" id="summaryDisplay">小计: ¥0.00 | 税率: 0% | 总计: ¥0.00</span>
+      </div>
+    </div>
+    <div class="items-body" id="itemsBody"></div>
+    <div class="items-footer">
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm btn-primary" id="addItemBtn">+ 添加行项目</button>
+      </div>
+      <div class="summary-bar">
+        <span>税率 <span style="color:#8b8bf8;font-weight:600;" id="taxRateDisplay">0</span>%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="exportPdfBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      导出 PDF
+    </button>
+    <button class="btn btn-secondary" id="saveDraftBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      保存草稿
+    </button>
+    <button class="btn btn-outline" id="resetInvoiceBtn">清空</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = { items: [], taxRate: 0 };
+
+const $ = (id) => document.getElementById(id);
+const companyName = $('companyName');
+const customerName = $('customerName');
+const companyAddress = $('companyAddress');
+const invoiceNumber = $('invoiceNumber');
+const invoiceDate = $('invoiceDate');
+const invoicePreview = $('invoicePreview');
+const itemsBody = $('itemsBody');
+const itemCount = $('itemCount');
+const summaryDisplay = $('summaryDisplay');
+const taxRateDisplay = $('taxRateDisplay');
+const addItemBtn = $('addItemBtn');
+const exportPdfBtn = $('exportPdfBtn');
+const saveDraftBtn = $('saveDraftBtn');
+const resetInvoiceBtn = $('resetInvoiceBtn');
+const toastEl = $('toast');
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+function addItem(desc, qty, price) {
+  state.items.push({ id: genId(), desc: desc || '', qty: qty || 1, price: price || 0 });
+  renderItems();
+  renderPreview();
+}
+
+function removeItem(id) {
+  state.items = state.items.filter(i => i.id !== id);
+  renderItems();
+  renderPreview();
+}
+
+function updateItem(id, field, value) {
+  const item = state.items.find(i => i.id === id);
+  if (!item) return;
+  item[field] = field === 'desc' ? value : (parseFloat(value) || 0);
+  const row = document.querySelector(`.item-row[data-id="${id}"]`);
+  if (row) {
+    const span = row.querySelector('.item-subtotal');
+    if (span) span.textContent = `¥${calcSubtotal(item).toFixed(2)}`;
+  }
+  updateSummary();
+  renderPreview();
+}
+
+function calcSubtotal(item) { return item.qty * item.price; }
+
+function calcTotals() {
+  const subtotal = state.items.reduce((s, i) => s + calcSubtotal(i), 0);
+  const tax = subtotal * (state.taxRate / 100);
+  const total = subtotal + tax;
+  return { subtotal, tax, total };
+}
+
+function renderItems() {
+  itemCount.textContent = state.items.length;
+  if (state.items.length === 0) {
+    itemsBody.innerHTML = '<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.48);font-size:13px;">暂无行项目，点击 "+ 添加行项目" 开始</div>';
+    return;
+  }
+  itemsBody.innerHTML = state.items.map(item => `
+    <div class="item-row" data-id="${item.id}">
+      <input type="text" class="item-desc" value="${escHtml(item.desc)}" placeholder="描述（如 网站设计服务）">
+      <input type="number" class="item-qty" value="${item.qty}" min="0" step="1" placeholder="数量">
+      <input type="number" class="item-price" value="${item.price}" min="0" step="0.01" placeholder="单价">
+      <span class="item-subtotal" style="font-size:13px;color:rgba(255,255,255,0.78);text-align:right;font-variant-numeric:tabular-nums;">¥${calcSubtotal(item).toFixed(2)}</span>
+      <button class="item-remove" data-id="${item.id}" title="移除行">✕</button>
+    </div>
+  `).join('');
+
+  itemsBody.querySelectorAll('.item-desc').forEach((inp, i) => {
+    inp.addEventListener('input', () => updateItem(state.items[i].id, 'desc', inp.value));
+  });
+  itemsBody.querySelectorAll('.item-qty').forEach((inp, i) => {
+    inp.addEventListener('input', () => updateItem(state.items[i].id, 'qty', inp.value));
+  });
+  itemsBody.querySelectorAll('.item-price').forEach((inp, i) => {
+    inp.addEventListener('input', () => updateItem(state.items[i].id, 'price', inp.value));
+  });
+  itemsBody.querySelectorAll('.item-remove').forEach(btn => {
+    btn.addEventListener('click', () => removeItem(btn.dataset.id));
+  });
+
+  updateSummary();
+}
+
+function updateSummary() {
+  const { subtotal, tax, total } = calcTotals();
+  summaryDisplay.textContent = `小计: ¥${subtotal.toFixed(2)} | 税额: ¥${tax.toFixed(2)} | 总计: ¥${total.toFixed(2)}`;
+  taxRateDisplay.textContent = state.taxRate;
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const dt = new Date(d);
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+
+function renderPreview() {
+  const cn = companyName.value || '公司名称';
+  const ct = customerName.value || '客户名称';
+  const addr = companyAddress.value || '';
+  const invNum = invoiceNumber.value || 'INV-XXXX';
+  const date = invoiceDate.value ? formatDate(invoiceDate.value) : '—';
+  const { subtotal, tax, total } = calcTotals();
+
+  let rowsHtml = '';
+  if (state.items.length === 0) {
+    rowsHtml = '<tr><td colspan="4" style="text-align:center;color:#ccc;padding:16px;">暂无行项目</td></tr>';
+  } else {
+    rowsHtml = state.items.map(item => `
+      <tr>
+        <td>${escHtml(item.desc) || '—'}</td>
+        <td>${item.qty}</td>
+        <td>¥${item.price.toFixed(2)}</td>
+        <td>¥${calcSubtotal(item).toFixed(2)}</td>
+      </tr>
+    `).join('');
+  }
+
+  invoicePreview.innerHTML = `
+    <div class="ip-header">
+      <div>
+        <div class="ip-title">INVOICE</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;">${escHtml(cn)}</div>
+        <div style="font-size:11px;color:#aaa;">${escHtml(addr)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ip-number">${escHtml(invNum)}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px;">${escHtml(date)}</div>
+      </div>
+    </div>
+    <div class="ip-bill">
+      <div>
+        <strong>Bill To:</strong><br>
+        ${escHtml(ct)}
+      </div>
+    </div>
+    <table class="ip-table">
+      <thead>
+        <tr><th style="width:40%;">描述</th><th style="width:15%;">数量</th><th style="width:20%;">单价</th><th style="width:15%;">金额</th></tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+    <div style="text-align:right;margin-top:4px;">
+      <div style="font-size:13px;color:#888;">小计: ¥${subtotal.toFixed(2)}</div>
+      <div style="font-size:13px;color:#888;">税率: ${state.taxRate}% (¥${tax.toFixed(2)})</div>
+    </div>
+    <div class="ip-total">总计: <span>¥${total.toFixed(2)}</span></div>
+    <div class="ip-footer">此发票由 InvoiceFlow 自动生成</div>
+  `;
+}
+
+function setTaxRate(val) {
+  state.taxRate = Math.max(0, Math.min(100, val));
+  updateSummary();
+  renderPreview();
+}
+
+addItemBtn.addEventListener('click', () => addItem('', 1, 0));
+
+resetInvoiceBtn.addEventListener('click', () => {
+  if (!confirm('确定要清空所有数据？')) return;
+  state.items = [];
+  companyName.value = '';
+  customerName.value = '';
+  companyAddress.value = '';
+  invoiceNumber.value = '';
+  invoiceDate.value = '';
+  setTaxRate(0);
+  renderItems();
+  renderPreview();
+  showToast('已清空');
+});
+
+saveDraftBtn.addEventListener('click', () => {
+  const draft = {
+    companyName: companyName.value,
+    customerName: customerName.value,
+    companyAddress: companyAddress.value,
+    invoiceNumber: invoiceNumber.value,
+    invoiceDate: invoiceDate.value,
+    taxRate: state.taxRate,
+    items: state.items,
+  };
+  localStorage.setItem('invoiceflow_draft', JSON.stringify(draft));
+  showToast('草稿已保存');
+});
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem('invoiceflow_draft');
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    companyName.value = d.companyName || '';
+    customerName.value = d.customerName || '';
+    companyAddress.value = d.companyAddress || '';
+    invoiceNumber.value = d.invoiceNumber || '';
+    invoiceDate.value = d.invoiceDate || '';
+    state.taxRate = d.taxRate || 0;
+    state.items = d.items || [];
+    renderItems();
+    renderPreview();
+  } catch (e) { /* ignore */ }
+}
+
+exportPdfBtn.addEventListener('click', () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210;
+  const margin = 20;
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  const cn = companyName.value || '公司名称';
+  const ct = customerName.value || '客户名称';
+  const addr = companyAddress.value || '';
+  const invNum = invoiceNumber.value || 'INV-XXXX';
+  const date = invoiceDate.value ? formatDate(invoiceDate.value) : '—';
+  const { subtotal, tax, total } = calcTotals();
+
+  doc.setFillColor(139, 139, 248);
+  doc.rect(margin, y, contentW, 1.2, 'F');
+  y += 4;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.setTextColor(139, 139, 248);
+  doc.text('INVOICE', margin, y);
+  y += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(60);
+  doc.text(cn, margin, y);
+  y += 4.5;
+  if (addr) { doc.text(addr, margin, y); y += 4.5; }
+
+  doc.setFontSize(10);
+  doc.setTextColor(120);
+  doc.text(`Invoice #: ${invNum}`, pageW - margin, y, { align: 'right' });
+  y += 4.5;
+  doc.text(`Date: ${date}`, pageW - margin, y, { align: 'right' });
+  y += 8;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(40);
+  doc.text('Bill To:', margin, y);
+  y += 5;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(ct, margin, y);
+  y += 8;
+
+  const colW = [contentW * 0.4, contentW * 0.15, contentW * 0.2, contentW * 0.15];
+  const headers = ['Description', 'Qty', 'Unit Price', 'Amount'];
+  const colX = [];
+  let cx = margin;
+  for (let i = 0; i < colW.length; i++) {
+    colX.push(cx);
+    cx += colW[i];
+  }
+
+  doc.setFillColor(245, 245, 250);
+  doc.rect(margin, y - 3, contentW, 6, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.setTextColor(100);
+  headers.forEach((h, i) => doc.text(h, colX[i] + 2, y, { maxWidth: colW[i] - 4 }));
+  y += 6;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(50);
+  if (state.items.length === 0) {
+    doc.text('No items', margin + 2, y + 4);
+    y += 8;
+  } else {
+    state.items.forEach((item) => {
+      const amt = calcSubtotal(item);
+      const rowH = 6;
+      doc.text(item.desc || '—', colX[0] + 2, y + 4, { maxWidth: colW[0] - 4 });
+      doc.text(String(item.qty), colX[1] + 2, y + 4, { maxWidth: colW[1] - 4 });
+      doc.text(`¥${item.price.toFixed(2)}`, colX[2] + 2, y + 4, { maxWidth: colW[2] - 4 });
+      doc.text(`¥${amt.toFixed(2)}`, colX[3] + 2, y + 4, { maxWidth: colW[3] - 4, align: 'right' });
+      y += rowH + 1;
+      doc.setDrawColor(230);
+      doc.line(margin, y - 0.5, pageW - margin, y - 0.5);
+    });
+  }
+
+  y += 4;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  const rightX = pageW - margin;
+  doc.text(`Subtotal: ¥${subtotal.toFixed(2)}`, rightX, y, { align: 'right' });
+  y += 5;
+  doc.text(`Tax (${state.taxRate}%): ¥${tax.toFixed(2)}`, rightX, y, { align: 'right' });
+  y += 6;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(139, 139, 248);
+  doc.text(`Total: ¥${total.toFixed(2)}`, rightX, y, { align: 'right' });
+  y += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(180);
+  doc.text('Generated by InvoiceFlow', margin, y + 10);
+
+  doc.save(`Invoice_${invNum || 'export'}.pdf`);
+  showToast('PDF 已导出');
+});
+
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+companyName.addEventListener('input', renderPreview);
+customerName.addEventListener('input', renderPreview);
+companyAddress.addEventListener('input', renderPreview);
+invoiceNumber.addEventListener('input', renderPreview);
+invoiceDate.addEventListener('input', renderPreview);
+
+(function init() {
+  const today = new Date();
+  invoiceDate.value = today.toISOString().split('T')[0];
+  loadDraft();
+  renderPreview();
+})();
+</script>
+</body>
+</html>

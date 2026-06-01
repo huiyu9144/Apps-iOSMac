@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ColorMind · 图片配色提取</title>
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+.header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #8b8bf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+.container {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.upload-area {
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(2px);
+}
+.upload-area:hover {
+  border-color: rgba(139, 139, 248, 0.5);
+  background: rgba(139, 139, 248, 0.06);
+}
+.upload-area.dragover {
+  border-color: #8b8bf8;
+  background: rgba(139, 139, 248, 0.1);
+  transform: scale(1.01);
+}
+.upload-icon {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 8px;
+  color: #8b8bf8;
+}
+.upload-area p {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 400;
+}
+.upload-area .hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.56);
+  margin-top: 4px;
+}
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.control-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.3px;
+}
+.mode-selector {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 3px;
+  overflow: hidden;
+}
+.mode-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(139, 139, 248, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+  pointer-events: none;
+}
+.mode-btn {
+  flex: 1;
+  padding: 8px 8px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+}
+.mode-btn.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.3s;
+}
+.btn:hover::after {
+  background: rgba(255, 255, 255, 0.06);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+.btn-primary {
+  background: rgba(139, 139, 248, 0.6);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: rgba(139, 139, 248, 0.7);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.btn-success {
+  background: rgba(52, 199, 89, 0.55);
+  color: #fff;
+}
+.btn-success:hover {
+  background: rgba(52, 199, 89, 0.65);
+}
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.65);
+}
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+.btn-sm {
+  padding: 7px 14px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+.image-list-section {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.image-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.image-list-header .count {
+  color: #8b8bf8;
+  font-weight: 600;
+}
+.image-list-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  max-height: 192px;
+  overflow-y: auto;
+  align-content: flex-start;
+}
+.image-list-body::-webkit-scrollbar {
+  width: 4px;
+}
+.image-list-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.image-list-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+.image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 6px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-shrink: 0;
+  width: 108px;
+  position: relative;
+  background: transparent;
+}
+.image-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+.image-item.active {
+  background: rgba(139, 139, 248, 0.12);
+  outline: 1.5px solid rgba(139, 139, 248, 0.35);
+}
+.image-item-thumb {
+  width: 92px;
+  height: 68px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.image-item-info {
+  width: 100%;
+  text-align: center;
+  min-width: 0;
+}
+.image-item-name {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+.image-item-dims {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.52);
+  margin-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.image-item-remove {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: scale(0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.image-item:hover .image-item-remove {
+  opacity: 1;
+  transform: scale(1);
+}
+.image-item-remove:hover {
+  background: rgba(255, 69, 58, 0.8);
+  transform: scale(1.1);
+}
+.palette-section {
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.palette-section .section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+}
+.palette-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.palette-block {
+  flex: 1;
+  min-width: 60px;
+  height: 90px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.palette-block:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(139, 139, 248, 0.25);
+  z-index: 2;
+}
+.palette-block .color-val {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 2px 6px;
+  border-radius: 4px;
+  user-select: none;
+}
+.palette-block.light-text .color-val {
+  color: rgba(0, 0, 0, 0.85);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
+}
+.palette-block .copy-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.palette-block:hover .copy-badge {
+  opacity: 1;
+}
+.preview-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.preview-panel .preview-original img {
+  width: 100%;
+  border-radius: 8px;
+  max-height: 160px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.03);
+}
+.preview-panel .preview-apply {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.preview-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.preview-card.dark-bg {
+  background: #1a1a1a;
+}
+.preview-card-bar {
+  display: flex;
+  gap: 4px;
+}
+.preview-card-bar .bar {
+  height: 20px;
+  border-radius: 4px;
+  flex: 1;
+}
+.preview-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.preview-card-text {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.55);
+  line-height: 1.4;
+}
+.dark-bg .preview-card-title {
+  color: #fff;
+}
+.dark-bg .preview-card-text {
+  color: rgba(255, 255, 255, 0.6);
+}
+.toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30, 30, 30, 0.95);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.progress-wrap {
+  display: none;
+  width: 100%;
+}
+.progress-wrap.show {
+  display: block;
+  animation: fadeSlideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+.progress-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b8bf8, #c084fc);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.export-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(24, 24, 28, 0.96);
+  border-radius: 12px;
+  padding: 6px;
+  z-index: 10;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 180px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+.export-menu.show {
+  display: block;
+  animation: fadeSlideUp 0.2s ease both;
+}
+.export-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+.export-menu button:hover {
+  background: rgba(139, 139, 248, 0.15);
+  color: #fff;
+}
+.btn-wrap {
+  position: relative;
+}
+@media (max-width: 700px) {
+  body { padding: 20px 12px 40px; }
+  .controls { grid-template-columns: 1fr; }
+  .preview-panel { grid-template-columns: 1fr; }
+  .header h1 { font-size: 24px; }
+  .image-item { width: 100px; }
+  .image-item-thumb { width: 84px; height: 62px; }
+  .image-list-body { max-height: 176px; }
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>ColorMind · 图片配色提取</h1>
+  <p>拖拽上传图片，自动提取主色调 — 支持批量处理</p>
+</div>
+
+<div class="container">
+  <div class="upload-area" id="uploadArea">
+    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>拖拽图片到此处，或点击上传</p>
+    <p class="hint">支持批量上传 JPG / PNG / WebP，可同时选择多张</p>
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+  </div>
+
+  <div class="image-list-section" id="imageListSection" style="display:none">
+    <div class="image-list-header">
+      <span>图片列表 <span class="count" id="imageCount">0</span> 张</span>
+      <button class="btn btn-outline btn-sm" id="clearAllBtn" style="padding:5px 12px;font-size:11px;border-radius:8px">清空列表</button>
+    </div>
+    <div class="image-list-body" id="imageListBody"></div>
+  </div>
+
+  <div class="controls" id="controlsSection" style="display:none">
+    <div>
+      <div class="control-group">
+        <label>提取颜色数量</label>
+        <div class="mode-selector">
+          <div class="mode-slider" id="countSlider"></div>
+          <button class="mode-btn active" data-count="5">5 色</button>
+          <button class="mode-btn" data-count="8">8 色</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="control-group">
+        <label>色值格式</label>
+        <div class="mode-selector">
+          <div class="mode-slider" id="formatSlider"></div>
+          <button class="mode-btn active" data-format="hex">Hex</button>
+          <button class="mode-btn" data-format="rgb">RGB</button>
+          <button class="mode-btn" data-format="hsl">HSL</button>
+          <button class="mode-btn" data-format="oklch">OKLCH</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-section" id="paletteSection" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="section-title">配色结果</div>
+      <div style="display:flex;gap:8px">
+        <div class="mode-selector" style="width:auto;display:inline-flex">
+          <div class="mode-slider" id="bgSlider"></div>
+          <button class="mode-btn" data-bg="light">浅色背景</button>
+          <button class="mode-btn active" data-bg="dark">深色背景</button>
+        </div>
+      </div>
+    </div>
+    <div class="palette-grid" id="paletteGrid"></div>
+    <div class="preview-panel" id="previewPanel">
+      <div class="preview-original">
+        <div style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);margin-bottom:8px">原图</div>
+        <img id="previewOriginImg" src="" alt="">
+        <div style="font-size:11px;color:rgba(255,255,255,0.52);margin-top:4px" id="previewDims"></div>
+      </div>
+      <div class="preview-apply">
+        <div style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);margin-bottom:4px">配色预览</div>
+        <div class="preview-card" id="previewCard">
+          <div class="preview-card-bar" id="previewCardBars"></div>
+          <div class="preview-card-title">Sample Title</div>
+          <div class="preview-card-text">This is a preview of how the color palette might look applied to a UI card component.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actionsSection" style="display:none">
+    <button class="btn btn-secondary btn-sm" id="copyAllBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      复制全部色值
+    </button>
+    <div class="btn-wrap">
+      <button class="btn btn-primary btn-sm" id="exportBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        导出
+      </button>
+      <div class="export-menu" id="exportMenu">
+        <button data-export="css">导出 CSS 变量</button>
+        <button data-export="sass">导出 Sass 变量</button>
+        <button data-export="tailwind">导出 Tailwind 配置</button>
+        <button data-export="json">导出 JSON</button>
+      </div>
+    </div>
+    <button class="btn btn-success btn-sm" id="downloadPaletteBtn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      下载配色截图
+    </button>
+    <button class="btn btn-outline btn-sm" id="reExtractBtn">重新提取</button>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progressText">提取中...</span>
+      <span id="progressPercent">0%</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  images: [],
+  selectedId: null,
+  palettes: {},
+  colorCount: 5,
+  colorFormat: 'hex',
+  previewBg: 'dark',
+  isExtracting: false
+};
+let idCounter = 0;
+
+const $ = (id) => document.getElementById(id);
+const uploadArea = $('uploadArea');
+const fileInput = $('fileInput');
+const imageListSection = $('imageListSection');
+const imageListBody = $('imageListBody');
+const imageCount = $('imageCount');
+const clearAllBtn = $('clearAllBtn');
+const controlsSection = $('controlsSection');
+const paletteSection = $('paletteSection');
+const actionsSection = $('actionsSection');
+const paletteGrid = $('paletteGrid');
+const previewPanel = $('previewPanel');
+const previewOriginImg = $('previewOriginImg');
+const previewDims = $('previewDims');
+const previewCard = $('previewCard');
+const previewCardBars = $('previewCardBars');
+const toastEl = $('toast');
+const copyAllBtn = $('copyAllBtn');
+const exportBtn = $('exportBtn');
+const exportMenu = $('exportMenu');
+const downloadPaletteBtn = $('downloadPaletteBtn');
+const reExtractBtn = $('reExtractBtn');
+const progressWrap = $('progressWrap');
+const progressFill = $('progressFill');
+const progressText = $('progressText');
+const progressPercent = $('progressPercent');
+
+function initModeSelectors() {
+  document.querySelectorAll('.controls .mode-selector').forEach((container) => {
+    const btns = container.querySelectorAll('.mode-btn');
+    const slider = container.querySelector('.mode-slider');
+    function moveSlider(btn) {
+      const cRect = container.getBoundingClientRect();
+      const bRect = btn.getBoundingClientRect();
+      slider.style.left = (bRect.left - cRect.left) + 'px';
+      slider.style.width = bRect.width + 'px';
+    }
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        btns.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        moveSlider(btn);
+        if (btn.dataset.count) {
+          state.colorCount = parseInt(btn.dataset.count);
+          if (state.selectedId) extractAndRender();
+        } else if (btn.dataset.format) {
+          state.colorFormat = btn.dataset.format;
+          if (state.selectedId && state.palettes[state.selectedId]) renderPalette(state.selectedId);
+        }
+      });
+    });
+    requestAnimationFrame(() => {
+      const active = container.querySelector('.mode-btn.active');
+      if (active) moveSlider(active);
+    });
+  });
+  const bgBtns = document.querySelectorAll('[data-bg]');
+  const bgSlider = $('bgSlider');
+  function moveBgSlider(btn) {
+    const container = btn.closest('.mode-selector');
+    const cRect = container.getBoundingClientRect();
+    const bRect = btn.getBoundingClientRect();
+    bgSlider.style.left = (bRect.left - cRect.left) + 'px';
+    bgSlider.style.width = bRect.width + 'px';
+  }
+  bgBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      bgBtns.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      moveBgSlider(btn);
+      state.previewBg = btn.dataset.bg;
+      if (state.selectedId && state.palettes[state.selectedId]) renderPalette(state.selectedId);
+    });
+  });
+  requestAnimationFrame(() => {
+    const active = document.querySelector('[data-bg].active');
+    if (active) moveBgSlider(active);
+  });
+}
+initModeSelectors();
+
+function addImages(files) {
+  const pending = [];
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const id = ++idCounter;
+    const entry = { id, file, name: file.name, img: null, width: 0, height: 0, loaded: false };
+    state.images.push(entry);
+    pending.push(entry);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        entry.img = img;
+        entry.width = img.width;
+        entry.height = img.height;
+        entry.loaded = true;
+        if (!state.selectedId) selectImage(entry.id);
+        else if (state.selectedId === entry.id) extractAndRender();
+        renderImageList();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  if (pending.length > 0) {
+    state.selectedId = pending[0].id;
+    sectionsVisible();
+    renderImageList();
+    setTimeout(() => extractAndRender(), 200);
+  }
+}
+
+function removeImage(id) {
+  state.images = state.images.filter((e) => e.id !== id);
+  delete state.palettes[id];
+  if (state.selectedId === id) {
+    state.selectedId = state.images.length > 0 ? state.images[0].id : null;
+  }
+  renderImageList();
+  if (state.images.length === 0) {
+    resetAll();
+  } else if (state.selectedId) {
+    if (state.palettes[state.selectedId]) renderPalette(state.selectedId);
+    else extractAndRender();
+  } else {
+    hidePalette();
+  }
+}
+
+function selectImage(id) {
+  state.selectedId = id;
+  renderImageList();
+  if (state.palettes[id]) renderPalette(id);
+  else extractAndRender();
+}
+
+function getSelected() {
+  return state.images.find((e) => e.id === state.selectedId);
+}
+
+function sectionsVisible() {
+  controlsSection.style.display = 'grid';
+  paletteSection.style.display = 'block';
+  actionsSection.style.display = 'flex';
+}
+
+function hidePalette() {
+  paletteSection.style.display = 'none';
+  actionsSection.style.display = 'none';
+}
+
+function resetAll() {
+  state.images = [];
+  state.selectedId = null;
+  state.palettes = {};
+  imageListSection.style.display = 'none';
+  controlsSection.style.display = 'none';
+  paletteSection.style.display = 'none';
+  actionsSection.style.display = 'none';
+  progressWrap.classList.remove('show');
+  fileInput.value = '';
+}
+
+function renderImageList() {
+  const loaded = state.images.filter((e) => e.loaded);
+  imageCount.textContent = loaded.length;
+  if (loaded.length === 0) {
+    imageListSection.style.display = 'none';
+    return;
+  }
+  imageListSection.style.display = 'block';
+  imageListBody.innerHTML = loaded.map((entry) => {
+    const active = entry.id === state.selectedId ? 'active' : '';
+    return `<div class="image-item ${active}" data-id="${entry.id}">
+      <img class="image-item-thumb" src="${entry.img.src}" alt="" loading="lazy">
+      <div class="image-item-info">
+        <div class="image-item-name">${escHtml(entry.name)}</div>
+        <div class="image-item-dims">${entry.width} × ${entry.height}</div>
+      </div>
+      <button class="image-item-remove" data-remove="${entry.id}" title="移除">✕</button>
+    </div>`;
+  }).join('');
+  imageListBody.querySelectorAll('.image-item').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.image-item-remove')) return;
+      selectImage(parseInt(el.dataset.id));
+    });
+  });
+  imageListBody.querySelectorAll('.image-item-remove').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      removeImage(parseInt(btn.dataset.remove));
+    });
+  });
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* ─── Color Quantization: Median Cut ─────────── */
+function medianCutQuantize(imageData, colorCount) {
+  const data = imageData.data;
+  const w = imageData.width;
+  const h = imageData.height;
+  const pixels = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+    if (a < 128) continue;
+    pixels.push({ r, g, b });
+  }
+  if (pixels.length === 0) return [{ r: 0, g: 0, b: 0 }];
+
+  const boxes = [pixels];
+  while (boxes.length < colorCount) {
+    const box = boxes.shift();
+    if (!box || box.length < 2) { boxes.push(box || []); break; }
+    const [splitBoxA, splitBoxB] = splitBox(box);
+    boxes.push(splitBoxA);
+    if (splitBoxB.length > 0) boxes.push(splitBoxB);
+  }
+
+  const colors = boxes.map((box) => {
+    if (box.length === 0) return { r: 0, g: 0, b: 0 };
+    let sumR = 0, sumG = 0, sumB = 0;
+    for (const p of box) { sumR += p.r; sumG += p.g; sumB += p.b; }
+    return { r: Math.round(sumR / box.length), g: Math.round(sumG / box.length), b: Math.round(sumB / box.length) };
+  });
+
+  while (colors.length < colorCount) colors.push({ r: 0, g: 0, b: 0 });
+  return colors.slice(0, colorCount);
+}
+
+function splitBox(box) {
+  let minR = 255, maxR = 0, minG = 255, maxG = 0, minB = 255, maxB = 0;
+  for (const p of box) {
+    if (p.r < minR) minR = p.r; if (p.r > maxR) maxR = p.r;
+    if (p.g < minG) minG = p.g; if (p.g > maxG) maxG = p.g;
+    if (p.b < minB) minB = p.b; if (p.b > maxB) maxB = p.b;
+  }
+  const rangeR = maxR - minR, rangeG = maxG - minG, rangeB = maxB - minB;
+  let channel = 'r';
+  if (rangeG >= rangeR && rangeG >= rangeB) channel = 'g';
+  else if (rangeB >= rangeR && rangeB >= rangeG) channel = 'b';
+  box.sort((a, b) => a[channel] - b[channel]);
+  const median = Math.floor(box.length / 2);
+  return [box.slice(0, median), box.slice(median)];
+}
+
+function extractColors(img, count) {
+  const c = document.createElement('canvas');
+  const size = 120;
+  const scale = Math.min(size / img.width, size / img.height);
+  c.width = Math.max(1, Math.round(img.width * scale));
+  c.height = Math.max(1, Math.round(img.height * scale));
+  const ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, c.width, c.height);
+  const imageData = ctx.getImageData(0, 0, c.width, c.height);
+  return medianCutQuantize(imageData, count);
+}
+
+async function extractAndRender() {
+  const entry = getSelected();
+  if (!entry || !entry.loaded || state.isExtracting) return;
+  state.isExtracting = true;
+  progressWrap.classList.add('show');
+  progressFill.style.width = '0%';
+  progressText.textContent = '提取配色...';
+  progressPercent.textContent = '0%';
+  await new Promise((r) => setTimeout(r, 30));
+  try {
+    const colors = await new Promise((resolve) => {
+      setTimeout(() => resolve(extractColors(entry.img, state.colorCount)), 0);
+    });
+    state.palettes[entry.id] = colors;
+    progressFill.style.width = '100%';
+    progressPercent.textContent = '100%';
+    await new Promise((r) => setTimeout(r, 150));
+    renderPalette(entry.id);
+  } finally {
+    state.isExtracting = false;
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+  }
+}
+
+/* ─── Color Formatting ───────────────────────── */
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`;
+}
+
+function srgbTransfer(c) {
+  c /= 255;
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+function rgbToOklch(r, g, b) {
+  const r1 = srgbTransfer(r), g1 = srgbTransfer(g), b1 = srgbTransfer(b);
+  const l_ = 0.4122214708 * r1 + 0.5363325363 * g1 + 0.0514459929 * b1;
+  const m_ = 0.2119034982 * r1 + 0.6806995451 * g1 + 0.1073969566 * b1;
+  const s_ = 0.0883024619 * r1 + 0.2817188376 * g1 + 0.6299787005 * b1;
+  const l = Math.cbrt(l_), m = Math.cbrt(m_), s = Math.cbrt(s_);
+  const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+  const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+  const b_ = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+  const C = Math.sqrt(a * a + b_ * b_);
+  let h = Math.atan2(b_, a) * 180 / Math.PI;
+  if (h < 0) h += 360;
+  return `oklch(${(L * 100).toFixed(1)}% ${C.toFixed(3)} ${h.toFixed(1)})`;
+}
+
+function formatColor(r, g, b, fmt) {
+  switch (fmt) {
+    case 'hex': return rgbToHex(r, g, b);
+    case 'rgb': return `rgb(${r}, ${g}, ${b})`;
+    case 'hsl': return rgbToHsl(r, g, b);
+    case 'oklch': return rgbToOklch(r, g, b);
+    default: return rgbToHex(r, g, b);
+  }
+}
+
+function getLuminance(r, g, b) {
+  const rs = r / 255, gs = g / 255, bs = b / 255;
+  const rl = rs <= 0.03928 ? rs / 12.92 : Math.pow((rs + 0.055) / 1.055, 2.4);
+  const gl = gs <= 0.03928 ? gs / 12.92 : Math.pow((gs + 0.055) / 1.055, 2.4);
+  const bl = bs <= 0.03928 ? bs / 12.92 : Math.pow((bs + 0.055) / 1.055, 2.4);
+  return 0.2126 * rl + 0.7152 * gl + 0.0722 * bl;
+}
+
+function renderPalette(id) {
+  const colors = state.palettes[id];
+  const entry = state.images.find((e) => e.id === id);
+  if (!colors || !entry) return;
+
+  paletteSection.style.display = 'block';
+  actionsSection.style.display = 'flex';
+
+  const fmt = state.colorFormat;
+  const isDarkBg = state.previewBg === 'dark';
+
+  paletteGrid.innerHTML = colors.map((c) => {
+    const val = formatColor(c.r, c.g, c.b, fmt);
+    const lum = getLuminance(c.r, c.g, c.b);
+    const lightText = lum > 0.5;
+    return `<div class="palette-block ${lightText ? 'light-text' : ''}" data-color="${val}" data-r="${c.r}" data-g="${c.g}" data-b="${c.b}" style="background:rgb(${c.r},${c.g},${c.b})">
+      <span class="copy-badge">复制</span>
+      <span class="color-val">${val}</span>
+    </div>`;
+  }).join('');
+
+  paletteGrid.querySelectorAll('.palette-block').forEach((el) => {
+    el.addEventListener('click', () => {
+      const val = el.dataset.color;
+      navigator.clipboard.writeText(val).then(() => showToast('已复制: ' + val)).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = val;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('已复制: ' + val);
+      });
+    });
+  });
+
+  previewOriginImg.src = entry.img.src;
+  previewDims.textContent = `${entry.width} × ${entry.height}`;
+
+  previewCard.className = 'preview-card' + (isDarkBg ? ' dark-bg' : '');
+  previewCardBars.innerHTML = colors.slice(0, 5).map((c) =>
+    `<div class="bar" style="background:rgb(${c.r},${c.g},${c.b})"></div>`
+  ).join('');
+}
+
+/* ─── Export Functions ───────────────────────── */
+function getCurrentColors() {
+  if (!state.selectedId || !state.palettes[state.selectedId]) return [];
+  return state.palettes[state.selectedId];
+}
+
+function copyAllColors() {
+  const colors = getCurrentColors();
+  if (colors.length === 0) { showToast('没有可复制的色值'); return; }
+  const fmt = state.colorFormat;
+  const text = colors.map((c) => formatColor(c.r, c.g, c.b, fmt)).join('\n');
+  navigator.clipboard.writeText(text).then(() => showToast('已复制全部色值')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('已复制全部色值');
+  });
+}
+
+function getExportContent(type) {
+  const colors = getCurrentColors();
+  if (colors.length === 0) return '';
+  let out = '';
+  switch (type) {
+    case 'css':
+      out = ':root {\n';
+      colors.forEach((c, i) => {
+        out += `  --color-${i + 1}: ${formatColor(c.r, c.g, c.b, 'hex')};\n`;
+      });
+      out += '}';
+      break;
+    case 'sass':
+      colors.forEach((c, i) => {
+        out += `$color-${i + 1}: ${formatColor(c.r, c.g, c.b, 'hex')};\n`;
+      });
+      break;
+    case 'tailwind':
+      out = 'module.exports = {\n  theme: {\n    extend: {\n      colors: {\n';
+      colors.forEach((c, i) => {
+        out += `        '${i + 1}': '${formatColor(c.r, c.g, c.b, 'hex')}',\n`;
+      });
+      out += '      },\n    },\n  },\n};';
+      break;
+    case 'json':
+      const arr = colors.map((c) => ({
+        hex: formatColor(c.r, c.g, c.b, 'hex'),
+        rgb: formatColor(c.r, c.g, c.b, 'rgb'),
+        hsl: formatColor(c.r, c.g, c.b, 'hsl'),
+        oklch: formatColor(c.r, c.g, c.b, 'oklch'),
+      }));
+      out = JSON.stringify(arr, null, 2);
+      break;
+  }
+  return out;
+}
+
+function downloadText(filename, text) {
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = URL.createObjectURL(blob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function downloadPaletteImage() {
+  const colors = getCurrentColors();
+  if (colors.length === 0) { showToast('没有配色数据'); return; }
+  const canvas = document.createElement('canvas');
+  const w = 600, h = 120;
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  const segW = w / colors.length;
+  colors.forEach((c, i) => {
+    ctx.fillStyle = `rgb(${c.r},${c.g},${c.b})`;
+    ctx.fillRect(i * segW, 0, segW, h);
+    ctx.fillStyle = '#fff';
+    ctx.font = '12px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    const val = formatColor(c.r, c.g, c.b, 'hex');
+    ctx.fillText(val, i * segW + segW / 2, h - 10);
+  });
+  const link = document.createElement('a');
+  link.download = 'palette.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  showToast('配色截图已下载');
+}
+
+/* ─── Event Binding ──────────────────────────── */
+uploadArea.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) {
+    addImages(fileInput.files);
+    fileInput.value = '';
+  }
+});
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) addImages(e.dataTransfer.files);
+  else showToast('请拖入图片文件');
+});
+clearAllBtn.addEventListener('click', resetAll);
+
+copyAllBtn.addEventListener('click', copyAllColors);
+
+exportBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  exportMenu.classList.toggle('show');
+});
+document.addEventListener('click', () => exportMenu.classList.remove('show'));
+
+exportMenu.querySelectorAll('button').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    exportMenu.classList.remove('show');
+    const type = btn.dataset.export;
+    const content = getExportContent(type);
+    const extMap = { css: 'css', sass: 'scss', tailwind: 'js', json: 'json' };
+    downloadText(`palette.${extMap[type]}`, content);
+    showToast(`已导出 ${type.toUpperCase()}`);
+  });
+});
+
+downloadPaletteBtn.addEventListener('click', downloadPaletteImage);
+
+reExtractBtn.addEventListener('click', () => {
+  if (state.selectedId) extractAndRender();
+});
+
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>

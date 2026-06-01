@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>PricingPage - 定价表生成器 | 在线工具</title>
+<meta name="description" content="在线定价表生成器，支持简约/卡片/企业三种模板，自定义套餐、价格、功能列表、推荐标签和颜色主题，实时预览并导出HTML/CSS/React代码。">
+<meta property="og:title" content="PricingPage - 定价表生成器">
+<meta property="og:description" content="免费在线定价表生成器，多模板多套餐，实时预览，一键导出代码。">
+<meta property="og:type" content="website">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "PricingPage 定价表生成器",
+  "description": "在线定价表生成器，支持多种模板、自定义套餐、实时预览和代码导出",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript"
+}
+</script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'.SFNSDisplay','SF Pro Display','Helvetica Neue',sans-serif;background:#000000;color:#ffffff;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 48px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.header{text-align:center;margin-bottom:32px;padding:0 8px}
+.header h1{font-size:30px;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,#8b8bf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header p{color:rgba(255,255,255,0.72);font-size:14px;margin-top:6px;font-weight:400;letter-spacing:0.2px}
+.container{width:100%;max-width:1200px;display:flex;flex-direction:column;gap:20px}
+.frost-panel{background:rgba(255,255,255,0.06);border-radius:14px;padding:20px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.col{display:flex;flex-direction:column;gap:16px}
+@media(max-width:900px){.row{grid-template-columns:1fr}}
+.mode-selector{position:relative;display:flex;background:rgba(0,0,0,0.4);border-radius:10px;padding:3px;overflow:hidden}
+.mode-slider{position:absolute;top:3px;left:3px;height:calc(100% - 6px);border-radius:7px;background:rgba(139,139,248,0.25);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:left 0.3s cubic-bezier(0.25,0.46,0.45,0.94),width 0.3s cubic-bezier(0.25,0.46,0.45,0.94);z-index:0;pointer-events:none}
+.mode-btn{flex:1;padding:8px 8px;border-radius:7px;border:none;background:transparent;color:rgba(255,255,255,0.78);font-size:12px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;position:relative;z-index:1;transition:color 0.25s ease;user-select:none}
+.mode-btn.active{color:#ffffff;font-weight:600}
+.control-group{display:flex;flex-direction:column;gap:6px}
+.control-group label{font-size:13px;font-weight:500;color:rgba(255,255,255,0.78);letter-spacing:0.3px}
+input[type="text"],input[type="number"]{background:rgba(0,0,0,0.5);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;color:#ffffff;font-size:14px;font-weight:400;outline:none;font-family:inherit;transition:border-color 0.3s,box-shadow 0.3s;width:100%}
+input[type="text"]:focus,input[type="number"]:focus{border-color:#8b8bf8;box-shadow:0 0 0 3px rgba(139,139,248,0.2)}
+.toggle-switch{position:relative;width:42px;height:24px;flex-shrink:0;display:inline-block}
+.toggle-switch input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.2);border-radius:12px;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#ffffff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:all 0.35s cubic-bezier(0.68,-0.55,0.27,1.55)}
+.toggle-switch input:checked+.toggle-track{background:#8b8bf8}
+.toggle-switch input:checked+.toggle-track .toggle-thumb{left:20px}
+.btn{padding:12px 24px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-family:inherit;letter-spacing:0.3px;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.3s}
+.btn:hover::after{background:rgba(255,255,255,0.06)}
+.btn:active{transform:scale(0.97)}
+.btn-primary{background:rgba(139,139,248,0.6);color:#fff}
+.btn-primary:hover{background:rgba(139,139,248,0.7)}
+.btn-success{background:rgba(52,199,89,0.55);color:#fff}
+.btn-success:hover{background:rgba(52,199,89,0.65)}
+.btn-secondary{background:rgba(255,255,255,0.1);color:#fff}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}
+.btn-outline:hover{border-color:rgba(255,255,255,0.3);color:#ffffff}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:8px}
+.section-title{font-size:15px;font-weight:600;color:rgba(255,255,255,0.88);margin-bottom:10px;letter-spacing:0.2px}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-slide{animation:fadeSlideUp 0.35s cubic-bezier(0.25,0.46,0.45,0.94) both}
+/* Package card */
+.package-card{background:rgba(255,255,255,0.04);border-radius:12px;padding:14px 16px;border:1px solid rgba(255,255,255,0.06);transition:border-color 0.3s}
+.package-card:hover{border-color:rgba(139,139,248,0.3)}
+.package-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.package-name{font-size:14px;font-weight:600;color:#fff}
+.package-remove{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px;transition:all 0.2s}
+.package-remove:hover{background:rgba(255,69,58,0.2);color:#ff453a}
+.feature-row{display:flex;gap:6px;margin-bottom:4px;align-items:center}
+.feature-row input{flex:1}
+.feature-row .remove-feature{background:none;border:none;color:rgba(255,255,255,0.35);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px}
+.feature-row .remove-feature:hover{background:rgba(255,69,58,0.2);color:#ff453a}
+.features-add{background:none;border:1px dashed rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;color:rgba(255,255,255,0.5);cursor:pointer;font-size:12px;width:100%;margin-top:4px;transition:all 0.2s}
+.features-add:hover{border-color:#8b8bf8;color:#8b8bf8}
+/* Color palette */
+.color-palette{display:flex;gap:8px;flex-wrap:wrap}
+.color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all 0.2s}
+.color-swatch.active{border-color:#fff;transform:scale(1.1)}
+.color-swatch:hover{transform:scale(1.08)}
+/* Preview */
+.preview-card{background:rgba(255,255,255,0.04);border-radius:12px;padding:24px 16px;text-align:center;flex:1;transition:all 0.3s;position:relative}
+.preview-card.popular{border:1.5px solid #8b8bf8}
+.preview-card .badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:#8b8bf8;color:#fff;font-size:10px;font-weight:600;padding:3px 12px;border-radius:20px;white-space:nowrap}
+.preview-price{font-size:32px;font-weight:700;color:#fff;margin:8px 0}
+.preview-price span{font-size:14px;font-weight:400;color:rgba(255,255,255,0.5)}
+.preview-name{font-size:16px;font-weight:600;color:rgba(255,255,255,0.9)}
+.preview-features{margin:12px 0;list-style:none;padding:0}
+.preview-features li{font-size:13px;color:rgba(255,255,255,0.72);padding:4px 0;display:flex;align-items:center;gap:6px;justify-content:center}
+.preview-features li::before{content:'✓';color:#8b8bf8;font-weight:700}
+.preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.code-area{background:rgba(0,0,0,0.5);border-radius:10px;padding:14px;font-family:'SF Mono','Menlo','Consolas',monospace;font-size:12px;color:rgba(255,255,255,0.8);max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-all;border:1px solid rgba(255,255,255,0.06)}
+.code-area::-webkit-scrollbar{width:4px}
+.code-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(30,30,30,0.95);color:#ffffff;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;opacity:0;transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);pointer-events:none;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PricingPage</h1>
+  <p>定价表生成器 · 多模板 · 多套餐 · 实时预览 · 一键导出代码</p>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="frost-panel">
+        <div class="section-title">模板风格</div>
+        <div class="mode-selector" id="templateSelector">
+          <div class="mode-slider" id="tmplSlider"></div>
+          <button class="mode-btn active" data-tmpl="simple">简约</button>
+          <button class="mode-btn" data-tmpl="card">卡片</button>
+          <button class="mode-btn" data-tmpl="enterprise">企业</button>
+        </div>
+      </div>
+
+      <div class="frost-panel">
+        <div class="section-title">颜色主题</div>
+        <div class="color-palette" id="colorPalette"></div>
+      </div>
+
+      <div class="frost-panel">
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span>套餐列表</span>
+          <button class="btn btn-primary btn-sm" id="addPackageBtn">+ 添加套餐</button>
+        </div>
+        <div id="packageList"></div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="frost-panel">
+        <div class="section-title">实时预览</div>
+        <div id="previewArea" class="preview-grid fade-slide"></div>
+      </div>
+
+      <div class="frost-panel">
+        <div class="section-title">导出代码</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn btn-primary btn-sm" id="copyHtmlBtn">复制 HTML</button>
+          <button class="btn btn-success btn-sm" id="downloadHtmlBtn">下载 HTML</button>
+          <button class="btn btn-secondary btn-sm" id="copyReactBtn">复制 React (Pro)</button>
+        </div>
+        <div class="code-area" id="codeArea">点击生成代码...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS = ['#8b8bf8','#ff6b6b','#4ecdc4','#ffd93d','#6bcbff','#ff8a5c'];
+const DEFAULT_PACKAGES = [
+  { name:'基础版', price:'0', period:'永久', features:['基础功能','1 个项目','社区支持'], popular:false },
+  { name:'专业版', price:'29', period:'/ 月', features:['高级功能','10 个项目','优先支持','API 访问'], popular:true },
+  { name:'企业版', price:'99', period:'/ 月', features:['全部功能','无限项目','专属支持','定制开发','SLA 保障'], popular:false },
+];
+const STORAGE_KEY = 'pricingpage_data';
+
+let state = {
+  template: 'simple',
+  color: COLORS[0],
+  packages: JSON.parse(localStorage.getItem(STORAGE_KEY)) || JSON.parse(JSON.stringify(DEFAULT_PACKAGES)),
+};
+let toastTimer = null;
+
+const $ = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+
+function showToast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.packages));
+}
+
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* Color palette */
+function renderPalette() {
+  const container = $('colorPalette');
+  container.innerHTML = COLORS.map(c =>
+    `<div class="color-swatch${c===state.color?' active':''}" style="background:${c}" data-color="${c}"></div>`
+  ).join('');
+  container.querySelectorAll('.color-swatch').forEach(el => {
+    el.addEventListener('click', () => {
+      COLORS.forEach(c => c===el.dataset.color && (state.color=c));
+      renderPalette();
+      renderPreview();
+    });
+  });
+}
+
+/* Package list editor */
+function renderPackages() {
+  const container = $('packageList');
+  container.innerHTML = state.packages.map((pkg, idx) => `
+    <div class="package-card fade-slide" style="margin-bottom:10px">
+      <div class="package-header">
+        <span class="package-name">套餐 ${idx+1}</span>
+        <button class="package-remove" data-idx="${idx}" title="删除套餐">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+        <div class="control-group">
+          <label>套餐名</label>
+          <input type="text" class="pkg-name" data-idx="${idx}" value="${escHtml(pkg.name)}">
+        </div>
+        <div class="control-group">
+          <label>价格</label>
+          <input type="text" class="pkg-price" data-idx="${idx}" value="${escHtml(pkg.price)}">
+        </div>
+        <div class="control-group">
+          <label>周期</label>
+          <input type="text" class="pkg-period" data-idx="${idx}" value="${escHtml(pkg.period)}">
+        </div>
+      </div>
+      <div class="control-group" style="margin-bottom:6px">
+        <label>功能列表</label>
+        ${pkg.features.map((f, fi) => `
+          <div class="feature-row">
+            <input type="text" class="pkg-feature" data-idx="${idx}" data-fi="${fi}" value="${escHtml(f)}" placeholder="输入功能">
+            <button class="remove-feature" data-idx="${idx}" data-fi="${fi}">✕</button>
+          </div>
+        `).join('')}
+        <button class="features-add" data-idx="${idx}">+ 添加功能</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <label class="toggle-switch">
+          <input type="checkbox" class="pkg-popular" data-idx="${idx}" ${pkg.popular?'checked':''}>
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+        </label>
+        <span style="font-size:12px;color:rgba(255,255,255,0.6)">推荐标签（最受欢迎）</span>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.pkg-name').forEach(el => {
+    el.addEventListener('input', () => { state.packages[+el.dataset.idx].name = el.value; saveState(); renderPreview(); });
+  });
+  container.querySelectorAll('.pkg-price').forEach(el => {
+    el.addEventListener('input', () => { state.packages[+el.dataset.idx].price = el.value; saveState(); renderPreview(); });
+  });
+  container.querySelectorAll('.pkg-period').forEach(el => {
+    el.addEventListener('input', () => { state.packages[+el.dataset.idx].period = el.value; saveState(); renderPreview(); });
+  });
+  container.querySelectorAll('.pkg-feature').forEach(el => {
+    el.addEventListener('input', () => {
+      const idx = +el.dataset.idx, fi = +el.dataset.fi;
+      state.packages[idx].features[fi] = el.value;
+      saveState(); renderPreview();
+    });
+  });
+  container.querySelectorAll('.pkg-popular').forEach(el => {
+    el.addEventListener('change', () => {
+      const idx = +el.dataset.idx;
+      state.packages.forEach((p,i) => p.popular = i===idx);
+      renderPackages(); renderPreview(); saveState();
+    });
+  });
+  container.querySelectorAll('.package-remove').forEach(el => {
+    el.addEventListener('click', () => {
+      state.packages.splice(+el.dataset.idx, 1);
+      if (state.packages.length===0) state.packages.push({ name:'套餐', price:'0', period:'永久', features:['功能1'], popular:false });
+      renderPackages(); renderPreview(); saveState();
+    });
+  });
+  container.querySelectorAll('.remove-feature').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = +el.dataset.idx, fi = +el.dataset.fi;
+      state.packages[idx].features.splice(fi, 1);
+      renderPackages(); renderPreview(); saveState();
+    });
+  });
+  container.querySelectorAll('.features-add').forEach(el => {
+    el.addEventListener('click', () => {
+      state.packages[+el.dataset.idx].features.push('新功能');
+      renderPackages(); renderPreview();
+    });
+  });
+}
+
+$('addPackageBtn').addEventListener('click', () => {
+  if (state.packages.length >= 6) { showToast('最多 6 个套餐'); return; }
+  state.packages.push({ name:'新套餐', price:'0', period:'月', features:['功能1'], popular:false });
+  renderPackages(); renderPreview();
+});
+
+/* Preview */
+function renderPreview() {
+  const area = $('previewArea');
+  const tmpl = state.template;
+  const color = state.color;
+  let html = '';
+
+  state.packages.slice(0, 4).forEach((pkg, idx) => {
+    const isPopular = pkg.popular;
+    let cardStyle = '';
+    if (tmpl === 'card') {
+      cardStyle = `border:1.5px solid ${isPopular?color:'rgba(255,255,255,0.1)'};border-radius:16px;padding:24px 16px;background:${isPopular?`rgba(${hexToRgb(color)},0.08)`: 'rgba(255,255,255,0.04)'};text-align:center;position:relative;transition:all 0.3s`;
+    } else if (tmpl === 'enterprise') {
+      cardStyle = `border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:28px 20px;text-align:center;position:relative;background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01))`;
+    } else {
+      cardStyle = `background:rgba(255,255,255,0.04);border-radius:12px;padding:20px 16px;text-align:center;position:relative;border:1px solid ${isPopular?color:'transparent'}`;
+    }
+
+    const badgeHtml = isPopular ? `<div class="badge" style="background:${color}">最受欢迎</div>` : '';
+
+    html += `<div style="${cardStyle}">
+      ${badgeHtml}
+      <div class="preview-name" style="color:rgba(255,255,255,0.9);font-size:${tmpl==='enterprise'?'18':'16'}px;font-weight:600">${escHtml(pkg.name)}</div>
+      <div class="preview-price" style="font-size:${tmpl==='enterprise'?'38':'32'}px;font-weight:700;color:#fff;margin:8px 0">
+        ${escHtml(pkg.price)}<span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.5)"> ${escHtml(pkg.period)}</span>
+      </div>
+      <ul class="preview-features" style="list-style:none;padding:0;margin:12px 0">
+        ${pkg.features.map(f => `<li style="font-size:13px;color:rgba(255,255,255,0.72);padding:4px 0;display:flex;align-items:center;gap:6px;justify-content:center"><span style="color:${color};font-weight:700">✓</span> ${escHtml(f)}</li>`).join('')}
+      </ul>
+      <button style="background:${isPopular?color:'rgba(255,255,255,0.1)'};color:#fff;border:none;border-radius:${tmpl==='enterprise'?'10':'8'}px;padding:${tmpl==='enterprise'?'12px 32px':'10px 24px'};font-size:${tmpl==='enterprise'?'15':'13'}px;font-weight:600;cursor:pointer;width:100%;transition:all 0.2s">${isPopular?'立即订阅':'了解更多'}</button>
+    </div>`;
+  });
+
+  area.innerHTML = html;
+  generateCode();
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+/* Code generation */
+function generateCode() {
+  const color = state.color;
+  const pkgHtml = state.packages.slice(0,4).map(pkg => {
+    const badge = pkg.popular ? `<div class="badge" style="background:${color}">\u6700\u53D7\u6B22\u8FCE</div>` : '';
+    return `<div class="pricing-card${pkg.popular?' popular':''}" style="--accent:${color}">
+  ${badge}
+  <h3>${escHtml(pkg.name)}</h3>
+  <div class="price">${escHtml(pkg.price)} <span>${escHtml(pkg.period)}</span></div>
+  <ul>${pkg.features.map(f => `<li>${escHtml(f)}</li>`).join('\n    ')}</ul>
+  <button class="btn ${pkg.popular?'btn-primary':'btn-outline'}">${pkg.popular?'\u7ACB\u5373\u8BA2\u9605':'\u4E86\u89E3\u66F4\u591A'}</button>
+</div>`;
+  }).join('\n  ');
+
+  const css = `.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:20px;background:#000;font-family:-apple-system,sans-serif}
+.pricing-card{background:rgba(255,255,255,0.06);border-radius:16px;padding:24px 20px;text-align:center;backdrop-filter:blur(10px);position:relative}
+.pricing-card.popular{border:2px solid var(--accent,#8b8bf8)}
+.pricing-card .badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);color:#fff;font-size:10px;font-weight:600;padding:3px 12px;border-radius:20px}
+.pricing-card h3{font-size:18px;font-weight:600;color:rgba(255,255,255,0.9);margin:0}
+.pricing-card .price{font-size:36px;font-weight:700;color:#fff;margin:10px 0}
+.pricing-card .price span{font-size:14px;font-weight:400;color:rgba(255,255,255,0.5)}
+.pricing-card ul{list-style:none;padding:0;margin:14px 0;text-align:left}
+.pricing-card ul li{font-size:13px;color:rgba(255,255,255,0.72);padding:5px 0;display:flex;align-items:center;gap:8px}
+.pricing-card ul li::before{content:'\u2713';color:var(--accent,#8b8bf8);font-weight:700}
+.btn{border:none;border-radius:10px;padding:10px 24px;font-size:13px;font-weight:600;cursor:pointer;width:100%;font-family:inherit}
+.btn-primary{background:var(--accent,#8b8bf8);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.65)}`;
+
+  const html = `<div class="pricing-grid">
+  ${pkgHtml}
+</div>`;
+
+  const reactCode = `const PricingGrid = ({ accent = '${color}' }) => (
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+    gap: 20,
+    padding: 20,
+    background: '#000',
+    fontFamily: '-apple-system, sans-serif',
+  }}>
+    ${state.packages.slice(0,4).map(pkg => `{
+      /* ${escHtml(pkg.name)} */
+      const popular = ${pkg.popular};
+      <div style={{
+        background: 'rgba(255,255,255,0.06)',
+        borderRadius: 16,
+        padding: '24px 20px',
+        textAlign: 'center',
+        backdropFilter: 'blur(10px)',
+        position: 'relative',
+        ${pkg.popular?`border: '2px solid ${color}',`:''}
+      }}>
+        ${pkg.popular?`<div style={{ position:'absolute',top:-10,left:'50%',transform:'translateX(-50%)',background:accent,color:'#fff',fontSize:10,fontWeight:600,padding:'3px 12px',borderRadius:20 }}>最受欢迎</div>`:''}
+        <h3 style={{ margin:0,fontSize:18,fontWeight:600,color:'rgba(255,255,255,0.9)' }}>${escHtml(pkg.name)}</h3>
+        <div style={{ fontSize:36,fontWeight:700,color:'#fff',margin:'10px 0' }}>
+          ${escHtml(pkg.price)}<span style={{ fontSize:14,fontWeight:400,color:'rgba(255,255,255,0.5)' }}> ${escHtml(pkg.period)}</span>
+        </div>
+        <ul style={{ listStyle:'none',padding:0,margin:'14px 0',textAlign:'left' }}>
+          ${pkg.features.map(f => `<li style={{ fontSize:13,padding:'5px 0',display:'flex',alignItems:'center',gap:8 }}><span style={{ color:accent,fontWeight:700 }}>✓</span> ${escHtml(f)}</li>`).join('\n          ')}
+        </ul>
+        <button style={{
+          background: popular ? accent : 'rgba(255,255,255,0.1)',
+          color: '#fff', border: 'none', borderRadius: 10,
+          padding: '10px 24px', fontSize: 13, fontWeight: 600,
+          cursor: 'pointer', width: '100%',
+        }}>{popular ? '立即订阅' : '了解更多'}</button>
+      </div>
+    }`).join('\n    ')}
+  </div>
+);`;
+
+  const fullHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>${css.replace(/</g,'&lt;')}</style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+
+  $('codeArea').textContent = fullHtml;
+  $('codeArea')._fullHtml = fullHtml;
+  $('codeArea')._reactCode = reactCode;
+}
+
+$('copyHtmlBtn').addEventListener('click', () => {
+  const code = $('codeArea')._fullHtml || $('codeArea').textContent;
+  copyToClipboard(code);
+  showToast('HTML 代码已复制');
+});
+$('downloadHtmlBtn').addEventListener('click', () => {
+  const code = $('codeArea')._fullHtml || $('codeArea').textContent;
+  const blob = new Blob([code], {type:'text/html'});
+  const a = document.createElement('a');
+  a.download = 'pricing-table.html';
+  a.href = URL.createObjectURL(blob);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('已下载 pricing-table.html');
+});
+$('copyReactBtn').addEventListener('click', () => {
+  const code = $('codeArea')._reactCode;
+  if (code) { copyToClipboard(code); showToast('React 代码已复制'); }
+});
+
+function copyToClipboard(text) {
+  if (navigator.clipboard) navigator.clipboard.writeText(text);
+  else { const ta = document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); }
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+/* Template selector */
+const tmplBtns = document.querySelectorAll('#templateSelector .mode-btn');
+const tmplSlider = $('tmplSlider');
+function moveTmplSlider(btn) {
+  const c = btn.closest('.mode-selector');
+  const cRect = c.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  tmplSlider.style.left = (bRect.left - cRect.left) + 'px';
+  tmplSlider.style.width = bRect.width + 'px';
+}
+tmplBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tmplBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveTmplSlider(btn);
+    state.template = btn.dataset.tmpl;
+    renderPreview();
+  });
+});
+requestAnimationFrame(() => {
+  const a = document.querySelector('#templateSelector .mode-btn.active');
+  if (a) moveTmplSlider(a);
+});
+
+/* Init */
+renderPalette();
+renderPackages();
+renderPreview();
+</script>
+</body>
+</html>

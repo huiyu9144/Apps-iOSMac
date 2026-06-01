@@ -138,37 +138,98 @@ namespace JiaRemoteWin
 
         private async Task FrameReceiveLoop(CancellationToken ct)
         {
-            byte[] headerBuf = new byte[JiaProtocol.FrameHeader.HeaderSize];
-            byte[] pixelBuf = null;
-
             Debug.WriteLine("[TCP] 帧接收循环启动");
+
+            var syncBuf = new byte[1];
+            int magicIdx = 0;
+            byte[] magic = JiaProtocol.FrameMagic;
 
             while (!ct.IsCancellationRequested && IsConnected && _frameStream != null)
             {
                 try
                 {
-                    await ReadExactAsync(_frameStream, headerBuf, 0, headerBuf.Length, ct);
+                    // 同步阶段：逐字节搜索 JRMC 魔数
+                    while (!ct.IsCancellationRequested)
+                    {
+                        int read = await _frameStream.ReadAsync(syncBuf, 0, 1, ct);
+                        if (read == 0) throw new EndOfStreamException("帧连接关闭");
+                        if (syncBuf[0] == magic[magicIdx])
+                        {
+                            magicIdx++;
+                            if (magicIdx >= 4)
+                            {
+                                magicIdx = 0;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (magicIdx > 0 && syncBuf[0] == magic[0])
+                                magicIdx = 1;
+                            else
+                                magicIdx = 0;
+                        }
+                    }
+
+                    // 已找到 JRMC，读剩余 32 字节帧头
+                    byte[] headerBuf = new byte[JiaProtocol.FrameHeader.HeaderSize];
+                    headerBuf[0] = magic[0];
+                    headerBuf[1] = magic[1];
+                    headerBuf[2] = magic[2];
+                    headerBuf[3] = magic[3];
+                    await ReadExactAsync(_frameStream, headerBuf, 4, 32, ct);
+
                     var header = JiaProtocol.FrameHeader.FromBytes(headerBuf);
                     if (header == null)
                     {
-                        Debug.WriteLine("[TCP] ⚠️ 帧头 magic 不匹配，跳过字节");
+                        Debug.WriteLine("[TCP] ⚠️ 帧头解析失败");
                         continue;
                     }
 
-                    if (pixelBuf == null || pixelBuf.Length < (long)header.Value.DataLength)
-                        pixelBuf = new byte[header.Value.DataLength];
+                    var frameHeader = header.Value;
+                    int dataLen = (int)frameHeader.DataLength;
+                    if (dataLen <= 0 || dataLen > JiaProtocol.MaxFrameSize)
+                    {
+                        Debug.WriteLine($"[TCP] ⚠️ 无效数据长度: {dataLen}");
+                        continue;
+                    }
 
-                    await ReadExactAsync(_frameStream, pixelBuf, 0, (int)header.Value.DataLength, ct);
+                    byte[] pixelBuf = new byte[dataLen];
+                    await ReadExactAsync(_frameStream, pixelBuf, 0, dataLen, ct);
 
-                    Debug.WriteLine($"[TCP] 📦 收到帧: {header.Value.Width}x{header.Value.Height}, {pixelBuf.Length} bytes");
+                    byte[] pixelData;
+                    if (JiaProtocol.IsCompressed(frameHeader.PixelFormat))
+                    {
+                        Debug.WriteLine($"[TCP] 📦 JPEG帧: {frameHeader.Width}x{frameHeader.Height}, 压缩{dataLen} bytes");
+                        var decompressed = JiaProtocol.DecompressToBGRA(pixelBuf, (int)frameHeader.Width, (int)frameHeader.Height);
+                        if (decompressed != null)
+                        {
+                            pixelData = decompressed;
+                            frameHeader.BytesPerRow = frameHeader.Width * 4;
+                            frameHeader.DataLength = (ulong)decompressed.Length;
+                            frameHeader.PixelFormat &= ~JiaProtocol.CompressionFlag;
+                        }
+                        else
+                        {
+                            Debug.WriteLine("[TCP] ⚠️ JPEG解码失败，跳过该帧");
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        pixelData = pixelBuf;
+                    }
+
+                    Debug.WriteLine($"[TCP] 📦 帧: {frameHeader.Width}x{frameHeader.Height} {pixelData.Length} bytes");
 
                     FrameReceived?.Invoke(this, new FrameReceivedEventArgs
                     {
-                        Header = header.Value,
-                        PixelData = pixelBuf
+                        Header = frameHeader,
+                        PixelData = pixelData
                     });
                 }
                 catch (OperationCanceledException) { Debug.WriteLine("[TCP] 帧接收循环取消"); break; }
+                catch (EndOfStreamException) { Debug.WriteLine("[TCP] 帧连接关闭"); break; }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"[TCP] 帧接收错误: {ex.Message}");

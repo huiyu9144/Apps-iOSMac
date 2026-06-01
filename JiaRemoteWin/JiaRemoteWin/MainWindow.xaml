@@ -112,8 +112,7 @@
                                              Foreground="White"
                                              Background="Transparent"
                                              BorderThickness="0"
-                                             VerticalAlignment="Center"
-                                             TextChanged="ManualIpInput_TextChanged"/>
+                                             VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                             <Border Background="#1C1C1E" CornerRadius="8"

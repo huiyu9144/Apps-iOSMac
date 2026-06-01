@@ -18,6 +18,7 @@ namespace JiaRemoteWin
         private bool _isLocked;
         private bool _overlayVisible;
         private int _frameCount;
+        private bool _isInitialized;
         private System.Windows.Threading.DispatcherTimer _statsTimer;
 
         private string _selectedHost = "";
@@ -43,8 +44,6 @@ namespace JiaRemoteWin
         {
             InitializeComponent();
 
-            ManualIpInput.Text = "192.168.3.19";
-
             _client = new TCPClient();
             _client.ConnectionStateChanged += OnConnectionStateChanged;
             _client.FrameReceived += OnFrameReceived;
@@ -54,6 +53,27 @@ namespace JiaRemoteWin
                 Interval = TimeSpan.FromSeconds(1)
             };
             _statsTimer.Tick += OnStatsTick;
+
+            Loaded += (s, e) =>
+            {
+                _isInitialized = true;
+                ManualIpInput.TextChanged += (sender, args) =>
+                {
+                    if (!_isInitialized) return;
+                    if (DeviceNameText == null || DeviceIpText == null || StatusText == null || DeviceDot == null) return;
+                    string ip = ManualIpInput.Text.Trim();
+                    if (!string.IsNullOrEmpty(ip))
+                    {
+                        _selectedHost = ip;
+                        DeviceNameText.Text = "手动连接";
+                        DeviceIpText.Text = ip;
+                        DeviceDot.Fill = new SolidColorBrush(Color.FromRgb(0x0A, 0x84, 0xFF));
+                        StatusText.Text = "输入 IP · 点击连接";
+                        StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x84, 0xFF));
+                    }
+                };
+                ManualIpInput.Text = "192.168.3.19";
+            };
         }
 
         public void AddScannedDevice(string name, string host, int port)
@@ -174,10 +194,30 @@ namespace JiaRemoteWin
 
         private void OnFrameReceived(object sender, FrameReceivedEventArgs e)
         {
-            if (_renderer == null || !_renderer.IsInitialized) return;
-            _renderer.UpdateFrameTexture(e.PixelData, e.Header.Width, e.Header.Height, e.Header.BytesPerRow);
-
             _frameCount++;
+
+            if (_renderer == null || !_renderer.IsInitialized) return;
+
+            if (Dispatcher.CheckAccess())
+            {
+                _renderer.UpdateFrameTexture(e.PixelData, e.Header.Width, e.Header.Height, e.Header.BytesPerRow);
+            }
+            else
+            {
+                try
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (_renderer == null || !_renderer.IsInitialized) return;
+                        _renderer.UpdateFrameTexture(e.PixelData, e.Header.Width, e.Header.Height, e.Header.BytesPerRow);
+                    });
+                }
+                catch (TaskCanceledException) { }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[MainWindow] Dispatcher error: {ex.Message}");
+                }
+            }
         }
 
         private void OnStatsTick(object sender, EventArgs e)
@@ -412,22 +452,6 @@ namespace JiaRemoteWin
                 {
                     _selectedPort = port;
                 }
-            }
-        }
-
-        private void ManualIpInput_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            if (DeviceNameText == null || DeviceIpText == null || StatusText == null) return;
-
-            string ip = ManualIpInput.Text.Trim();
-            if (!string.IsNullOrEmpty(ip))
-            {
-                _selectedHost = ip;
-                DeviceNameText.Text = "手动连接";
-                DeviceIpText.Text = ip;
-                DeviceDot.Fill = new SolidColorBrush(Color.FromRgb(0x0A, 0x84, 0xFF));
-                StatusText.Text = "输入 IP · 点击连接";
-                StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x0A, 0x84, 0xFF));
             }
         }
 

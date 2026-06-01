@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace JiaRemoteWin
 {
@@ -12,8 +15,9 @@ namespace JiaRemoteWin
     {
         public const int DefaultPort = 9527;
         public const int MaxFrameSize = 256 * 1024 * 1024;
+        public const uint CompressionFlag = 0x80000000;
 
-        private static readonly byte[] FrameMagic = { 0x4A, 0x52, 0x4D, 0x43 };
+        public static readonly byte[] FrameMagic = { 0x4A, 0x52, 0x4D, 0x43 };
         private static readonly byte[] CmdMagic = { 0x4A, 0x52, 0x43, 0x4D };
 
         public struct FrameHeader
@@ -130,6 +134,35 @@ namespace JiaRemoteWin
             Array.Copy(headerBytes, result, headerBytes.Length);
             Array.Copy(pixelData, 0, result, headerBytes.Length, pixelData.Length);
             return result;
+        }
+
+        public static bool IsCompressed(uint pixelFormat)
+        {
+            return (pixelFormat & CompressionFlag) != 0;
+        }
+
+        public static byte[] DecompressToBGRA(byte[] compressedData, int width, int height)
+        {
+            try
+            {
+                using (var ms = new MemoryStream(compressedData))
+                {
+                    var decoder = new JpegBitmapDecoder(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                    var frame = decoder.Frames[0];
+
+                    // 将帧转为 32bpp BGRA
+                    var converted = new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
+                    int stride = width * 4;
+                    byte[] pixels = new byte[height * stride];
+                    converted.CopyPixels(pixels, stride, 0);
+                    return pixels;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[JiaProtocol] JPEG 解码失败: {ex.Message}");
+                return null;
+            }
         }
     }
 

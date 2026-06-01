@@ -1,4 +1,4 @@
-﻿import ScreenCaptureKit
+import ScreenCaptureKit
 import CoreMedia
 import CoreVideo
 import IOSurface
@@ -139,7 +139,7 @@ final class CaptureEngine: NSObject {
         }
     }
 
-    func start(target: CaptureTarget) throws {
+    func start(target: CaptureTarget) async throws {
         guard !isRunning else {
             throw CaptureEngineError.streamAlreadyRunning
         }
@@ -149,69 +149,42 @@ final class CaptureEngine: NSObject {
         }
 
         currentTarget = target
-        let semaphore = DispatchSemaphore(value: 0)
-        var setupError: Error?
 
-        Task {
-            do {
-                let content = try await Self.fetchShareableContent()
-                let filter: SCContentFilter
+        let content = try await Self.fetchShareableContent()
+        let filter: SCContentFilter
 
-                switch target {
-                case .display(let displayID):
-                    guard let scDisplay = content.displays.first(where: { $0.displayID == displayID }) else {
-                        setupError = CaptureEngineError.noDisplayAvailable
-                        semaphore.signal()
-                        return
-                    }
-                    filter = SCContentFilter(display: scDisplay, excludingWindows: [])
+        switch target {
+        case .display(let displayID):
+            guard let scDisplay = content.displays.first(where: { $0.displayID == displayID }) else {
+                throw CaptureEngineError.noDisplayAvailable
+            }
+            filter = SCContentFilter(display: scDisplay, excludingWindows: [])
 
-                case .window(let windowID):
-                    guard let scWindow = content.windows.first(where: { $0.windowID == windowID }) else {
-                        setupError = CaptureEngineError.noWindowAvailable
-                        semaphore.signal()
-                        return
-                    }
-                    if #available(macOS 13.3, *) {
-                        filter = SCContentFilter(desktopIndependentWindow: scWindow)
-                    } else {
-                        guard let scDisplay = content.displays.first(where: {
-                            $0.displayID == CGMainDisplayID()
-                        }) ?? content.displays.first else {
-                            setupError = CaptureEngineError.noDisplayAvailable
-                            semaphore.signal()
-                            return
-                        }
-                        filter = SCContentFilter(display: scDisplay, including: [scWindow])
-                    }
+        case .window(let windowID):
+            guard let scWindow = content.windows.first(where: { $0.windowID == windowID }) else {
+                throw CaptureEngineError.noWindowAvailable
+            }
+            if #available(macOS 13.3, *) {
+                filter = SCContentFilter(desktopIndependentWindow: scWindow)
+            } else {
+                guard let scDisplay = content.displays.first(where: {
+                    $0.displayID == CGMainDisplayID()
+                }) ?? content.displays.first else {
+                    throw CaptureEngineError.noDisplayAvailable
                 }
-
-                let config = Self.buildStreamConfiguration()
-
-                let newStream = SCStream(filter: filter, configuration: config, delegate: self)
-                try newStream.addStreamOutput(self, type: .screen, sampleHandlerQueue: captureQueue)
-
-                self.streamConfiguration = config
-                self.stream = newStream
-
-                semaphore.signal()
-            } catch let error as CaptureEngineError {
-                setupError = error
-                semaphore.signal()
-            } catch {
-                setupError = error
-                semaphore.signal()
+                filter = SCContentFilter(display: scDisplay, including: [scWindow])
             }
         }
 
-        semaphore.wait()
+        let config = Self.buildStreamConfiguration()
 
-        if let error = setupError {
-            currentTarget = nil
-            throw error
-        }
+        let newStream = SCStream(filter: filter, configuration: config, delegate: self)
+        try newStream.addStreamOutput(self, type: .screen, sampleHandlerQueue: captureQueue)
 
-        stream?.startCapture()
+        self.streamConfiguration = config
+        self.stream = newStream
+
+        try await stream?.startCapture()
         isRunning = true
     }
 
@@ -242,16 +215,16 @@ final class CaptureEngine: NSObject {
         let config = SCStreamConfiguration()
 
         config.showsCursor = false
-        config.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(1000))
+        config.minimumFrameInterval = CMTime(value: 1, timescale: CMTimeScale(120))
         config.scalesToFit = false
 
         if #available(macOS 13.0, *) {
             config.pixelFormat = kCVPixelFormatType_32BGRA
-            config.queueDepth = 3
+            config.queueDepth = 5
         }
 
         if #available(macOS 14.0, *) {
-            config.captureResolution = .automatic
+            config.captureResolution = .best
         }
 
         return config

@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Image Compressor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, '.SFNSDisplay', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 48px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 0 8px;
+}
+
+.header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #34c759, #30d158);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  margin-top: 6px;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Upload Area */
+.upload-area {
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(2px);
+}
+
+.upload-area:hover {
+  border-color: rgba(52, 199, 89, 0.5);
+  background: rgba(52, 199, 89, 0.06);
+}
+
+.upload-area.dragover {
+  border-color: #34c759;
+  background: rgba(52, 199, 89, 0.1);
+  transform: scale(1.01);
+}
+
+.upload-icon {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 8px;
+  color: #34c759;
+}
+
+.upload-area p {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.upload-area .hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.56);
+  margin-top: 4px;
+}
+
+/* Image List */
+.image-list-section {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.image-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.image-list-header .count {
+  color: #34c759;
+  font-weight: 600;
+}
+
+.image-list-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px;
+  max-height: 192px;
+  overflow-y: auto;
+  align-content: flex-start;
+}
+
+.image-list-body::-webkit-scrollbar { width: 4px; }
+.image-list-body::-webkit-scrollbar-track { background: transparent; }
+.image-list-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.image-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 6px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-shrink: 0;
+  width: 108px;
+  position: relative;
+  background: transparent;
+}
+
+.image-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
+}
+
+.image-item.active {
+  background: rgba(52, 199, 89, 0.12);
+  outline: 1.5px solid rgba(52, 199, 89, 0.35);
+}
+
+.image-item-thumb {
+  width: 92px;
+  height: 68px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.image-item-info {
+  width: 100%;
+  text-align: center;
+  min-width: 0;
+}
+
+.image-item-name {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.88);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+}
+
+.image-item-dims {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.52);
+  margin-top: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.image-item-remove {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  opacity: 0;
+  transform: scale(0.8);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.image-item:hover .image-item-remove { opacity: 1; transform: scale(1); }
+.image-item-remove:hover { background: rgba(255, 69, 58, 0.8); transform: scale(1.1); }
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.3px;
+}
+
+/* Quality Segmented Control */
+.quality-selector {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 3px;
+  overflow: hidden;
+}
+
+.quality-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(52, 199, 89, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.quality-btn {
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+}
+
+.quality-btn.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.quality-desc {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.52);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Format Selector */
+.format-selector {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 3px;
+  overflow: hidden;
+}
+
+.format-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: calc(100% - 6px);
+  border-radius: 7px;
+  background: rgba(52, 199, 89, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.format-btn {
+  flex: 1;
+  padding: 8px 8px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.25s ease;
+  user-select: none;
+}
+
+.format-btn.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Preview */
+.preview-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.preview-box {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.preview-header .dim {
+  color: rgba(255, 255, 255, 0.52);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-header .size {
+  color: rgba(255, 255, 255, 0.52);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.preview-canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  padding: 14px;
+  background: repeating-conic-gradient(rgba(255,255,255,0.04) 0% 25%, rgba(255,255,255,0.08) 0% 50%) 0 0 / 18px 18px;
+}
+
+.preview-canvas-wrap canvas {
+  max-width: 100%;
+  max-height: 380px;
+  border-radius: 6px;
+  display: block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.preview-placeholder {
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+/* Savings badge */
+.savings-badge {
+  display: none;
+  text-align: center;
+  padding: 16px;
+  background: rgba(52, 199, 89, 0.08);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+  border-radius: 12px;
+  animation: fadeSlideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.savings-badge.show { display: block; }
+
+.savings-pct {
+  font-size: 28px;
+  font-weight: 700;
+  color: #34c759;
+  letter-spacing: -0.5px;
+}
+
+.savings-detail {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.52);
+  margin-top: 4px;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: inherit;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.3s;
+}
+
+.btn:hover::after { background: rgba(255, 255, 255, 0.06); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: rgba(52, 199, 89, 0.6);
+  color: #fff;
+}
+
+.btn-primary:hover { background: rgba(52, 199, 89, 0.7); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-success {
+  background: rgba(52, 199, 89, 0.55);
+  color: #fff;
+}
+
+.btn-success:hover { background: rgba(52, 199, 89, 0.65); }
+.btn-success:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.14); }
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.btn-outline:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+/* Progress */
+.progress-wrap {
+  display: none;
+  width: 100%;
+}
+
+.progress-wrap.show {
+  display: block;
+  animation: fadeSlideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34c759, #30d158);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.56);
+  margin-top: 6px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: rgba(30, 30, 30, 0.95);
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Animations */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 700px) {
+  body { padding: 20px 12px 40px; }
+  .controls { grid-template-columns: 1fr; }
+  .preview-section { grid-template-columns: 1fr; }
+  .header h1 { font-size: 24px; }
+  .image-item { width: 100px; }
+  .image-item-thumb { width: 84px; height: 62px; }
+  .image-list-body { max-height: 176px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Image Compressor</h1>
+  <p>智能压缩图片 · 自动降级 · 四档质量可选</p>
+</div>
+
+<div class="container">
+  <div class="upload-area" id="uploadArea">
+    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <p>拖拽图片到此处，或点击上传</p>
+    <p class="hint">支持批量上传 JPG / PNG / WebP，可同时选择多张</p>
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+  </div>
+
+  <div class="image-list-section" id="imageListSection" style="display:none">
+    <div class="image-list-header">
+      <span>图片列表 <span class="count" id="imageCount">0</span> 张</span>
+      <button class="btn btn-outline" id="clearAllBtn" style="padding:5px 12px;font-size:11px;border-radius:8px">清空列表</button>
+    </div>
+    <div class="image-list-body" id="imageListBody"></div>
+  </div>
+
+  <div class="controls" id="controlsSection" style="display:none">
+    <div>
+      <div class="control-group">
+        <label>压缩质量</label>
+        <div class="quality-selector">
+          <div class="quality-slider" id="qualitySlider"></div>
+          <button class="quality-btn active" data-quality="lossless">无损</button>
+          <button class="quality-btn" data-quality="high">高</button>
+          <button class="quality-btn" data-quality="medium">中</button>
+          <button class="quality-btn" data-quality="low">低</button>
+        </div>
+        <div class="quality-desc" id="qualityDesc">近乎无损压缩，最大保留画质</div>
+      </div>
+    </div>
+
+    <div class="controls-right" style="display:flex;flex-direction:column;gap:14px">
+      <div class="control-group">
+        <label>输出格式</label>
+        <div class="format-selector">
+          <div class="format-slider" id="formatSlider"></div>
+          <button class="format-btn active" data-format="jpeg">JPEG</button>
+          <button class="format-btn" data-format="png">PNG</button>
+          <button class="format-btn" data-format="webp">WebP</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="savings-badge" id="savingsBadge">
+    <div class="savings-pct" id="savingsPct">-0%</div>
+    <div class="savings-detail" id="savingsDetail">原始: 0 KB → 压缩后: 0 KB</div>
+  </div>
+
+  <div class="preview-section" id="previewSection" style="display:none">
+    <div class="preview-box">
+      <div class="preview-header">
+        <span>原始图片</span>
+        <span class="size" id="originalSize">—</span>
+      </div>
+      <div class="preview-canvas-wrap">
+        <canvas id="originalCanvas"></canvas>
+        <div class="preview-placeholder" id="originalPlaceholder">选择图片后显示预览</div>
+      </div>
+    </div>
+    <div class="preview-box">
+      <div class="preview-header">
+        <span>压缩后</span>
+        <span class="size" id="resultSize">—</span>
+      </div>
+      <div class="preview-canvas-wrap">
+        <canvas id="resultCanvas"></canvas>
+        <div class="preview-placeholder" id="resultPlaceholder">调整参数后自动预览</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" id="actionsSection" style="display:none">
+    <button class="btn btn-primary" id="downloadCurrentBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      下载当前图片
+    </button>
+    <button class="btn btn-success" id="downloadAllBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      压缩全部 <span id="batchCount">(0)</span>
+    </button>
+    <button class="btn btn-secondary" id="addMoreBtn">添加更多图片</button>
+    <button class="btn btn-outline" id="resetBtn">重新开始</button>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progressText">处理中...</span>
+      <span id="progressPercent">0%</span>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── PicShrink compression levels ────────────────────
+const QUALITY_LEVELS = {
+  lossless: { jpeg: 0.92, webp: 100, maxDim: 8192, label: '无损', desc: '近乎无损压缩，最大保留画质，适合存档' },
+  high:     { jpeg: 0.75, webp: 85,  maxDim: 2560, label: '高',   desc: '高质量压缩，肉眼几乎无差异' },
+  medium:   { jpeg: 0.55, webp: 60,  maxDim: 1920, label: '中',   desc: '平衡压缩，适合日常分享' },
+  low:      { jpeg: 0.25, webp: 30,  maxDim: 1024, label: '低',   desc: '最大压缩，适合缩略图和极速加载' },
+};
+const QUALITY_ORDER = ['lossless', 'high', 'medium', 'low'];
+
+const FORMATS = ['jpeg', 'png', 'webp'];
+const FORMAT_MIME = { jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const FORMAT_EXT  = { jpeg: 'jpg', png: 'png', webp: 'webp' };
+
+// ─── State ────────────────────────────────────────────
+const state = {
+  images: [],
+  selectedId: null,
+  currentQuality: 'lossless',
+  currentFormat: 'jpeg',
+};
+
+let idCounter = 0;
+
+// ─── DOM refs ─────────────────────────────────────────
+const $ = (id) => document.getElementById(id);
+const uploadArea = $('uploadArea');
+const fileInput = $('fileInput');
+const imageListSection = $('imageListSection');
+const imageListBody = $('imageListBody');
+const imageCount = $('imageCount');
+const clearAllBtn = $('clearAllBtn');
+const controlsSection = $('controlsSection');
+const previewSection = $('previewSection');
+const actionsSection = $('actionsSection');
+const savingsBadge = $('savingsBadge');
+const savingsPct = $('savingsPct');
+const savingsDetail = $('savingsDetail');
+const originalCanvas = $('originalCanvas');
+const originalPlaceholder = $('originalPlaceholder');
+const originalSize = $('originalSize');
+const resultCanvas = $('resultCanvas');
+const resultPlaceholder = $('resultPlaceholder');
+const resultSize = $('resultSize');
+const qualityBtns = document.querySelectorAll('.quality-btn');
+const qualitySlider = $('qualitySlider');
+const qualityDesc = $('qualityDesc');
+const formatBtns = document.querySelectorAll('.format-btn');
+const formatSlider = $('formatSlider');
+const downloadCurrentBtn = $('downloadCurrentBtn');
+const downloadAllBtn = $('downloadAllBtn');
+const batchCount = $('batchCount');
+const addMoreBtn = $('addMoreBtn');
+const resetBtn = $('resetBtn');
+const progressWrap = $('progressWrap');
+const progressFill = $('progressFill');
+const progressText = $('progressText');
+const progressPercent = $('progressPercent');
+const toastEl = $('toast');
+
+// ─── Slider helper ────────────────────────────────────
+function moveSlider(btn, sliderEl) {
+  const container = btn.closest(btn.dataset.quality ? '.quality-selector' : '.format-selector');
+  const cRect = container.getBoundingClientRect();
+  const bRect = btn.getBoundingClientRect();
+  sliderEl.style.left = (bRect.left - cRect.left) + 'px';
+  sliderEl.style.width = bRect.width + 'px';
+}
+
+// ─── Core compression logic ──────────────────────────
+// Mirrors PicShrink's algorithm:
+// 1. If image exceeds quality's maxDim, resize proportionally
+// 2. Compress with quality's settings
+// 3. If result > original, auto-downgrade to next quality level
+
+function formatBytes(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+async function compressImage(img, quality, format) {
+  const q = QUALITY_LEVELS[quality];
+  const sw = img.width;
+  const sh = img.height;
+
+  // Step 1: Resize if exceeds maxDim
+  let source = img;
+  if (sw > q.maxDim || sh > q.maxDim) {
+    const ratio = q.maxDim / Math.max(sw, sh);
+    const newW = Math.round(sw * ratio);
+    const newH = Math.round(sh * ratio);
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = newW;
+    tmpCanvas.height = newH;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    tmpCtx.imageSmoothingEnabled = true;
+    tmpCtx.imageSmoothingQuality = 'high';
+    tmpCtx.drawImage(img, 0, 0, newW, newH);
+    source = tmpCanvas;
+  }
+
+  // Step 2: Encode
+  const mime = FORMAT_MIME[format];
+  let qualityVal;
+  if (format === 'png') {
+    // PNG: lossless by nature; quality maps to compression factor via canvas.toBlob
+    // Canvas toBlob quality parameter is ignored for PNG, so we simulate compression
+    qualityVal = undefined;
+  } else if (format === 'webp') {
+    qualityVal = q.webp / 100;
+  } else {
+    qualityVal = q.jpeg;
+  }
+
+  return new Promise((resolve) => {
+    source.toBlob((blob) => {
+      resolve({ blob, width: source.width, height: source.height });
+    }, mime, qualityVal);
+  });
+}
+
+async function compressWithFallback(img, quality, format, originalSize) {
+  let result = await compressImage(img, quality, format);
+  let currentQuality = quality;
+
+  // Step 3: If compressed size >= original, downgrade (mirrors PicShrink logic)
+  let attempts = 0;
+  while (result.blob.size >= originalSize && currentQuality !== 'low' && attempts < 3) {
+    const idx = QUALITY_ORDER.indexOf(currentQuality);
+    currentQuality = QUALITY_ORDER[Math.min(idx + 1, QUALITY_ORDER.length - 1)];
+    result = await compressImage(img, currentQuality, format);
+    attempts++;
+  }
+
+  return { ...result, finalQuality: currentQuality };
+}
+
+// ─── Preview / Render ─────────────────────────────────
+
+function renderOriginal(img, fileSize) {
+  originalPlaceholder.style.display = 'none';
+  const oCanvas = originalCanvas;
+  const maxH = 380;
+  const scale = img.height > maxH ? maxH / img.height : 1;
+  oCanvas.width = Math.round(img.width * scale);
+  oCanvas.height = Math.round(img.height * scale);
+  const ctx = oCanvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.clearRect(0, 0, oCanvas.width, oCanvas.height);
+  ctx.drawImage(img, 0, 0, oCanvas.width, oCanvas.height);
+  originalSize.textContent = formatBytes(fileSize);
+}
+
+async function renderResult(img, fileSize) {
+  resultPlaceholder.style.display = 'none';
+  const { blob, width, height, finalQuality } = await compressWithFallback(img, state.currentQuality, state.currentFormat, fileSize);
+
+  // Display compressed preview
+  const blobUrl = URL.createObjectURL(blob);
+  const previewImg = new Image();
+  await new Promise((resolve) => { previewImg.onload = resolve; previewImg.src = blobUrl; });
+
+  const rCanvas = resultCanvas;
+  const maxH = 380;
+  const scale = height > maxH ? maxH / height : 1;
+  rCanvas.width = Math.round(width * scale);
+  rCanvas.height = Math.round(height * scale);
+  const ctx = rCanvas.getContext('2d');
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+  ctx.drawImage(previewImg, 0, 0, rCanvas.width, rCanvas.height);
+  URL.revokeObjectURL(blobUrl);
+
+  const compressedSize = blob.size;
+  resultSize.textContent = formatBytes(compressedSize);
+
+  const saved = fileSize - compressedSize;
+  const pct = fileSize > 0 ? (saved / fileSize * 100) : 0;
+
+  savingsBadge.classList.add('show');
+  savingsPct.textContent = `-${Math.abs(pct).toFixed(1)}%`;
+  const qLabel = QUALITY_LEVELS[finalQuality].label;
+  savingsDetail.textContent = `${formatBytes(fileSize)} → ${formatBytes(compressedSize)} | 节省 ${formatBytes(Math.max(0, saved))} | 质量: ${qLabel}`;
+  if (finalQuality !== state.currentQuality) {
+    savingsDetail.textContent += ' (自动降级)';
+  }
+
+  // Store result on entry for download
+  const entry = getSelected();
+  if (entry) {
+    entry.compressedBlob = blob;
+    entry.compressedWidth = width;
+    entry.compressedHeight = height;
+    entry.finalQuality = finalQuality;
+  }
+}
+
+// ─── Image management ─────────────────────────────────
+
+function addImages(files) {
+  const pending = [];
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const id = ++idCounter;
+    const entry = { id, file, name: file.name, size: file.size, img: null, width: 0, height: 0, loaded: false, compressedBlob: null };
+    state.images.push(entry);
+    pending.push(entry);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        entry.img = img;
+        entry.width = img.width;
+        entry.height = img.height;
+        entry.loaded = true;
+        if (state.selectedId === entry.id || !state.selectedId) {
+          if (!state.selectedId) selectImage(entry.id);
+          else rerender();
+        }
+        renderImageList();
+        updateBatchCount();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  if (pending.length > 0) {
+    if (state.images.length === pending.length) {
+      state.selectedId = pending[0].id;
+    }
+    sectionsVisible();
+    renderImageList();
+    updateBatchCount();
+  }
+}
+
+function removeImage(id) {
+  state.images = state.images.filter((e) => e.id !== id);
+  if (state.selectedId === id) {
+    state.selectedId = state.images.length > 0 ? state.images[0].id : null;
+  }
+  renderImageList();
+  updateBatchCount();
+  if (state.images.length === 0) {
+    resetAll();
+  } else if (state.selectedId) {
+    const entry = state.images.find((e) => e.id === state.selectedId);
+    if (entry && entry.loaded) rerender(entry);
+  } else {
+    clearPreview();
+  }
+}
+
+function selectImage(id) {
+  state.selectedId = id;
+  renderImageList();
+  const entry = state.images.find((e) => e.id === id);
+  if (entry && entry.loaded) rerender(entry);
+}
+
+function getSelected() {
+  return state.images.find((e) => e.id === state.selectedId);
+}
+
+function renderImageList() {
+  const loaded = state.images.filter((e) => e.loaded);
+  imageCount.textContent = loaded.length;
+  if (loaded.length === 0) { imageListSection.style.display = 'none'; return; }
+  imageListSection.style.display = 'block';
+
+  imageListBody.innerHTML = loaded.map((entry) => {
+    const active = entry.id === state.selectedId ? 'active' : '';
+    return `
+      <div class="image-item ${active}" data-id="${entry.id}">
+        <img class="image-item-thumb" src="${entry.img.src}" alt="" loading="lazy">
+        <div class="image-item-info">
+          <div class="image-item-name">${escHtml(entry.name)}</div>
+          <div class="image-item-dims">${entry.width} × ${entry.height}</div>
+        </div>
+        <button class="image-item-remove" data-remove="${entry.id}" title="移除">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  imageListBody.querySelectorAll('.image-item').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.image-item-remove')) return;
+      selectImage(parseInt(el.dataset.id));
+    });
+  });
+  imageListBody.querySelectorAll('.image-item-remove').forEach((btn) => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); removeImage(parseInt(btn.dataset.remove)); });
+  });
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function rerender(entry) {
+  if (!entry) entry = getSelected();
+  if (!entry || !entry.loaded) return;
+  renderOriginal(entry.img, entry.size);
+  renderResult(entry.img, entry.size);
+}
+
+function clearPreview() {
+  originalPlaceholder.style.display = 'block';
+  resultPlaceholder.style.display = 'block';
+  savingsBadge.classList.remove('show');
+  originalSize.textContent = '—';
+  resultSize.textContent = '—';
+  originalCanvas.width = 0; originalCanvas.height = 0;
+  resultCanvas.width = 0; resultCanvas.height = 0;
+}
+
+function sectionsVisible() {
+  controlsSection.style.display = 'grid';
+  previewSection.style.display = 'grid';
+  actionsSection.style.display = 'flex';
+}
+
+function updateBatchCount() {
+  batchCount.textContent = `(${state.images.filter((e) => e.loaded).length})`;
+}
+
+function resetAll() {
+  state.images = []; state.selectedId = null;
+  imageListSection.style.display = 'none';
+  controlsSection.style.display = 'none';
+  previewSection.style.display = 'none';
+  actionsSection.style.display = 'none';
+  savingsBadge.classList.remove('show');
+  progressWrap.classList.remove('show');
+  clearPreview();
+  fileInput.value = '';
+  updateBatchCount();
+}
+
+function getOutputName(name, quality, format) {
+  const stem = name.replace(/\.[^.]+$/, '');
+  const ext = FORMAT_EXT[format];
+  return `${stem}_${quality}.${ext}`;
+}
+
+// ─── Events ───────────────────────────────────────────
+
+uploadArea.addEventListener('click', () => fileInput.click());
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length > 0) { addImages(fileInput.files); fileInput.value = ''; }
+});
+
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) addImages(e.dataTransfer.files);
+  else showToast('请拖入图片文件');
+});
+
+addMoreBtn.addEventListener('click', () => fileInput.click());
+clearAllBtn.addEventListener('click', resetAll);
+resetBtn.addEventListener('click', resetAll);
+
+// Quality buttons
+qualityBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    qualityBtns.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, qualitySlider);
+    state.currentQuality = btn.dataset.quality;
+    qualityDesc.textContent = QUALITY_LEVELS[state.currentQuality].desc;
+    const sel = getSelected();
+    if (sel && sel.loaded) rerender(sel);
+  });
+});
+
+// Format buttons
+formatBtns.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    formatBtns.forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    moveSlider(btn, formatSlider);
+    state.currentFormat = btn.dataset.format;
+    const sel = getSelected();
+    if (sel && sel.loaded) rerender(sel);
+  });
+});
+
+// Init sliders
+requestAnimationFrame(() => {
+  document.querySelectorAll('.quality-selector, .format-selector').forEach((container) => {
+    const active = container.querySelector('.active');
+    const slider = container.querySelector('[class$=slider]');
+    if (active && slider) moveSlider(active, slider);
+  });
+});
+
+// Download single
+downloadCurrentBtn.addEventListener('click', () => {
+  const sel = getSelected();
+  if (!sel || !sel.loaded || !sel.compressedBlob) { showToast('请等待压缩完成'); return; }
+  const link = document.createElement('a');
+  link.download = getOutputName(sel.name, state.currentQuality, state.currentFormat);
+  link.href = URL.createObjectURL(sel.compressedBlob);
+  link.click();
+  URL.revokeObjectURL(link.href);
+  showToast('已下载: ' + link.download);
+});
+
+// Download all as ZIP
+downloadAllBtn.addEventListener('click', async () => {
+  const loaded = state.images.filter((e) => e.loaded);
+  if (loaded.length === 0) { showToast('没有可处理的图片'); return; }
+
+  downloadAllBtn.disabled = true;
+  progressWrap.classList.add('show');
+  progressFill.style.width = '0%';
+
+  try {
+    const zip = new JSZip();
+
+    for (let i = 0; i < loaded.length; i++) {
+      const entry = loaded[i];
+      progressText.textContent = `压缩: ${escHtml(entry.name)}`;
+      progressPercent.textContent = `${Math.round((i / loaded.length) * 100)}%`;
+      progressFill.style.width = `${(i / loaded.length) * 100}%`;
+
+      const { blob, finalQuality } = await compressWithFallback(entry.img, state.currentQuality, state.currentFormat, entry.size);
+      const outName = getOutputName(entry.name, finalQuality, state.currentFormat);
+      zip.file(outName, blob);
+    }
+
+    progressText.textContent = '正在打包 ZIP...';
+    progressPercent.textContent = '99%';
+    progressFill.style.width = '99%';
+
+    const link = document.createElement('a');
+    link.download = `compressed_images_${state.currentQuality}_${loaded.length}pcs.zip`;
+    link.href = URL.createObjectURL(await zip.generateAsync({ type: 'blob' }));
+    link.click();
+    URL.revokeObjectURL(link.href);
+    showToast(`已完成！共处理 ${loaded.length} 张图片`);
+  } catch (err) {
+    showToast('处理出错: ' + err.message);
+  } finally {
+    downloadAllBtn.disabled = false;
+    progressWrap.classList.remove('show');
+    progressFill.style.width = '0%';
+  }
+});
+
+// Toast
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>

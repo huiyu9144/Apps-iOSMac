@@ -41,7 +41,9 @@ namespace JiaRemoteWin
                 string err = $"启动失败: {ex.Message}\n{ex.StackTrace}\n\nInner: {ex.InnerException?.Message}";
                 Debug.WriteLine($"[JiaRemote] {err}");
                 System.Console.Error.WriteLine(err);
-                System.IO.File.WriteAllText(@"C:\Users\Administrator\Desktop\jia_error.log", err);
+                System.IO.File.WriteAllText(
+                    @"C:\Users\Administrator\Desktop\jia_error_" +
+                    DateTime.Now.ToString("HHmmss") + ".log", err);
                 MessageBox.Show(err, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown(1);
             }
