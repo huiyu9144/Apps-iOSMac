@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormatQuick - 支持</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 680px; margin: 0 auto; padding: 60px 24px; }
+        .header { text-align: center; margin-bottom: 48px; }
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .header p { font-size: 16px; color: #6e6e73; }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .card h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .card p, .card li { font-size: 14px; color: #424245; }
+        .card ul { padding-left: 20px; }
+        .card li { margin-bottom: 6px; }
+        .faq-item { margin-bottom: 16px; }
+        .faq-item h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        .faq-item p { font-size: 13px; color: #6e6e73; }
+        .contact {
+            text-align: center;
+            padding: 24px;
+        }
+        .contact a {
+            color: #0071e3;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact a:hover { text-decoration: underline; }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #86868b;
+            margin-top: 40px;
+        }
+        .lang-switch {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .lang-switch a {
+            font-size: 13px;
+            color: #0071e3;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        .lang-switch a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FormatQuick</h1>
+            <p>批量图片格式转换工具</p>
+        </div>
+
+        <div class="lang-switch">
+            <a href="#zh">中文</a>
+            <a href="#en">English</a>
+        </div>
+
+        <!-- 中文 -->
+        <div id="zh">
+            <div class="card">
+                <h2>关于 FormatQuick</h2>
+                <p>FormatQuick 是一款 macOS 菜单栏工具，帮助您快速批量转换图片格式。支持 JPG、HEIC、GIF 格式互转，可调整图片质量和尺寸，保留照片信息。</p>
+            </div>
+
+            <div class="card">
+                <h2>常见问题</h2>
+                <div class="faq-item">
+                    <h3>支持哪些图片格式？</h3>
+                    <p>目前支持 JPG、HEIC、GIF 三种输出格式。输入支持常见的图片格式（PNG、JPG、HEIC、WebP、GIF、TIFF、BMP 等）。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>转换后的文件保存在哪里？</h3>
+                    <p>转换后的文件保存在临时文件夹中，转换完成后会自动打开文件夹供您查看。您可以将文件移动到任意位置。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>如何调整图片质量？</h3>
+                    <p>在选项区域可以通过滑块调整输出质量，百分比越高画质越好，文件也越大。建议 JPG 设为 30%-70% 以获得较好的平衡。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>调整尺寸有什么作用？</h3>
+                    <p>开启后可以设定图片的最大宽度和高度，程序会自动缩放图片。支持适应（保持比例）、填充（裁剪适应）、拉伸三种模式。</p>
+                </div>
+                <div class="faq-item">
+                    <h3>保留照片信息是什么？</h3>
+                    <p>开启后会保留图片的 EXIF 信息（如拍摄日期、相机型号、GPS 位置等）。</p>
+                </div>
+            </div>
+
+            <div class="card contact">
+                <h2>联系我们</h2>
+                <p>如有问题或建议，请发送邮件至：<br><a href="mailto:support@formatquick.app">support@formatquick.app</a></p>
+            </div>
+        </div>
+
+        <!-- English -->
+        <div id="en" style="display:none;">
+            <div class="card">
+                <h2>About FormatQuick</h2>
+                <p>FormatQuick is a macOS menu bar tool for batch image format conversion. It supports JPG, HEIC, and GIF output formats, with adjustable quality and resize options, while preserving photo metadata.</p>
+            </div>
+
+            <div class="card">
+                <h2>FAQ</h2>
+                <div class="faq-item">
+                    <h3>What formats are supported?</h3>
+                    <p>Output: JPG, HEIC, GIF. Input: common image formats including PNG, JPG, HEIC, WebP, GIF, TIFF, BMP, etc.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Where are converted files saved?</h3>
+                    <p>Converted files are saved to a temporary folder, which opens automatically after conversion. You can move them to any location.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How to adjust image quality?</h3>
+                    <p>Use the slider in the options area. Higher percentage means better quality but larger file size. For JPG, 30%-70% is recommended for a good balance.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What does resize do?</h3>
+                    <p>When enabled, you can set max width and height. Three modes: Fit (maintains aspect ratio), Fill (crops to fit), Stretch (distorts to fit).</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What is "Keep Photo Info"?</h3>
+                    <p>When enabled, EXIF metadata (date taken, camera model, GPS location, etc.) is preserved in the output.</p>
+                </div>
+            </div>
+
+            <div class="card contact">
+                <h2>Contact Us</h2>
+                <p>For questions or feedback:<br><a href="mailto:support@formatquick.app">support@formatquick.app</a></p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>FormatQuick &copy; 2025. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple language toggle
+        document.querySelectorAll('.lang-switch a').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var target = this.getAttribute('href').substring(1);
+                document.getElementById('zh').style.display = target === 'zh' ? 'block' : 'none';
+                document.getElementById('en').style.display = target === 'en' ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

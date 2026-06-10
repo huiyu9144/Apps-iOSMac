@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -24,6 +24,9 @@
         .faq-item { margin-bottom: 20px; }
         .faq-item h4 { color: #333; margin-bottom: 8px; }
         .faq-item p { color: #666; }
+        .policy-box { background: #fff8e1; padding: 20px; border-radius: 12px; border-left: 4px solid #ffc107; margin-top: 20px; }
+        .policy-box p { color: #666; }
+        .privacy-badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 500; }
         footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.9em; }
     </style>
 </head>
@@ -33,57 +36,109 @@
         
         <h1> Support Center</h1>
         
-        <p>Welcome to the Apps-iOSMac Support Center. We are here to help you get the best experience with our products. If you have any questions, issues, or feedback, please use one of the contact methods below.</p>
+        <p>Welcome to the Apps-iOSMac Support Center. We are committed to providing you with the best possible experience across all of our macOS applications. Whether you need help with installation, features, permissions, or troubleshooting, you've come to the right place.</p>
         
         <div class="contact-box">
             <h3> Contact Us</h3>
             <p> Email: <a href="mailto:361512234@qq.com">361512234@qq.com</a></p>
             <p> GitHub Issues: <a href="https://github.com/huiyu9144/Apps-iOSMac/issues" target="_blank">https://github.com/huiyu9144/Apps-iOSMac/issues</a></p>
-            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">We typically respond within 24-48 hours.</p>
+            <p style="font-size: 0.9em; color: #999; margin-top: 10px;">We typically respond within 24-48 hours. For faster assistance, please include your macOS version and a detailed description of the issue.</p>
         </div>
 
-        <h2>Product Support Pages</h2>
-        <p>Select a product to visit its dedicated support page with FAQs and troubleshooting:</p>
+        <h2>Our Products</h2>
+        <p>Select a product below to visit its dedicated support page with detailed information, FAQs, and troubleshooting guides:</p>
         <ul class="product-list">
-            <li><a href="clean-shot/support.html">CleanShot</a> - Screen capture tool</li>
-            <li><a href="paste-lite/support.html">PasteLite</a> - Clipboard manager</li>
-            <li><a href="find-dup/support.html">FindDup</a> - Duplicate file finder</li>
-            <li><a href="dash-timer/support.html">DashTimer</a> - Menu bar timer</li>
-            <li><a href="quick-ocr/support.html">QuickOCR</a> - OCR text recognition</li>
-            <li><a href="menu-meter/support.html">MenuMeter</a> - System monitor</li>
-            <li><a href="format-quick/support.html">FormatQuick</a> - Text format converter</li>
-            <li><a href="hue-snap/support.html">HueSnap</a> - Color picker</li>
-            <li><a href="net-meter/support.html">NetMeter</a> - Network monitor</li>
-            <li><a href="pic-shrink/support.html">PicShrink</a> - Image compression</li>
-            <li><a href="jia-remote-mac/support.html">JiaRemoteMac</a> - Remote desktop (macOS host)</li>
-            <li><a href="jia-remote-win/support.html">JiaRemoteWin</a> - Remote desktop (Windows client)</li>
-            <li><a href="net-bar/support.html">NetBar</a> - Network traffic monitor</li>
+            <li><a href="clean-shot/support.html">CleanShot</a> - Screen capture & screenshot tool for macOS</li>
+            <li><a href="paste-lite/support.html">PasteLite</a> - Lightweight clipboard manager</li>
+            <li><a href="find-dup/support.html">FindDup</a> - Duplicate file finder and cleaner</li>
+            <li><a href="dash-timer/support.html">DashTimer</a> - Menu bar countdown timer</li>
+            <li><a href="quick-ocr/support.html">QuickOCR</a> - OCR text recognition from screen</li>
+            <li><a href="menu-meter/support.html">MenuMeter</a> - System resource monitor (CPU, memory, disk)</li>
+            <li><a href="format-quick/support.html">FormatQuick</a> - Text format converter (JSON, XML, YAML, CSV)</li>
+            <li><a href="hue-snap/support.html">HueSnap</a> - Color picker and color management tool</li>
+            <li><a href="net-meter/support.html">NetMeter</a> - Network speed and traffic monitor</li>
+            <li><a href="pic-shrink/support.html">PicShrink</a> - Image compression and optimization tool</li>
+            <li><a href="jia-remote-mac/support.html">JiaRemoteMac</a> - Remote desktop host for macOS</li>
+            <li><a href="jia-remote-win/support.html">JiaRemoteWin</a> - Remote desktop client for Windows</li>
+            <li><a href="net-bar/support.html">NetBar</a> - Network traffic monitor with per-process tracking</li>
         </ul>
-        
+
+        <h2>Privacy & Data Policy</h2>
+        <p><span class="privacy-badge"> Privacy First</span></p>
+        <p>All Apps-iOSMac applications are designed with your privacy as a top priority. Here is our commitment to you:</p>
+        <ul>
+            <li><strong>Local Processing Only</strong> - All data processing happens entirely on your device. None of our apps upload, transmit, or share your data with any external servers.</li>
+            <li><strong>No Data Collection</strong> - We do not collect any personal information, usage statistics, or analytics data. No tracking cookies, no telemetry, no user profiling.</li>
+            <li><strong>No Internet Required</strong> - Most of our apps function fully offline. Only apps with network-related features (remote desktop, network monitoring) require local network access, and even then, data stays within your local network.</li>
+            <li><strong>No Third-Party Services</strong> - Our apps do not integrate any third-party analytics, advertising, or data collection SDKs.</li>
+            <li><strong>Transparent Permissions</strong> - Each app only requests permissions that are strictly necessary for its core functionality. We clearly explain why each permission is needed.</li>
+        </ul>
+
+        <h2>Permissions Overview</h2>
+        <p>Some of our apps require specific macOS permissions to function. Here is what each permission is used for:</p>
+        <ul>
+            <li><strong>Screen Recording</strong> - Required by CleanShot (screenshots), QuickOCR (screen text recognition), and JiaRemoteMac (remote screen sharing). This permission is used solely for capturing screen content and is never transmitted externally.</li>
+            <li><strong>Accessibility</strong> - Required by PasteLite (auto-paste) and JiaRemoteMac (remote control input simulation). Used only for the specific automation features you enable.</li>
+            <li><strong>Files & Folders</strong> - Required by FindDup (scanning for duplicates) and PicShrink (accessing images). You control which folders are accessible.</li>
+            <li><strong>Network</strong> - Required by NetMeter, NetBar (traffic monitoring), and JiaRemoteMac/JiaRemoteWin (remote connection). Network data is processed locally and never leaves your device.</li>
+        </ul>
+
         <h2>Frequently Asked Questions (General)</h2>
         
         <div class="faq-item">
             <h4>Q: The app won't launch. What should I do?</h4>
-            <p>A: Please check that your macOS version meets the requirements (macOS 12.0 or later, some apps require 14.0+). If the issue persists, please contact us via email or GitHub Issues.</p>
+            <p>A: First, verify your macOS version meets the minimum requirement (macOS 12.0 or later, some apps require 14.0+). Try moving the app to the Applications folder if you haven't already. If a "damaged" or "unidentified developer" warning appears, go to System Settings > Privacy & Security and click "Open Anyway." If the issue persists, restart your Mac and try again.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>Q: How do I grant permissions to an app?</h4>
+            <p>A: Go to System Settings > Privacy & Security. Find the relevant permission category (Screen Recording, Accessibility, Files & Folders, etc.) and ensure the app is checked. You may need to click the lock icon to make changes. Some permissions require restarting the app after being granted.</p>
         </div>
         
         <div class="faq-item">
             <h4>Q: How do I uninstall an app?</h4>
-            <p>A: Open the Applications folder and drag the app to the Trash. You may also want to check ~/Library/Preferences/ for any leftover configuration files.</p>
+            <p>A: Open the Applications folder in Finder, locate the app, and drag it to the Trash. For a clean removal, you may also want to check ~/Library/Preferences/ for any leftover configuration files (e.g., files starting with the app's bundle identifier) and ~/Library/Application Support/ for any app data folders.</p>
         </div>
         
         <div class="faq-item">
             <h4>Q: Is my data uploaded to the cloud?</h4>
-            <p>A: No. All apps run locally on your device. None of our apps upload your data to any cloud servers. Data is processed and stored entirely on your machine.</p>
+            <p>A: No. All Apps-iOSMac applications process data entirely on your local machine. None of our apps upload your data to any cloud servers, third-party services, or external APIs. Your data stays on your device at all times.</p>
         </div>
         
         <div class="faq-item">
             <h4>Q: How do I submit a bug report or feature request?</h4>
-            <p>A: The best way is to submit an issue on our <a href="https://github.com/huiyu9144/Apps-iOSMac/issues">GitHub Issues page</a>. You can also email us directly.</p>
+            <p>A: The best way is to submit an issue on our <a href="https://github.com/huiyu9144/Apps-iOSMac/issues">GitHub Issues page</a>. Please include your macOS version, app version, and a detailed description of the issue or suggestion. You can also email us directly at <a href="mailto:361512234@qq.com">361512234@qq.com</a>.</p>
         </div>
-        
+
+        <div class="faq-item">
+            <h4>Q: Do I need to purchase a license?</h4>
+            <p>A: All Apps-iOSMac applications are currently free to use. There are no in-app purchases, subscriptions, or license fees. If this changes in the future, we will clearly communicate it to all users.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>Q: The app asks for permissions I'm not comfortable with. Can I still use it?</h4>
+            <p>A: Some features may work with limited functionality if permissions are denied. However, core features of certain apps (e.g., CleanShot without Screen Recording, JiaRemoteMac without Accessibility) will not function properly. We only request permissions that are essential for the app's primary purpose, and we never use them for any other purpose.</p>
+        </div>
+
+        <h2>General Troubleshooting Tips</h2>
+        <ul>
+            <li><strong>Restart the app</strong> - Many issues are resolved by quitting and relaunching the application.</li>
+            <li><strong>Check permissions</strong> - If a feature isn't working, verify that the required permissions are enabled in System Settings > Privacy & Security.</li>
+            <li><strong>Update macOS</strong> - Ensure your system is running a supported version. Some features require macOS 14.0 or later.</li>
+            <li><strong>Reinstall</strong> - If problems persist, try deleting the app and downloading a fresh copy from the official source.</li>
+            <li><strong>Check for conflicts</strong> - Some third-party security software may interfere with app functionality. Try temporarily disabling such software to isolate the issue.</li>
+        </ul>
+
+        <h2>Disclaimer</h2>
+        <div class="policy-box">
+            <p><strong>General Disclaimer</strong></p>
+            <p>All Apps-iOSMac applications are provided "as is" without warranty of any kind, either express or implied, including but not limited to the implied warranties of merchantability and fitness for a particular purpose. The entire risk as to the quality and performance of the software is with you. Should the software prove defective, you assume the cost of all necessary servicing, repair, or correction.</p>
+            <p>In no event shall the developer be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.</p>
+            <p>Some of our apps interact with system-level features (screen recording, accessibility, network monitoring). By using these apps, you acknowledge that you understand the permissions being requested and accept responsibility for their use. These apps are designed for legitimate productivity purposes only and should not be used for any unauthorized monitoring or data collection.</p>
+        </div>
+
         <h2>Feedback & Suggestions</h2>
-        <p>We value your feedback! Please feel free to reach out with any questions, suggestions, or concerns. Your input helps us make better products.</p>
+        <p>We value your feedback! Your input helps us make better products. Whether you have a feature request, a usability suggestion, or just want to say hello, we'd love to hear from you. Please reach out via email or GitHub Issues.</p>
         
         <footer>
             <p>&copy; 2026 Apps-iOSMac. All rights reserved.</p>
