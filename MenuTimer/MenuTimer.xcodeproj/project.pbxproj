@@ -23,7 +23,7 @@
 		6600000D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		6600000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6600000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		66000010 /* MenuTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MenuTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		66000010 /* DashTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DashTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66000021 /* Localized.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localized.swift; sourceTree = "<group>"; };
 		66000023 /* MenuTimer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MenuTimer.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -55,7 +55,7 @@
 		66000008 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				66000010 /* MenuTimer.app */,
+				66000010 /* DashTimer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,7 +76,7 @@
 			);
 			name = DashTimer;
 			productName = DashTimer;
-			productReference = 66000010 /* MenuTimer.app */;
+			productReference = 66000010 /* DashTimer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -89,7 +89,7 @@
 				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1540;
 			};
-			buildConfigurationList = 66000016 /* Build configuration list for PBXProject "DashTimer" */;
+			buildConfigurationList = 66000016 /* Build configuration list for PBXProject "MenuTimer" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = "en-US";
 			hasScannedForEncodings = 0;
@@ -161,7 +161,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DashTimer.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -189,7 +189,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.DashTimer.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -251,7 +251,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		66000015 /* Build configuration list for PBXNativeTarget "MenuTimer" */ = {
+		66000015 /* Build configuration list for PBXNativeTarget "DashTimer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66000013 /* Debug */,
@@ -260,7 +260,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		66000016 /* Build configuration list for PBXProject "DashTimer" */ = {
+		66000016 /* Build configuration list for PBXProject "MenuTimer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				66000018 /* Debug */,
